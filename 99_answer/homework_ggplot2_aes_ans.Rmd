@@ -1,0 +1,78 @@
+---
+title: "可视化作业"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+
+# 读取数据
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+library(gapminder)
+gapminder
+```
+
+## 画出2007年人均寿命与人均GDP的散点图 
+
+提示：人均GDP为x轴，人均寿命为y轴
+
+```{r}
+gapminder_2007 <- gapminder %>% 
+  filter(year == 2007) 
+
+gapminder_2007
+```
+
+
+```{r}
+gapminder_2007 %>% 
+  ggplot(aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point()
+```
+
+## 画出2007年人均寿命的对数与人均GDP对数的散点图
+```{r}
+gapminder_2007_log  <- gapminder_2007 %>% 
+  mutate(
+    gdpPercap = log(gdpPercap),
+      lifeExp = log(lifeExp)
+  )
+gapminder_2007_log
+```
+
+
+```{r}
+gapminder_2007_log %>% 
+  ggplot(aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point()
+```
+
+## 在上图的基础上，给不同的洲添加不同的颜色
+```{r}
+gapminder_2007_log %>%  
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent)) + 
+  geom_point()
+```
+
+
+## 继续在上图的基础上，希望点的大小代表着该国家人口数量
+```{r}
+gapminder_2007_log %>%  
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) + 
+  geom_point()
+```
+
+

@@ -1,0 +1,174 @@
+---
+title: "Working with logistic regression"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+孟加拉国的部分引用水源被天然砷污染，约1亿人口受到影响。长时间接触砷，会增加患癌症和其他疾病的风险。来自美国和孟加拉国的科研团队测量了当地水井砷的含量，并进行了标注（低于0.5个单位视为安全，高于0.5个单位视为不安全）。科研人员鼓励位于不安全水井的居民转移到有安全水源的地方取水。几年之后，科研团队再次返回当地，看看哪些居民转移(switch)了新井。假定我们关注的变量是**是否换到新井**
+
+$$
+y_i = 
+\begin{cases}
+ 1 & \text{if household i switched to a new well} \\
+ 0 & \text{if household i continued using its own well} 
+\end{cases}
+$$
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+wells <- read_csv("./data/wells.csv")
+
+glimpse(wells)
+```
+
+- switch  : 是否换到新井取水
+- arsenic : 砷的含量
+- dist    : 距离安全水井的最短距离(米)
+- dist100 : 距离安全水井的最短距离除以100
+- assoc   : 家庭成员是否参与社区组织
+- educ    : 户主的教育层次
+- educ4   : 户主的教育层次除以4
+
+
+## 结果变量
+
+结果变量只有两个值：0 和 1
+```{r}
+wells %>% 
+  count(switch) %>% 
+  mutate(
+    percent = 100 * n / sum(n) 
+  )
+```
+
+
+```{r, echo = FALSE, fig.cap = "Linear vs. logistic regression models for binary response data"}
+knitr::include_graphics(path = "images/OLSlogistic-1.png")
+```
+
+
+
+
+
+## Logistic regression model 1: 一个预测因子
+
+我们首先用距离安全水源的**最短距离**作为预测因子，建立回归模型
+$$
+\begin{align*}
+\text{switch}_{i} &\sim \mathrm{Binomial}(1,\; p_{i}) \\
+\text{logit}(p_{i}) &= \log\Big(\frac{p_{i}}{1 - p_{i}}\Big) = \alpha + \beta \cdot \text{dist}_{i} 
+\end{align*}
+$$
+
+
+
+
+```{r}
+fit1 <- glm(switch ~ dist100,
+  data = wells,
+  family = binomial(link = "logit")
+)
+
+summary(fit1)
+```
+
+
+### 解释
+
+$$
+\text{Pr(switch)} = \text{logit}^{-1}  (0.61 − 0.62 ∗ \text{dist100)}
+$$
+```{r}
+logit <- qlogis 
+inv_logit <- plogis
+```
+
+
+- 常数项0.61的意义可以解释成，当`dist100 = 0`时对应的换井取水的概率`inv_logit(0.61) = 0.65`。也就说你住的地方刚好有个安全的水井，你切换到安全水井的概率是65%
+
+- dist100的平均值是0.48（480米），在平均值这个点上切换的概率是
+```{r}
+inv_logit(0.61 - 0.62*0.48)
+```
+如果dist100增加 1个单位（100米），切换到安全水井的概率变为
+```{r}
+inv_logit(0.61 - 0.62*1.48) 
+```
+
+换句话说，在平均距离的位置上，距离增加100米，切换到安全水井的概率下降15%
+```{r}
+inv_logit(0.61 - 0.62*1.48)  - inv_logit(0.61 - 0.62*0.48)
+```
+
+## Logistic regression model 2: 两个预测因子
+
+```{r}
+fit2 <- glm(switch ~ dist + arsenic,
+  data = wells,
+  family = binomial(link = "logit")
+)
+
+summary(fit2)
+```
+
+
+## Logistic regression model 3: 两个预测因子 + 交互项
+
+```{r}
+fit3 <- glm(switch ~ dist + arsenic + dist100:arsenic,
+  data = wells,
+  family = binomial(link = "logit")
+)
+
+summary(fit3)
+```
+
+
+
+
+## Logistic regression model 4: 三个预测因子
+
+```{r}
+fit4 <- glm(switch ~ dist100 + arsenic + educ4,
+  data = wells,
+  family = binomial(link = "logit")
+)
+
+summary(fit4)
+```
+
+
+## Logistic regression model 5: 三个预测因子 + 两个交互项
+
+先中心化预测变量
+```{r}
+wells <-
+  wells %>% 
+  mutate(
+    c_dist100 = dist100 - mean(dist100),
+    c_arsenic = arsenic - mean(arsenic),
+    c_educ4 = educ4 - mean(educ4)
+  )
+```
+
+然后增加更多交互项
+```{r}
+fit5 <- glm(switch ~  c_dist100 + c_arsenic + c_educ4 + c_dist100:c_educ4 + c_arsenic:c_educ4,
+  data = wells,
+  family = binomial(link = "logit")
+)
+
+summary(fit5)
+```

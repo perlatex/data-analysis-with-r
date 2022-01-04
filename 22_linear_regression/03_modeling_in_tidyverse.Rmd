@@ -1,0 +1,252 @@
+---
+title: "Modeling in Tidyverse"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+
+## tidyverse框架下的建模
+
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+derby <- read_csv("./demo_data/derbyplus.csv")
+```
+
+
+
+```{r}
+mod1 <- lm(
+  formula = speed ~ year,
+  data = derby
+)
+```
+
+
+
+### 规整统计结果
+
+模型的输出结果是一个复杂的list
+
+```{r}
+mod1 %>% summary()
+summary(mod1)$residuals
+```
+
+
+broom宏包可以帮助我们**规整**模型输出结果。它将常用的100多种模型的输出结果规整成数据框`tibble()`的格式，在模型比较和可视化中就可以方便使用`dplyr`函数了。
+
+`broom` 提供了三个主要的函数:
+
+- `tidy()` 提取模型输出结果的主要信息，比如 `coefficients` 和 `t-statistics`
+- `glance()` 把模型视为一个整体，提取如 `F-statistic`，`model deviance` 或者 `r-squared`等信息
+- `augment()` 模型输出的信息添加到建模用的数据集中，比如`fitted values` 和 `residuals` 
+
+
+```{r}
+library(broom)
+
+mod1 %>% 
+  tidy() %>% 
+  filter(p.value < 0.05)
+```
+
+
+
+```{r}
+mod1 %>% glance()
+```
+
+
+
+```{r}
+mod1 %>%
+  glance() %>%
+  select(adj.r.squared, p.value)
+```
+
+
+为什么红色不在了？
+```{r}
+mod1 %>% 
+  broom::augment() %>%
+  ggplot(mapping = aes(x = year, y = speed)) +
+  geom_point() +
+  geom_line(aes(y = .fitted), color = "red") +
+  geom_smooth(method = "lm")
+```
+
+
+
+
+
+
+### 增加拟合值
+
+为了让建模操作更方便，让我们的思维限定在`data.frame`，方便使用`dplyr`，`ggplot2`中的函数。我推荐大家使用`modelr`宏包
+
+```{r}
+library(modelr)
+```
+
+
+```{r}
+# predictions at original x values
+derby %>% modelr::add_predictions(mod1)
+```
+
+
+```{r}
+derby %>% 
+  modelr::add_predictions(mod1) %>% 
+  
+  ggplot(aes(x = year, y = speed)) +
+  geom_point() +
+  geom_line(aes(y = pred), color = "red") 
+```
+
+
+
+### 增加残差值
+```{r}
+derby %>%
+  modelr::add_predictions(mod1) %>%
+  modelr::add_residuals(mod1)
+```
+
+
+### 增加预测值
+
+```{r}
+derby %>% modelr::add_predictions(mod1)
+```
+
+
+```{r}
+newdata <- data.frame(year = seq(2019, 2021, by = 1))
+
+newdata %>% modelr::add_predictions(mod1)
+```
+
+
+
+### predict vs fit
+
+- **拟合** , 模型一旦建立，建模和拟合使用的是同一数据
+
+- **预测**， 模型建立后，可以用新的数据进行预测
+
+
+
+### 课堂练习
+
+根据模型**残差标准误**公式
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/RSE_formual.jpeg")
+```
+
+使用`modelr::add_residuals(mod1)`计算残差标准误，还原`summary(mod1)$sigma`的结果，对模型理解就更深刻：
+
+```{r, eval=FALSE}
+derby %>%
+  modelr::add_residuals(mod1) %>% 
+  summarise(
+    
+  )
+```
+
+
+
+### 分组建模
+
+因为condition中 good和slow比较少，我们可以合并成一组
+
+```{r}
+derby %>% 
+  count(condition) %>% 
+  ggplot(aes(x = condition, y = n)) +
+  geom_col()
+```
+
+
+我们这里做一点数据变换
+```{r}
+tb <- derby %>%
+  mutate( 
+    yearnew = year - 1896,
+    fastfactor = if_else(condition == "fast", "fast", "not fast") 
+  ) 
+tb
+```
+
+
+```{r}
+tb %>% 
+  ggplot(aes(x = yearnew, y = speed)) +
+  geom_point()
+```
+
+
+```{r}
+tb %>% 
+  ggplot(aes(x = yearnew, y = speed, colour = fastfactor)) +
+  geom_point(aes(shape = fastfactor)) +
+  geom_smooth(aes(linetype = fastfactor), method = "lm", se = FALSE)
+```
+
+
+
+有没有方法，快速的求出两条曲线的截距和斜率？
+
+```{r}
+tb %>%
+  group_by(fastfactor) %>%
+  group_modify(
+    ~ broom::tidy(lm(speed ~ 1 + yearnew, data = .))
+  )
+```
+
+
+
+
+
+```{r}
+tb %>%
+  nest_by(fastfactor)  %>%
+  mutate(model = list(lm(speed ~ 1 + yearnew, data = data))) %>%
+  mutate(
+    coef = list(broom::tidy(model))
+  ) %>% 
+  unnest(coef)
+```
+
+
+或者
+```{r}
+tb %>%
+  nest_by(fastfactor)  %>%
+  mutate(model = list(lm(speed ~ 1 + yearnew, data = data))) %>%
+  summarise(
+    broom::tidy(model)
+  ) 
+```
+
+
+**课后练习**：看文档学函数
+- `?dplyr::modify()`
+- `?dplyr::nest_by()`
+
+

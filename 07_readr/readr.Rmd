@@ -1,0 +1,34 @@
+---
+title: "读取数据"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    code_folding: hide
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+## 习题
+
+读取data文件夹下kidiq.RDS文件
+
+
+变量含义：
+
+| 变量       	| 含义             	|
+|------------	|------------------	|
+| kid_score  	| 小孩考试分数     	|
+| mom_hs     	| 母亲是否完成高中 	|
+| mom_iq     	| 母亲IQ值         	|
+| mom_age    	| 母亲年龄         	|
+
+请说出数据框中每一列的变量类型
+
+

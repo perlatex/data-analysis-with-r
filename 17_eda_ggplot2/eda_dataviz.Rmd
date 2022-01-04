@@ -1,0 +1,39 @@
+---
+title: "How to plot this picture using ggplot2"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+## 今天的任务
+
+重复这张图
+
+```{r, out.width = '85%', echo = FALSE}
+knitr::include_graphics("./images/to_reproduce2.png")
+```
+
+
+数据在下面
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+raw_df <- read_rds("./data/rude_behavior_in_airplane.rds") 
+raw_df
+```
+
+
+提示，可以把图片拉到<https://color.adobe.com/zh/create/image-gradient> 获取颜色值，比如
+
+```{r}
+colorspace::swatchplot(c("#F2B138", "#32A685", "#77C2EA"))
+```
+

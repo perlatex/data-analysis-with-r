@@ -1,0 +1,424 @@
+---
+title: "lm further"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+## 线性回归的前提假设
+
+线性模型
+$$
+y_n = \alpha + \beta x_n + \epsilon_n \quad \text{where}\quad
+\epsilon_n \sim \operatorname{normal}(0,\sigma).
+$$
+
+线性回归需要满足四个前提假设：
+
+1. **Linearity **
+    - 因变量和每个自变量都是线性关系
+    
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/jhudsl/Linearity1.png")
+knitr::include_graphics(path = "images/jhudsl/Linearity2.png")
+```
+
+
+2. **Indpendence **
+    - 对于所有的观测值，它们的误差项相互之间是独立的
+
+
+
+3. **Normality **
+    - 误差项服从正态分布
+
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/jhudsl/Normality1.png")
+knitr::include_graphics(path = "images/jhudsl/Normality2.png")
+```
+
+
+
+4. **Equal-variance **  
+    - 所有的误差项具有同样方差
+    
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/jhudsl/Homoscedasticity.png")
+```
+
+这四个假设的首字母，合起来就是**LINE**，这样很好记
+
+
+把这**四个前提**画在一张图中
+
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/LINE.png")
+```
+
+
+**课堂练习**：以下是否违背了LINE假设
+
+1. 努力学习与是否通过R语言考试？
+    - *响应变量* 是否通过考试 (Pass or Fail)
+    - *解释变量:* 课后练习时间 (in hours) 
+
+2. 汽车音乐音量大小与司机刹车的反应时
+    - *响应变量* 反应时
+    - *解释变量:* 音量大小 
+
+
+
+## 回到案例
+
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+derby <- read_csv("./demo_data/derbyplus.csv")
+```
+
+
+```{r message = FALSE, warning = FALSE}
+glimpse(derby )
+```
+
+
+让系数好解释，我们调整了时间
+
+```{r}
+derby <- derby %>% 
+  mutate(yearnew = year - 1896)
+derby
+```
+
+
+
+$$
+\begin{split}
+Y_{i}=\beta_{0}+\beta_{1}\textrm{Yearnew}_{i}+\epsilon_{i}\quad &\textrm{where} \quad \epsilon_{i}\sim \textrm{N}(0,\sigma^2) \\
+    &\textrm{and} \quad \textrm{Yearnew}=\textrm{Year}-1896.
+\end{split}
+$$
+
+
+
+```{r}
+mod2 <- lm(
+  formula = speed ~ yearnew,
+  data = derby
+)
+```
+
+
+
+我们可以用**残差图**诊断模型是否满足`LINE`假设
+
+```{r, fig.height = 8, fig.asp = 0.8}
+par(mfrow = c(2, 2))
+plot(mod2)
+```
+
+
+
+- 第一张图，Residuals vs. Fitted图, 用于检测**线性假设**。如果是线性关系，会有一条水平Y = 0的红线(dashed line)，残差沿着这条线周围均匀分散，不应该有什么聚集和趋势，否则，说明模型还存在我们没有考虑到的模式。本图中，我们看到有先增加后下降的明显趋势（红色线），说明残差中还有二项式的部分，这部分可以移到模型中，所以可以尝试用二项式拟合，可能会比线性拟合要好。
+
+
+- 第二张图（右上），Normal Q-Q图，用于检查残差是否符合**正态性假定**，点沿着直线上是最好的，点越接近线性，残差呈正态分布的可能性就越大。如果偏离直线越多，说明残差分布符合正态分布曲线越不好。
+
+
+
+- 第三张图，Scale-Location, 用于检查**等方差假定**，图中的点沿着水平方向的红线周围均匀分散是最好的。如果红线不是水平直线，或者点过于集中，有明显的正或负趋势，表明方差不是恒定的。
+
+
+
+- 第四张图，Residuals vs. Leverage, 用于检查异常值，或者影响很大的极端值。
+y轴是标准化残差(standardized residuals)，理想情况下，标准化残差的分散程度是恒定的，不会随Leverage的变化而改变。其次，残差很大的点会对模型参数的估计产生不当影响，图中会用红色的虚线画出Cook's Distance，
+红色虚线以外的点，就是异常点，当然，我们这张图没有红色虚线，说明没有异常点^[https://data.library.virginia.edu/diagnostic-plots/]。
+
+
+> LINE，其中 LNE 都检查了，唯独没有I，没有**独立性的假设**，因为这个从数据上看不出的，这需要从实验设计和数据获取方法去看。
+
+这个包[performance](https://easystats.github.io/performance/reference/check_model.html)提供了更清晰的说明
+
+```{r, fig.height = 10, fig.asp = 0.8}
+library(performance)
+check_model(mod2)
+```
+
+## 改进，来自残差图的提醒
+
+根据残差诊断图的提醒，模型1没有完全**捕获**数据的特征。因此我们在模型1的基础上，增加二次项，改进模型
+
+$$
+Y_{i}=\beta_{0}+\beta_{1}\textrm{Yearnew}_{i}+\beta_{2}\textrm{Yearnew}^2_{i}+\epsilon_{i}\quad \textrm{where}\quad \epsilon_{i}\sim \textrm{N}(0,\sigma^2).
+$$
+
+
+```{r}
+derby %>% 
+  ggplot(aes(x = year, y = speed)) +
+  geom_point() +
+  stat_smooth(method = "lm", formula = y ~ x, 
+              se = FALSE, linetype = 1) +
+  stat_smooth(method = "lm", formula = y ~ x + I(x^2), 
+              se = FALSE, linetype = 2)
+```
+
+
+
+```{r}
+tb <- derby %>% 
+  mutate(yearnew2 = yearnew^2)
+
+mod2q <- lm(speed ~ yearnew + yearnew2, data = tb)
+```
+
+
+
+```{r}
+summary(mod2q)
+```
+
+
+
+残差诊断
+```{r}
+par(mfrow = c(2, 2))
+plot(mod2q)
+```
+
+模型2 要比 模型1 有所改进：
+
+- $R^2$， 51.3\% 提升到 64.1\%
+- 残差诊断Residuals vs. Fitted图，点的分布没有了很明显的趋势。
+- $\beta_{2}$ 为负，说明获胜速度的增长在最近几年减缓了。
+
+
+
+
+
+## 获胜速度的增长率是否取决于赛道状况或起跑手的数量？
+
+我们来看第二个问题，获胜速度的增长率是否取决于赛道状况？
+
+
+因为condition中有fast、good和slow三种，但good和slow比较少，我们其合并成一组
+
+```{r}
+tb %>% 
+  count(condition) %>% 
+  ggplot(aes(x = condition, y = n)) +
+  geom_col()
+```
+
+
+我们这里做一点数据变换
+```{r}
+tb <- tb %>%
+  mutate( 
+    fast       = if_else(condition == "fast",   1,     0),
+    fastfactor = if_else(condition == "fast", "fast", "not fast") 
+  ) 
+tb
+```
+
+### 模型
+
+$$
+Y_{i}=\beta_{0}+\beta_{1}\textrm{Fast}_{i}+\epsilon_{i}\quad \textrm{where}\quad \epsilon_{i}\sim \textrm{N}(0,\sigma^2).
+$$
+
+
+```{r}
+mod3 <- lm(speed ~ fast, data = tb)
+```
+
+
+```{r}
+summary(mod3)
+```
+
+
+### 解释
+
+为了方便理解，我们分开来看
+
+- 赛道状况 `fast = 0` 情形
+
+$$
+Y_{i} = \beta_{0}+\epsilon_{i}
+$$
+
+
+- 赛道状况 `fast = 1` 情形
+
+$$
+Y_{i} = (\beta_{0}+\beta_{1})+\epsilon_{i}
+$$
+
+
+
+
+### 与t-test等价性
+
+可能会问，以上相当于比较两组（fast and non-fast）的速度speeds，为什么不做t-test。
+实际上，我们已经做了。
+
+
+```{r}
+tb %>% 
+  t.test(speed ~ fast, data = .)
+```
+
+
+
+## 增加解释变量
+
+为了更好的解释speed，我们将**时间**和**赛道条件**同时考虑进模型
+
+
+$$
+Y_{i}=\beta_{0}+\beta_{1}\textrm{Yearnew}_{i}+\beta_{2}\textrm{Fast}_{i}+\epsilon_{i}\quad \textrm{where}\quad \epsilon_{i}\sim \textrm{N}(0,\sigma^2).
+$$
+
+
+```{r }
+mod4 <- lm(speed ~ yearnew + fast, data = tb)
+```
+
+
+
+
+```{r}
+summary(mod4)
+```
+
+### 思考
+
+在固定的时间上，比较不同的赛道的获胜速度的**差异**， 比如在2012年，fast赛道切换到non-fast赛道，我们预期的获胜速度会下降多少？
+
+- 赛道状况 `fast = 0` 情形
+
+$$
+Y_{i} = \beta_{0}+ \beta_{1}\textrm{Yearnew}_{i} + \epsilon_{i}
+$$
+
+
+- 赛道状况 `fast = 1` 情形
+
+$$
+Y_{i} = \beta_{0}+ \beta_{1}\textrm{Yearnew}_{i} + \beta_{2} + \epsilon_{i}
+$$
+
+$$
+Y_{i} = (\beta_{0}+ \beta_{2}) + \beta_{1}\textrm{Yearnew}_{i}  + \epsilon_{i}
+$$
+
+```{r}
+tb %>% 
+  ggplot(aes(x = yearnew, y = speed, colour = fastfactor)) +
+  geom_point() +
+  geom_line(aes(y = predict(mod4))) 
+```
+
+
+
+## 交互项
+
+然而，模型4的一个局限性是，我们必须假设赛道条件的影响在122年内是相同的，或者相反，在所有赛道条件下，获胜速度的年度改善是相同的。从图形上看，是两条**平行的直线**，虽然分组考虑不同的赛道，但不同赛道具有相同的增速不一定符合现实情况。
+
+为了扩展模型能力，允许预测因子之间相互影响，即需要考虑**交互项**。
+
+
+```{r}
+tb %>% 
+  ggplot(aes(x = yearnew, y = speed, colour = fastfactor)) +
+  geom_point(aes(shape = fastfactor)) +
+  geom_smooth(aes(linetype = fastfactor), method = "lm", se = FALSE)
+```
+
+
+
+$$
+\begin{split}
+Y_{i}=& \beta_{0}+\beta_{1}\textrm{Yearnew}_{i}+\beta_{2}\textrm{Fast}_{i} \; +\\
+      &{}\beta_{3}\textrm{Yearnew}_{i}\times\textrm{Fast}_{i}+\epsilon_{i}\quad \textrm{where}\quad \epsilon_{i}\sim \textrm{N}(0,\sigma^2)
+\end{split}
+$$
+
+
+
+```{r}
+mod5 <- lm(speed ~ yearnew + fast + yearnew:fast, data = tb)
+```
+
+
+
+```{r}
+summary(mod5)
+```
+
+
+### 解释
+
+$$
+ \hat{Y}_{i}=50.53+0.031\textrm{Yearnew}_{i}+1.83\textrm{Fast}_{i}-0.011\textrm{Yearnew}_{i}\times\textrm{Fast}_{i}.
+$$
+
+不想自己写公式，可以偷懒
+```{r}
+library(equatiomatic)
+extract_eq(mod5, use_coefs = TRUE)
+```
+
+为了方便理解，我们分开来看
+
+$$
+\begin{align*}
+ \textrm{Fast}=0: & \\
+ \hat{Y}_{i} &= 50.53+0.031\textrm{Yearnew}_{i} \\
+ \textrm{Fast}=1: & \\
+ \hat{Y}_{i} &= (50.53+1.83)+(0.031-0.011)\textrm{Yearnew}_{i}
+ \end{align*}
+$$
+
+
+两条拟合直线，不同的截距和不同的斜率。不同赛道，不同的起始速度、不同的速度增速。
+
+关于模型结果的解释，可以参考这里
+
+```{r}
+library(report)
+report(mod5)
+```
+
+
+## 更复杂的模型
+
+
+$$
+\begin{split}
+ Y_{i}&=\beta_{0}+\beta_{1}\textrm{Yearnew}_{i}+\beta_{2}\textrm{Yearnew}^2_{i}+\beta_{3}\textrm{Fast}_{i}\\
+      &{}+\beta_{4}\textrm{Starters}_{i}+\epsilon_{i}\quad 
+      \textrm{where}\quad \epsilon_{i}\sim \textrm{N}(0,\sigma^2)
+\end{split}
+$$
+
+
+```{r}
+mod6 <- lm(speed ~ yearnew + yearnew2 + fast + starters, data = tb)
+```
+
+```{r}
+summary(mod6)
+```

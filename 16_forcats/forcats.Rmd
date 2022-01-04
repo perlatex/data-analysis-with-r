@@ -1,0 +1,173 @@
+---
+title: "因子型变量以及在可视化中应用"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+本章介绍R语言中的因子类型数据。因子型变量常用于数据处理和可视化中，尤其在排序的时候，因子就格外有用。
+
+
+# 提问
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+
+
+```{r}
+ggplot(penguins, aes(y = species)) +
+  geom_bar()
+```
+
+上图是按照首字母顺序排列的，可能不是我们想要的顺序
+
+
+
+## 反序
+```{r}
+penguins %>%
+  ggplot(aes(y = fct_rev(species))) +
+  geom_bar()
+```
+
+
+
+```{r}
+penguins %>% 
+  count(species) %>% 
+  pull(species)
+
+penguins %>% 
+  count(species) %>% 
+  mutate(species = fct_relevel(species, "Chinstrap", "Gentoo", "Adelie")) %>% 
+  pull(species)
+```
+
+
+## 移动
+```{r }
+# Move "Chinstrap" in front, rest alphabetic
+penguins %>%
+  ggplot(aes(y = fct_relevel(species, "Chinstrap"))) +
+  geom_bar()
+```
+
+
+## 指定顺序
+```{r}
+# Use order "Chinstrap", "Gentoo", "Adelie"
+penguins %>%
+  ggplot(aes(y = fct_relevel(species, "Chinstrap", "Gentoo", "Adelie"))) +
+  geom_bar()
+```
+
+
+```{r}
+penguins %>%
+  mutate(species = fct_relevel(species, "Chinstrap", "Gentoo", "Adelie")) %>%
+  ggplot(aes(y = species)) +
+  geom_bar()
+```
+
+
+```{r}
+penguins %>%
+  ggplot(aes(y = fct_relevel(species, "Adelie", after = Inf))) +
+  geom_bar()
+```
+
+
+## 按照频次的顺序
+```{r}
+# Use the order defined by the number of penguins of different species
+# The order is descending, from most frequent to least frequent
+
+penguins %>%
+  mutate(species = fct_infreq(species)) %>%
+  ggplot(aes(y = species)) +
+  geom_bar()
+```
+
+
+```{r}
+penguins %>%
+  mutate(species = fct_rev(fct_infreq(species))) %>%
+  ggplot(aes(y = species)) + 
+  geom_bar()
+```
+
+## 按照某个数值排序
+```{r forcats-28}
+# Reorder based on numeric values, .fun(.x)
+penguins %>%
+  count(species) %>%
+  mutate(species = fct_reorder(.f = species, .x = n, .fun = median)) %>%
+  ggplot(aes(n, species)) + 
+  geom_col()
+```
+
+## 作业
+
+- 画出的2007年美洲的国家人均寿命的柱状图，要求按照人均寿命的大小从大到小排序
+```{r}
+library(gapminder)
+gapminder %>%
+   filter(
+     year == 2007,
+     continent == "Americas"
+)
+```
+
+
+```{r}
+gapminder %>%
+  filter(year == 2007, continent == "Americas") %>%
+  mutate(country = fct_reorder(country, lifeExp)) %>%
+  ggplot(aes(lifeExp, country)) +
+  geom_col()
+```
+
+- 这是四个国家人口寿命的变化图
+```{r, fig.width = 9, fig.asp = 0.45}
+gapminder %>%
+  filter(country %in% c("Norway", "Portugal", "Spain", "Austria")) %>%
+  ggplot(aes(year, lifeExp)) + geom_line() +
+  facet_wrap(vars(country), nrow = 1)
+```
+
+- 给四个分面排序，要求按每个国家寿命的中位数的大小（提示 `?fct_reorder`）
+```{r, fig.width = 9, fig.asp = 0.45}
+gapminder %>%
+  filter(country %in% c("Norway", "Portugal", "Spain", "Austria")) %>%
+  mutate(country = fct_reorder(country, lifeExp, .fun = median)) %>% 
+  ggplot(aes(year, lifeExp)) + 
+  geom_line() +
+  facet_wrap(vars(country), nrow = 1)
+```
+
+
+
+- 要求给四个分面排序，按每个国家寿命差（最大值减去最小值）
+
+```{r forcats-33, eval=FALSE, echo = FALSE}
+gapminder %>%
+  filter(country %in% c("Norway", "Portugal", "Spain", "Austria")) %>%
+  # order by custom function: here, difference between max and min
+  mutate(country = fct_reorder(country, lifeExp, function(x) { max(x) - min(x) })) %>%
+  ggplot(aes(year, lifeExp)) + geom_line() +
+  facet_wrap(vars(country), nrow = 1)
+```
+
+

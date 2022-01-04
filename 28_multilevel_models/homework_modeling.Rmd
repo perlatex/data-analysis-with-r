@@ -1,0 +1,40 @@
+---
+title: "模型"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+
+# 读取数据
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+
+kidiq <- read_rds("./data/kidiq.RDS") 
+kidiq
+```
+
+
+# 作业
+
+- 不同的性别儿童考试成绩的均值，是否存在差异
+
+- 母亲智商与儿童考试成绩的关系
+
+- 母亲智商与 不同性别儿童考试成绩的关系（提示，可以建立多层线性模型）
+
+- 自己提出一个问题，尝试建立模型，并回答
+
+

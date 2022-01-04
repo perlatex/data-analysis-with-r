@@ -1,0 +1,185 @@
+---
+title: "函数"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+R 语言的强大在于丰富的函数，这里的函数和我们高中数学中的函数 `y = f(x)` 没什么区别。
+上一节课我们提到向量操作符，体会到了向量化操作的强大，事实上，向量操作符就是一种函数。
+
+## 基础函数
+
+R 语言内置了很多统计函数，比如对于向量`x`
+```{r}
+x <- c(2, 7, 8, 9, 3)
+```
+
+打印向量`x`
+```{r}
+print(x)
+```
+
+求向量元素之和
+```{r}
+sum(x)
+```
+
+求向量元素的均值
+```{r}
+mean(x)
+```
+
+求向量元素的标准差
+```{r}
+sd(x)
+```
+
+求向量元素的对数
+```{r}
+log(x)
+```
+
+
+找出向量元素中的最小值
+```{r}
+min(x)
+```
+
+找出向量元素中的最大值
+```{r}
+max(x)
+```
+
+计算向量元素的个数
+```{r}
+length(x)
+```
+
+对向量元素大小排序
+```{r}
+sort(x)
+```
+
+找出向量元素的唯一值，就是给出**去重后**的数据
+```{r}
+unique(x)
+```
+
+
+判断是否为数值型/字符串型
+```{r}
+is.numeric(x)
+is.character(x)
+```
+
+判断向量元素是否大于5
+
+```{r}
+ifelse(x > 5, "big", "small")
+```
+
+## 向量的函数
+
+用在向量上的函数，可以分为向量化函数(vectorized function)和汇总类函数(summary function)，
+
+```{r, out.width = '100%', fig.align='center', echo = FALSE, fig.cap='这两类函数在 Tidyverse 框架中，应用非常广泛。'}
+knitr::include_graphics("images/vector-function.png")
+```
+
+当然，也会有例外，比如`unique()`函数，它返回的向量通常不会与输入的向量等长，既不属于向量化函数，也不属于汇总类函数。
+
+
+
+
+## 自定义函数
+
+自己定义函数，需要四个关键部件：
+
+```{r, eval=FALSE}
+myFunction <- function(x, y) {
+   ...
+}
+```
+
+
+- 创建，由`function(...)`创建一个函数
+- 参数，由`(...)` 里指定参数，比如`function(x, y)`中的参数为 `x` 和 `y`
+- 函数主体，一般情况下，在`function(...)`后跟随一对大括号`{ }`，在大括号里声明具体函数功能，在代码最后一行，可以用return返回计算后的值，当然，这个return不是必需的。
+- 函数名，`function() { }` 赋值给新对象，比如这里的`myFunction`
+
+用一个简单的案例说明。这里我们想让输入的向量每个元素增加1，可以这样写函数
+```{r}
+add_one <- function(x) {
+   y <- x + 1
+   return(y)  # 返回计算后的值
+}
+```
+
+
+## 函数调用
+```{r}
+add_one(x = 10)
+add_one(x = 1:6)
+```
+
+
+
+## 案例
+
+- 根据数据标准化的数学表达式，写出**数据标准化**的函数
+$$
+\mathrm{std}(x) = \frac{x_i - \bar{x}}{\mathrm{sd}(x)}  
+$$
+
+
+
+```{r}
+y <- c(2, 7, 8, 9, 3, 6, 8, 12, 6, 9)
+y
+```
+
+
+## 使用宏包的函数
+
+各种宏包也为我们准备了不同的函数，我们在使用前一般会先加载该宏包，比如后面章节我们会用的`dplyr`宏包中的`select()`函数，它用于选取数据框的某列
+```{r, eval=FALSE}
+library(dplyr)
+select(mtcars, mpg)
+```
+
+但是，其它宏包可能也有`select()`函数，比如`MASS`和`skimr`，如果同时加载了`dplyr`，`MASS`和`skimr`三个宏包，在程序中使用`select()`函数，就会造成混淆和报错。这个时候就需要给每个函数指定是来源哪个宏包，具体方法就是在宏包和函数之间添加`::`，比如`dplyr::select()`，`skimr::select()` 或者`MASS::select()`。
+
+
+
+
+
+## 作业
+
+- 根据方差的数学表达式，写出**方差**计算函数，并与基础函数`var()`的结果对比
+
+$$
+\mathrm{Var}(x) = \frac{1}{n - 1} \sum_{i=1}^n (x_i - \bar{x}) ^2 
+$$
+
+
+
+- 根据下面的数学表达式，写出函数
+
+$$
+\mathrm{rescale}(x) = \frac{x_i- min(x)}{max(x) - min(x)} 
+$$
+
+
+

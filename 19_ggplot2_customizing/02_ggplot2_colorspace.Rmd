@@ -1,0 +1,123 @@
+---
+title: "ggplot2之数据可视化中的配色"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+## 配色
+
+
+先对比下
+```{r}
+colorspace::swatchplot(c("red", "green", "blue", "cyan", "magenta", "yellow"))
+```
+
+
+```{r}
+colorspace::swatchplot(c("firebrick", "springgreen4", "blue3", "turquoise3", "darkorchid2", "gold2"))
+```
+
+
+这里有个小小的提示：
+
+- 尽可能不避免使用`"red"`, `"green"`, `"blue"`, `"cyan"`, `"magenta"`, `"yellow"`颜色
+- 使用相对柔和的颜色`"firebrick"`, `"springgreen4"`, `"blue3"`, `"turquoise3"`, `"darkorchid2"`, `"gold2"`，会让人觉得舒服
+
+
+
+## colorspace
+
+我个人比较喜欢[colorspace](http://colorspace.r-forge.r-project.org/articles/color_spaces.html)中的配色，今天我们就讲讲如何使用这个宏包！
+
+
+
+`colorspace` 宏包提供了三种类型的配色模板:
+
+- Qualitative: 分类，用于呈现分类信息，比如不同种类用不同的颜色，颜色之间一般对比鲜明。
+- Sequential: 序列，用于呈现有序/连续的数值信息，比如为了展示某地区黑人比例，比例越高颜色越深，比例越低颜色越浅。
+- Diverging: 分歧，用于呈现有序/连续的数值信息，这些数值围绕着一个中心值，比中心值越大的方向用一种渐变色，比中心值越小用另一种渐变色。
+
+三种类型对应着三个函数 `qualitative_hcl()`, `sequential_hcl()`, 和 `diverging_hcl()`. 
+
+
+
+
+```{r}
+colorspace::qualitative_hcl(n = 4, palette = "Dark 2") %>% 
+  colorspace::swatchplot()
+```
+
+
+```{r}
+colorspace::sequential_hcl(n = 7, palette = "Peach") %>% 
+  colorspace::swatchplot()
+```
+
+
+```{r}
+colorspace::diverging_hcl(n = 7, palette = "Tropic") %>% 
+  colorspace::swatchplot()
+```
+
+
+## 配色模板
+
+根据你需要颜色的三大种类，先找适合的模板palettes
+```{r}
+hcl_palettes(plot = TRUE)
+```
+
+
+## 在ggplot2中使用
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+library(colorspace)    
+```
+
+
+```{r}
+penguins %>% 
+   ggplot(aes(bill_length_mm, fill = species)) +
+   geom_density(alpha = 0.6)
+```
+
+
+```{r}
+penguins %>% 
+   ggplot(aes(bill_length_mm, fill = species)) +
+   geom_density(alpha = 0.6) +
+   scale_fill_discrete_qualitative(palette = "cold")
+```
+
+
+
+```{r}
+penguins %>% 
+   ggplot(aes(bill_length_mm, fill = species)) +
+   geom_density(alpha = 0.6) +
+   scale_fill_discrete_sequential(palette = "Peach")
+```
+
+
+```{r}
+penguins %>% 
+   ggplot(aes(bill_length_mm, fill = species)) +
+   geom_density(alpha = 0.6) +
+   scale_fill_discrete_diverging(palette = "Tropic")
+```
+
+
+
+

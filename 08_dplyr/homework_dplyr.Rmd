@@ -1,0 +1,129 @@
+---
+title: "dplyr作业"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+# 作业一
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+kidiq <- read_rds("./data/kidiq.RDS") 
+kidiq
+```
+
+
+- kid_score : 小孩考试分数
+- mom_hs    : 母亲是否完成高中
+- mom_iq    : 母亲IQ值
+- mom_age   : 母亲年龄
+
+
+# 问题
+
+1. 说出数据框中每一列的变量类型
+
+2. 统计考试的平均成绩
+
+3. 统计母亲完成高中的比例
+
+4. 构建新的一列`index`，其中 $index = mom_iq/mom_age$
+
+5. 中心化 mom_iq （提示：中心化 = mom_iq值 - 全部mom_iq的均值，`mom_iq - mean(mom_iq)`）
+
+6. 按mom_hs分组，计算 mom_iq 均值、kid_score的均值以及mom_age的最大值
+
+
+
+
+
+
+# 作业二
+
+请同学们先安装"babynames"宏包，该宏包包含了若干数据框。今天，我们会用到其中的"babynames"
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(babynames) # install.packages("babynames")
+
+babynames
+```
+
+- year = 年份（从1880年到2017年的每一年）
+- sex  = 儿童性别
+- name = 登记使用的姓名
+- n    = 使用该姓名的人数
+- prop = 登记使用该名字的人数占同年登记人数的比例（按性别分）
+
+比如，在1880年名叫"Mary"的女孩有7065个，占当年申请登记的全部女孩的比例是0.07238.
+
+
+
+
+## 问题
+
+1. 选择 `n` 这一列
+
+2. 同时选择`name` 和 `n` 列，以下方法错误的是？
+```{r}
+babynames %>% select(-c(year, sex, prop))
+babynames %>% select(name:n)
+babynames %>% select(starts_with("n"))
+babynames %>% select(ends_with("n"))
+```
+
+3. 选出 `prop` 大于0.08 的所有 `name`
+
+4. 显示所有名叫 "Sea" 的儿童的行
+
+5. 找出 `n` 有**缺失值**的行
+
+6. 找出名叫 "Sea" 或者 "Anemone" 的儿童
+
+7. 只使用了5次或者6次的姓名
+
+8. 列出最常用的姓名（先按 `n` 从大往小排）
+
+9. 2015年使用最多的女孩姓名
+
+10. 统计男孩女孩的全部人数
+
+11. 统计每年男孩女孩的人数
+
+12. 统计名叫 `Khaleesi` 的人数
+
+13. 第一次使用 `Khaleesi` 这个名字是哪一年？
+
+14. 找出最受欢迎的姓名（分男孩女孩）
+
+```{r}
+babynames %>%
+  group_by(  ) %>%
+  summarise(  )  
+```
+
+15. 统计每年使用最多的名字的数量与使用最少的名字数量的差距
+
+```{r}
+babynames %>%
+  group_by(     ) %>%
+  summarise(
+    diff = max( ) - min( )
+  )  
+```
+
+
+

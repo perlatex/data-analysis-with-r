@@ -1,0 +1,154 @@
+---
+title: "lm beyond"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+## 线性模型的物理解释
+
+图中，中间蓝色点是这些数据点的均值点，线性模型可以类比为，这里有一根通过这个均值点的刚体，而每个数据点都是一个弹簧，竖直连接到刚体，很显然越远的点，对刚体的拉力越大，越近越小，最后刚体达到平衡状态，此时刚体的状态就是线性回归的直线。
+
+```{r out.width = '85%', echo = FALSE}
+knitr::include_graphics("images/Least_squares_as_springs.png")
+```
+
+
+
+## 回到案例
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+derby <- read_csv("./demo_data/derbyplus.csv")
+
+glimpse(derby)
+```
+
+
+
+```{r}
+tb <- derby %>% 
+  mutate(yearnew = year - 1896) 
+tb
+```
+
+
+
+
+## 截距项
+
+包含截距，以下两者是等价的
+```{r, eval=FALSE}
+lm(speed ~ 1 + yearnew, data = tb)
+lm(speed ~ yearnew, data = tb)
+```
+
+
+去掉截距，以下两者是等价的
+```{r, eval=FALSE}
+lm(speed ~ yearnew - 1, data = tb)
+lm(speed ~ 0 + yearnew, data = tb)
+```
+
+不包含截距项，实际上就是强制通过原点`(0, 0)`，这样做很大程度上影响了斜率。
+
+
+## 只有截距项
+
+```{r}
+lm(speed ~ 1, data = tb)
+```
+
+
+只有截距项，实质上就是计算y变量的均值
+```{r}
+tb %>%
+  summarise(
+    mean_speed = mean(speed)
+  )
+```
+
+
+## 分类变量
+
+condition是分类变量，代表三种不同的赛道。用分类变量做回归，本质上是各组之间的进行比较。
+
+```{r}
+tb %>% distinct(condition)
+```
+
+
+```{r}
+tb %>%
+  ggplot(aes(x = condition, y = speed, fill = condition)) +
+  geom_boxplot(position = position_dodge())
+```
+
+以分类变量作为解释变量，做线性回归
+
+```{r}
+mod3 <- lm(speed ~ condition, data = tb)
+mod3
+```
+
+为了让大家看的更清楚，用broom的`tidy()`函数将**模型输出**转换为数据框的形式
+
+```{r}
+broom::tidy(mod3)
+```
+
+
+我们看到输出结果，只有good、slow两个系数和Intercept截距，fast去哪里了呢？
+
+事实上，condition变量里有3组，回归时，选fast为**基线**，那么good的系数可以理解为由fast**切换**到good，引起speed的变化（效应）
+
+-  对 fast 组的估计，`53.623`
+-  对 good 组的估计，`53.623 - 0.897 = 52.726`
+-  对 slow 组的估计，`53.623 - 1.934 = 51.689`
+
+
+**想想，为什么选择fast基线？能否用slow作为基线？**
+
+
+
+## 因子变量
+
+基线的选择，默认是按照首字母顺序，所以选择`fast`。但这里slow 组的估计最低，适合做基线。我们可以将condition转换为因子变量，这样方便调整因子先后顺序
+
+```{r}
+tb_fct <- tb %>%
+  mutate(
+    condition = factor(condition, levels = c("slow", "good", "fast"))
+  ) 
+tb_fct
+```
+
+`tb_fct`替换`tb`，然后建立线性模型
+
+```{r}
+mod4 <- lm(speed ~ condition, data = tb_fct)
+broom::tidy(mod4)
+```
+
+以slow组作为基线，各组系数也调整了，但加上截距后，实际值是没有变的。
+
+-  对 slow 组的估计，`51.688`
+-  对 good 组的估计，`51.688 + 1.037 = 52.726`
+-  对 fast 组的估计，`51.688 + 1.934 = 53.622`
+
+
+
+
+# 参考
+
+- [tidymodels](https://recipes.tidymodels.org/reference/)
+- [Least squares as springs](https://joshualoftus.com/posts/2020-11-23-least-squares-as-springs/)

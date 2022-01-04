@@ -1,0 +1,85 @@
+---
+title: "Rmarkdown文档"
+subtitle: "这是我的副标题"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    #code_folding: hide
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE, 
+  message = FALSE
+)
+```
+
+
+大家好，我是你们的新朋友 Rmarkdown，有时候简写为Rmd。
+你看到*.Rmd，不要惊慌。现在我就来说说，我有什么不一样的功能吧...
+
+# 运行代码
+
+```{r}
+1:10
+```
+
+
+```{r}
+x <- 5
+x
+```
+
+
+
+# 插入表格
+
+```{r}
+# mtcars 是系统自带的数据集
+mtcars
+```
+
+# 生成图片
+
+```{r out.width = '100%'}
+library(ggplot2)
+
+ggplot(midwest, aes(x = area, y = poptotal)) +
+  geom_point(aes(color = state, size = popdensity)) +
+  geom_smooth(method = "loess", se = F) +
+  xlim(c(0, 0.1)) +
+  ylim(c(0, 500000)) +
+  labs(
+    title = "Scatterplot",
+    subtitle = "Area Vs Population",
+    x = "Area",
+    y = "Population"
+  )
+```
+
+
+
+# 插入图片
+
+
+```{r, out.width='20%', fig.align='center', fig.cap='我的女神', echo = F}
+knitr::include_graphics("./images/my_girl.jpg")
+```
+
+
+
+# 参考资料
+
+- <https://bookdown.org/yihui/rmarkdown/html-document.html>

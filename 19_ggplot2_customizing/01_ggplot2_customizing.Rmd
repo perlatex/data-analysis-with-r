@@ -1,0 +1,79 @@
+---
+title: "ggplot2 customizing"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+```{r}
+library(tidyverse)
+library(gapminder)
+```
+
+
+## 组合图片
+```{r}
+p1 <- gapdata %>%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = lifeExp > mean(lifeExp))) +
+  scale_x_log10() +
+  theme(legend.position = "none") +
+  scale_color_manual(values = c("orange", "pink")) +
+  labs(
+    title = "My Plot Title",
+    x = "The X Variable",
+    y = "The Y Variable"
+  )
+```
+
+```{r}
+p2 <- gapdata %>%
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_color_manual(
+    values = c("#195744", "#008148", "#C6C013", "#EF8A17", "#EF2917")
+  ) +
+  theme(legend.position = "none") +
+  labs(
+    title = "My Plot Title",
+    x = "The X Variable",
+    y = "The Y Variable"
+  )
+```
+
+
+
+```{r}
+library(cowplot)
+plot_grid(
+  p1,
+  p2,
+  labels = c("A", "B")
+)
+```
+
+
+```{r}
+library(patchwork)
+p1 + p2
+```
+
+
+## 推荐书目
+
+- [R for Data Science](https://r4ds.had.co.nz/) 
+- [ggplot2: Elegant Graphics for Data Analysis](https://ggplot2-book.org/)
+- [R Graphics Cookbook](https://r-graphics.org/)
+- [Fundamentals of Data Visualization](https://serialmentor.com/dataviz/)
+- [Data Visualization: A practical introduction](https://socviz.co/)

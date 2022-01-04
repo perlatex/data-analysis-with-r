@@ -1,0 +1,56 @@
+---
+title: "行方向上的统计"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+# 作业
+
+增加`prop_water`和`prop_food`两列，计算每天水分和食物的所占比例， 比如第一天water和food都是10.0，那么各自比例都是50%.
+
+```{r}
+library(tidyverse)
+
+d <- tibble::tribble(
+  ~water, ~food,
+  10.0,   10.0,
+  12.1,   10.3,
+  13.5,   19.1,
+  17.4,   16.0,
+  25.8,   15.6,
+  27.4,   19.8
+)
+d
+```
+
+```{r}
+d %>% 
+  rowwise() %>% 
+  mutate(
+    across(.cols = everything(), .names = "prop_{.col}", .fns = ~ .x /sum(c_across()))
+  )
+```
+
+```{r}
+d %>% 
+  rowwise() %>% 
+  mutate(
+    across(.names = "prop_{.col}", .fns = ~ .x /sum(c_across()))
+  )
+```
+
+```{r}
+d %>% 
+  rowwise() %>%
+  mutate(100 * across(.names = "prop_{.col}") / sum(c_across()) )
+```
+

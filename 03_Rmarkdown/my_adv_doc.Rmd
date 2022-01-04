@@ -1,0 +1,153 @@
+---
+title: "Rmarkdown文档"
+subtitle: "这是我的副标题"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    #code_folding: hide
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE, 
+  message = FALSE
+)
+```
+
+大家好，我是你们的新朋友 Rmarkdown，有时候简写为Rmd。 你看到\*.Rmd，不要惊慌。现在我就来说说，我有什么不一样的功能吧...
+
+# 运行代码
+
+## object
+```{r}
+x <- 5
+x
+```
+
+
+## vector
+```{r}
+y <- 1:10
+y
+```
+
+
+## data.frame
+```{r}
+df <- data.frame(
+  name      = c("Alice", "Bob", "Carl", "Dave"),
+  age       = c(23, 34, 23, 25),
+  marriage  = c(TRUE, FALSE, TRUE, FALSE),
+  color     = c("red", "blue", "orange", "purple")
+)
+df
+```
+
+
+# 读入数据
+
+```{r}
+library(tidyverse)
+
+rule10_wide  <- read_rds("./data/rule10_wide.rds")
+rule10_wide 
+```
+
+
+# 漂亮表格
+
+```{r, echo = FALSE}
+library(gt)
+
+rule10_wide %>% 
+  arrange(desc(`2013`)) %>% 
+  select(-crop) %>% 
+  gt() %>% 
+  data_color(
+    columns = 2:6, 
+    colors = scales::col_numeric(
+      palette = paletteer::paletteer_d(
+        palette = "ggsci::blue_material"
+      ) %>% as.character(),
+      domain = NULL
+    )
+  ) %>% 
+  fmt_number(2:6) %>% 
+  tab_spanner(
+    label = "Potato Yield in Tonnes/Hectare",
+    columns = c(2:6)
+  ) %>% 
+  tab_style(
+    style = cell_text(color = "black", weight = "bold"),
+    locations = list(
+      cells_column_spanners(everything()),
+      cells_column_labels(everything())
+    )
+  ) %>%  
+  cols_width(
+    1 ~ px(125),
+    2:6 ~ px(65)
+  ) %>% 
+  tab_options(
+    row_group.border.top.width = px(3),
+    row_group.border.top.color = "black",
+    row_group.border.bottom.color = "black",
+    table_body.hlines.color = "white",
+    table.border.top.color = "white",
+    table.border.top.width = px(3),
+    table.border.bottom.color = "white",
+    table.border.bottom.width = px(3),
+    column_labels.border.bottom.color = "black",
+    column_labels.border.bottom.width = px(2),
+  ) %>% 
+  tab_source_note(md("**Table**: @thomas_mock | **Data**: OurWorldInData.org<br>**Inspiration**: @jschwabish"))
+
+
+```
+
+# 生成图片
+
+```{r, echo = FALSE}
+#| fig.align: "center"
+
+library(tidyverse)
+library(ggridges)
+
+lincoln_weather %>%
+  ggplot(aes(x = `Mean Temperature [F]`, y = Month, fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, gradient_lwd = 1.) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_discrete(expand = expand_scale(mult = c(0.01, 0.25))) +
+  scale_fill_viridis_c(name = "Temp. [F]", option = "C") +
+  labs(
+    title = 'Temperatures in Lincoln NE',
+    subtitle = 'Mean temperatures (Fahrenheit) by month for 2016'
+  ) +
+  theme_ridges(font_size = 13, grid = TRUE) + 
+  theme(axis.title.y = element_blank())
+
+```
+
+# 插入图片
+
+```{r, echo = FALSE}
+#| fig.align: "center"
+#| out.width: "45%"
+#| fig.cap: "我的第一女神"
+
+knitr::include_graphics("./images/my_girl.jpg")
+```
+
+# 参考资料
+
+- <https://r4ds.had.co.nz/>
+- <https://bookdown.org/yihui/rmarkdown/html-document.html>

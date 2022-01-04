@@ -1,0 +1,54 @@
+---
+title: "advance dplyr"
+subtitle: "企鹅的故事"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+# 作业
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+
+penguins <- read_csv("./demo_data/penguins.csv") 
+penguins
+```
+
+
+1. 好身材的比例，男宝宝多还是女宝宝多？(提示，先假定一个好身材的标准，比如体重body_mass_g 低于 4200，就是好身材，那么，让新建的变量`goodfit`为1，否则为0；然后按照性别分组，统计每组里1的个数占总数的比例)
+```{r}
+penguins %>% 
+  mutate(
+    goodfit = if_else(body_mass_g < 4200, 1, 0)
+  ) 
+```
+
+2. 不同岛屿的女企鹅的嘴峰深度均值不同？
+
+3. 每种类型企鹅，各种体征属性的均值？
+
+4. 各种体征属性的标准化（提示，标准化函数如下）
+```{r}
+std <- function(x) {
+   (x - mean(x)) / sd(x)
+}
+```
+
+
+
+其中3,4题推荐使用 `across()`
+
+
+

@@ -1,0 +1,53 @@
+---
+title: "ggplot2之几何图形作业"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+# 作业
+
+阅读 <https://bookdown.org/wangminjie/R4DS/eda-height.html>，要求
+
+- 用分面的方法画出不同性别bill_length_mm的密度分布图
+- 同时在每个分面上添加全局分布（灰色背景）
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+penguins <- read_csv("./demo_data/penguins.csv") 
+penguins
+```
+
+
+```{r}
+density_colors <- c(
+  "male"         = "#56B4E9",
+  "female"       = "#EF8A17",
+  "all penguins" = "grey85"
+)
+
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = after_stat(count))) +
+  geom_density(
+    data = penguins %>% select(-sex),
+    aes(fill = "all penguins", color = "all penguins")
+  ) +
+  geom_density(aes(color = sex, fill = sex)) +
+  facet_wrap(vars(sex)) +
+  scale_fill_manual(name = NULL, values = density_colors) +
+  scale_color_manual(name = NULL, values = density_colors) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+```
+

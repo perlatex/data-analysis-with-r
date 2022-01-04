@@ -1,0 +1,389 @@
+---
+title: "The beauty of layer()"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 思考
+
+## 案例一
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+
+penguins <- penguins %>% 
+  drop_na()
+```
+
+统计每个种类企鹅的数量，然后画出来
+
+按照正常的思路，我们一般会先统计，然后喂给ggplot，
+```{r}
+penguins %>% 
+  count(species) %>% 
+  
+  ggplot(aes(x = species, y = n)) +
+  geom_col()
+```
+
+有时候，我们会这样画
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = species)) +
+  geom_bar()
+```
+
+或者这样画
+```{r}
+penguins %>% 
+  ggplot(aes(x = species)) +
+  stat_count()
+```
+
+思考，为什么`geom_bar()/stat_count()`给出了相同的图？里面发生了什么呢？
+
+
+
+
+
+
+## 案例二
+
+现在想画柱状图，柱子的高度代表不同性别下bill_length_mm的均值。
+
+
+```{r}
+df_bar <- penguins %>% 
+  group_by(sex) %>% 
+  summarize(
+    mean_length = mean(bill_length_mm)
+  ) %>% 
+  ungroup()
+
+df_bar
+```
+
+
+```{r}
+df_bar %>% 
+  ggplot(aes(x = sex, y = mean_length)) +
+  geom_col()
+```
+
+同时，我们想画出均值的误差棒（标准误），因此，还需要做点计算
+
+```{r}
+df_errorbar <- penguins %>% 
+  group_by(sex) %>% 
+  summarize(
+    mean_length = mean(bill_length_mm),
+    se = sqrt(var(bill_length_mm)/length(bill_length_mm)),
+  ) %>% 
+  ungroup() %>% 
+  mutate(
+    lower = mean_length - se,
+    upper = mean_length + se
+  )
+
+df_errorbar
+```
+
+然后再来画图
+```{r}
+df_errorbar %>% 
+  ggplot(aes(x = sex, y = mean_length, ymin = lower, ymax = upper)) +
+  geom_errorbar()
+```
+
+
+最后，我们希望柱状图和误差棒叠加到一张图上，那么，需要用到这两个数据框
+
+
+```{r}
+ggplot() +
+  geom_col(
+    data = df_bar,
+    aes(x = sex, y = mean_length)
+  ) +
+  geom_errorbar(
+    data = df_errorbar,
+    aes(x = sex, y = mean_length, ymin = lower, ymax = upper)
+  )
+```
+
+OMG, 为了画一个简单的图，我们需要写这么长的一段代码，不高兴。
+
+
+> 事实上，何必如此幸苦。
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = sex, y = bill_length_mm)) +
+  stat_summary(geom = "bar") +
+  stat_summary(geom = "errorbar")
+```
+
+思考，`stat_summary()`为何物？为什么如此神奇？
+
+
+
+# stat_summary里发生了什么
+
+## 猜想
+
+不要惊慌，我们慢慢来。我们先模拟一个测试数据`height_df`
+
+```{r}
+height_df <- tibble(group = "A",
+                    height = rnorm(30, 170, 10))
+
+height_df
+```
+
+用我们熟悉的`geom_point()`先看看长什么样
+
+```{r}
+height_df %>% 
+  ggplot(aes(x = group, y = height)) +
+  geom_point()
+```
+
+然后用`stat_summary()`代替`geom_point()`，然后看看发生了什么
+
+```{r}
+height_df %>% 
+  ggplot(aes(x = group, y = height)) +
+  stat_summary()
+```
+
+咦，这不是`geom_pointrange()`的图么？它这个几何对象需要哪些美学映射
+
+- x or y
+- ymin or xmin
+- ymax or xmax
+
+
+问题来了，我们没有给`geom_pointrange()`所需要的美学映射`ymin`和`ymax`，那`stat_summmary()`是怎么画出`pointrange`的呢？
+
+
+
+我们先猜测一下：
+> `stat_summary()`先计算出必要的数据值，然后传递给`geom_pointrange()`？是不是呢？
+
+
+## 探寻
+
+我们猜对了，这就是`stat_*()`神秘的地方：
+
+- 首先，`stat_summary()`有一个参数`fun.data`，它的默认值是`mean_se()`
+- 其次，我们看看这个函数
+
+```{r}
+mean_se
+```
+
+
+测试下
+```{r}
+mean_se(height_df$height)
+```
+
+Bingo，找到了`geom_pointrange()`所需要的美学映射`ymin`和`ymax`
+
+
+我们揭开了`stat_summary()`**统计图层**的神秘面纱的一角：
+
+- 函数`stat_summary()`里若没有指定数据，那就会从`ggplot(data = .)`里继承
+- 参数`fun.data` 会调用函数将数据**统计变形**，这个函数默认是`mean_se()`，也可以自定义
+- `fun.data` 返回的是数据框，这个数据框将用于geom参数画图，这里缺省的geom是`pointrange`
+- 如果`fun.data` 返回的数据框包含了所需要的美学映射，图形就会显示出来。
+
+
+
+为了让大家看的更明白，我们在`stat_summary()`中显式地给出`fun.data`和`geom`两个参数
+
+```{r}
+height_df %>% 
+  ggplot(aes(x = group, y = height)) +
+  stat_summary(
+    geom = "pointrange",
+    fun.data = mean_se
+  )
+```
+
+
+
+
+# 真相在哪里？
+
+
+"The Grammar of Graphics": 
+
+> You provide the data, tell 'ggplot2' how to map variables to aesthetics,
+what graphical primitives to use, and it takes care of the details.
+
+
+ggplot2中每个**图层**都要有的五大元素：
+
+1. 数据data 
+2. 美学映射mapping  
+3. 几何图形geom 
+4. 统计变换stat 
+5. 位置调整position
+
+因为任何数据映射后，都想要通过某种几何图形geom来对其进行可视化的展现，此时就需要指定一种数据统计变换的方式（不进行统计变换可以理解为是等值变换）。
+
+我们现在按照这个思路来，理解之前的案例。
+
+
+## 案例一真相
+
+真相在`?layer()`，我们按照它参数补全代码
+
+
+```{r}
+ggplot() +
+  layer(
+    data     = penguins,
+    mapping  = aes(x = species),
+    geom     = "bar",
+    stat     = "count",
+    position = "identity"
+  )
+```
+
+
+> A layer is a combination of data, stat and geom with a potential position adjustment. Usually layers are created using geom_* or stat_* calls but it can also be created directly using this function.
+
+
+### 使用 geom_*()
+```{r}
+penguins %>% 
+  ggplot(aes(x = species)) +
+  geom_bar(
+    stat = "count"     # 缺省值
+  )
+```
+
+
+### 使用 stat_*()
+```{r}
+penguins %>% 
+  ggplot(aes(x = species)) +
+  stat_count(
+    geom = "bar"       # 缺省值
+  )
+```
+
+
+也就说，构建一个图层有以上三种方法。但通常情形下，为了追求简约和可读性，尽管`layer()`才是核心，我们很少直接使用`layer()`，而是用 `geom_*()` 与 `stat_*()` 两种快捷方式。 
+
+
+
+
+
+
+## 案例二真相
+
+案例二有两个图层
+
+### 使用 layer()
+```{r}
+ggplot() +
+  layer(
+    data     = penguins,
+    mapping  = aes(x = sex, y = bill_length_mm),
+    geom     = "bar",
+    stat     = "summary",
+    position = "identity"
+    ) +
+  layer(
+    data     = penguins,
+    mapping  = aes(x = sex, y = bill_length_mm),
+    geom     = "errorbar",
+    stat     = "summary",
+    position = "identity"
+    ) 
+```
+
+### 使用 stat_*()
+```{r}
+ggplot() +
+  stat_summary(
+    data     = penguins,
+    mapping  = aes(x = sex, y = bill_length_mm),
+    geom     = "bar"
+    ) +
+  stat_summary(
+    data     = penguins,
+    mapping  = aes(x = sex, y = bill_length_mm),
+    geom     = "errorbar"
+    ) 
+```
+
+
+### 使用 geom_*()
+```{r}
+ggplot() +
+  geom_bar(
+    data     = penguins,
+    mapping  = aes(x = sex, y = bill_length_mm),
+    stat     = "summary"
+    ) +
+  geom_errorbar(
+    data     = penguins,
+    mapping  = aes(x = sex, y = bill_length_mm),
+    stat     = "summary"
+    ) 
+```
+
+现在用ggplot2画图，是不是有一览众山小的成就感？
+
+
+
+
+# 课后作业
+
+- 在散点图图层上，用三种构建图层方法，添加每组的均值
+```{r}
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_point() 
+```
+
+
+
+- 用另外两种方法重写这段代码
+
+```{r}
+n_fun <- function(x) {
+  data.frame(y = 62,
+            label = length(x),
+            color = ifelse(length(x) > 100, "red", "blue")
+            )
+}
+
+
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_boxplot() +
+  geom_jitter() +
+  stat_summary(
+    fun.data = n_fun,
+    geom = "text"
+  )
+```
+
+

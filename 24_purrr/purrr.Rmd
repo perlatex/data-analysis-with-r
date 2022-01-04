@@ -1,0 +1,476 @@
+---
+title: "高效迭代方法"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+## 列表 vs 向量
+
+假定一向量
+```{r}
+v <- c(-2, -1, 0, 1, 2)
+v
+```
+
+对元素分别取绝对值
+```{r}
+abs(v)
+```
+
+
+如果是列表形式，
+```{r}
+lst <- list(-2, -1, 0, 1, 2)
+```
+
+
+`abs`函数应用到列表中就会报错
+
+```{r, error=TRUE}
+abs(lst)
+```
+
+
+用在向量的函数用在list上，往往行不通。
+
+
+
+再来一个例子：我们模拟了5个学生的10次考试的成绩
+
+```{r}
+exams <- list(
+  student1 = round(runif(10, 50, 100)),
+  student2 = round(runif(10, 50, 100)),
+  student3 = round(runif(10, 50, 100)),
+  student4 = round(runif(10, 50, 100)),
+  student5 = round(runif(10, 50, 100))
+)
+exams
+```
+
+很显然，`exams`是一个列表。那么，每个学生的平均成绩是多呢？
+
+我们可能会想到用mean函数，但是
+```{r, error=TRUE}
+mean(exams)
+```
+
+发现报错了，可以看看帮助文档看看问题出在什么地方
+```{r, eval=FALSE}
+?mean()
+```
+
+帮助文档告诉我们，`mean()`要求第一个参数是**数值型或者逻辑型**的向量。
+而我们这里的`exams`是列表，因此无法运行。
+
+
+那好，我们就用笨办法吧
+```{r}
+list(
+  student1 = mean(exams$student1),
+  student2 = mean(exams$student2),
+  student3 = mean(exams$student3),
+  student4 = mean(exams$student4),
+  student5 = mean(exams$student5)
+)
+```
+
+成功了。但发现我们写了好多代码，如果有100个学生，那就得写更多的代码，如果是这样，程序员就不高兴了，这太累了啊。于是`purrr`包的`map()`函数来解救我们，下面主角出场了。
+
+
+
+## purrr
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+介绍之前，先试试
+```{r}
+map(exams, mean)
+```
+
+哇，短短一句话，得出了相同的结果。
+
+
+### map函数
+
+`map()`函数的第一个参数是list或者vector，第二个参数是函数
+
+```{r, echo = FALSE, fig.align = 'center'}
+knitr::include_graphics("images/dcl/map-step-1.png")
+```
+
+函数 `f` 应用到list/vector 的每个元素
+
+```{r, fig.align = 'center', echo = FALSE}
+knitr::include_graphics("images/dcl/map-step-2.png")
+```
+
+
+于是输入的 list/vector 中的每个元素，都对应一个输出
+
+```{r, out.width = '55%', echo = FALSE}
+knitr::include_graphics("images/dcl/map.png")
+```
+
+最后，所有的输出元素，聚合成一个新的list
+
+```{r, out.width = '55%', echo = FALSE}
+knitr::include_graphics("images/dcl/map-output.png")
+```
+
+整个过程，可以想象 list/vector 是生产线上的盒子，依次将里面的元素，送入加工机器。
+函数决定了机器该如何处理每个元素，机器依次处理完毕后，结果打包成list，最后送出机器。
+
+
+在我们这个例子，`mean()` 作用到每个学生的成绩向量，
+```{r, out.width = '85%', echo = FALSE}
+knitr::include_graphics("images/dcl/map-mean.png")
+```
+
+调用一次`mean()`, 返回一个数值，所以最终的结果是五个数值的列表。
+
+```{r}
+map(exams, mean)
+```
+
+我们也可以使用管道
+```{r}
+map(exams, mean)
+```
+
+```{r}
+exams %>% map(mean)
+```
+
+
+### map函数家族
+
+如果希望返回的是数值型的**向量**，可以这样写`map_dbl()`
+```{r}
+exams %>% map_dbl(mean)
+```
+
+`map_dbl()`要求每个输出的元素必须是数值型
+
+```{r, echo = FALSE}
+knitr::include_graphics("images/dcl/map-dbl.png")
+```
+
+如果每个元素是数值型，`map_dbl()`会聚合所有元素构成一个原子型向量
+
+```{r, out.width = '55%', echo = FALSE}
+knitr::include_graphics("images/dcl/map-dbl-output.png")
+```
+
+如果希望返回的结果是数据框
+```{r}
+exams %>% map_df(mean)
+```
+
+是不是很酷？是不是很灵活？
+
+
+**注意下面的区别**
+
+```{r}
+c(-1, 2, -4, 5) %>% abs
+list(-1, 2, -4, 5) %>% abs
+```
+
+
+```{r}
+c(-1, 2, -4, 5) %>% map_dbl(abs)
+list(-1, 2, -4, 5) %>% map_dbl(abs)
+```
+
+
+
+### 额外参数
+
+将每位同学的成绩排序，默认的是升序。
+```{r}
+map(exams, sort)
+```
+
+如果我们想降序排，需要在`sort()`函数里添加参数 `decreasing = TRUE`。比如
+```{r}
+sort(exams$student1, decreasing = TRUE)
+```
+
+
+`map()`很人性化，可以让函数的参数直接跟随在函数名之和
+
+```{r}
+map(exams, sort, decreasing = TRUE)
+```
+
+当然，也可以添加更多的参数，`map()`会自动的传递给函数。
+
+```{r}
+map(exams, sort, decreasing = TRUE, na.last = TRUE)
+```
+
+
+```{r, out.width = '75%', echo = FALSE}
+knitr::include_graphics("images/dcl/map-extra-arg.png")
+```
+
+
+
+
+### 函数的写法
+
+刚才我们是让学生成绩执行求平均`mean`，求方差`var`等函数。
+```{r}
+exams %>% map(mean)
+```
+
+
+也可以自定义函数。比如我们这里定义了将向量**中心化**的函数（先求出10次考试的平均值，然后每次考试成绩去减这个平均值）
+```{r}
+my_fun <- function(x){
+  x - mean(x)
+}
+
+exams %>% map(my_fun)
+```
+
+我们也可以不用**命名函数**，而使用**匿名函数**。匿名函数顾名思义，就是没有名字的函数，
+```{r, eval=FALSE}
+function(x) x - mean(x)
+```
+
+我们能将匿名函数直接放在`map()`函数中
+```{r}
+exams %>% map( function(x) x - mean(x)  )
+```
+
+
+还可以更加偷懒，用`~`代替`function()`，但**代价**是参数必须是规定的写法，比如`.x`
+
+```{r}
+exams %>% map(~ .x - mean(.x))
+```
+
+有时候，程序员觉得`x`还是有点多余，于是更够懒一点，只用`.`， 也是可以的
+```{r}
+exams %>% map(~ . - mean(.))
+```
+
+`~` 告诉 `map()` 后面跟随的是一个匿名函数，`.` 对应函数的参数，可以认为是一个占位符，等待传送带的student1、student2到student5 依次传递到函数机器。
+
+
+```{r, out.width = '85%', echo = FALSE}
+knitr::include_graphics("images/dcl/map-anonymous.png")
+```
+
+**课堂练习**，对exams数据标准化，要求用purrr-style形式写出函数
+
+```{r}
+exams %>% 
+  map(~ (. - mean(.))/sd(.))
+```
+
+
+**课堂练习**，自己写出更多purrr-style形式的函数
+
+```{r}
+exams %>% map( ~ max(.x) )
+exams %>% map( ~ sort(.x) )
+exams %>% map( ~ quantile(.x) )
+exams %>% map( ~ .x^2 )
+```
+
+
+**课堂练习**， 如果熟悉匿名函数的写法，会增强代码的可读性和简洁程度。比如下面这段代码，找出每位同学有多少门考试成绩是高于80分的
+
+```{r}
+exams %>% 
+  map_int(~ length(.x[.x > 80]))
+```
+
+**建议一步步解析**
+```{r, eval=FALSE}
+~ .x > 80
+
+~ .x[.x > 80]
+
+~ length(.x[.x > 80])
+
+map(~ length(.x[.x > 80]))
+
+map_int(~ length(.x[.x > 80]))
+```
+
+
+
+::: {.rmdnote}
+总之，有三种方法将函数传递给`map()`
+
+
+- 直接传递 
+```{r, eval=FALSE}
+map(.x, mean, na.rm = TRUE)
+```
+
+- 匿名函数 
+
+```{r, eval=FALSE}
+map(.x, funciton(.x) mean(.x, na.rm = TRUE) )
+```
+
+- 使用 `~`  
+
+```{r, eval=FALSE}
+function(.x) .x *2
+
+# Equivalent
+~ .x * 2
+```
+
+```{r, eval=FALSE}
+map(.x, ~ mean(.x, na.rm = TRUE) )
+```
+:::
+
+
+
+
+## 在dplyr函数中的运用map
+
+### 在tibble中
+
+假定有tibble如下
+```{r}
+tb <- 
+  tibble(
+    col_1 = c(1, 2, 3),
+    col_2 = c(100, 200, 300),
+    col_3 = c(0.1, 0.2, 0.3)
+  )
+tb
+```
+
+统计每一列的中位数
+```{r}
+tb %>% 
+  summarise(
+    across(everything(), median)
+  )
+```
+
+tibble本质上是向量构成的列表，因此tibble也适用`map()`函数。即，tibble的每一列，map给函数`f = median`
+
+```{r}
+tb %>% map_df(median)
+```
+
+可能不足以让你心动，我们接着往下看。
+
+
+再比如，`map()`找出企鹅数据中**每列**缺失值`NA`的数量
+
+```{r}
+library(palmerpenguins)
+penguins %>% 
+  map(is.na) %>% 
+  map_int(sum)
+```
+
+
+或者
+```{r}
+penguins %>% 
+  map_int(~ sum(is.na(.)))
+```
+
+
+**课堂练习**，求出缺失值在每列中的比例？
+```{r}
+penguins %>% 
+  map(is.na) %>% 
+  map(sum) %>% 
+  map(~ . / nrow(penguins)) %>% 
+  bind_cols()
+```
+
+或者
+```{r}
+penguins %>% 
+  map(is.na) %>% 
+  map_dbl(~ sum(.) /length(.))
+```
+
+
+
+### 在list-column中
+
+如果想维持数据框的结构不变，新增一列显示**列表列**`x`中对应位置元素的长度，可以这样写
+
+```{r}
+tibble(
+  id = c("a", "b", "c"),
+  x = list(1, 2:3, 4:9)
+) %>% 
+ mutate(num = purrr::map_int(x, length))
+```
+
+
+用于各种函数，比如产生随机数
+```{r}
+tibble(
+  x = c(3, 5, 6)
+) %>% 
+ mutate(r = purrr::map(x, ~rnorm(.x, mean = 0, sd = 1)))
+```
+
+**课堂练习**，继续新增一列，找出每行随机数中的最大值
+```{r}
+tibble(
+  x = c(3, 5, 6)
+) %>% 
+ mutate(r = map(x, ~rnorm(.x, mean = 0, sd = 1))) %>% 
+ mutate(max  = map_dbl(r, max)) %>% 
+ unnest(r)
+```
+
+
+
+用于建模
+
+```{r}
+palmerpenguins::penguins %>% 
+  drop_na() %>% 
+  group_by(species) %>% 
+  nest() %>% 
+  mutate(model = purrr::map(data, ~ lm(bill_length_mm ~ bill_depth_mm, data = .))) %>%
+  mutate(result = purrr::map(model, ~ broom::tidy(.))) %>%
+  unnest(result)
+```
+
+
+或者
+```{r}
+palmerpenguins::penguins %>% 
+  drop_na() %>%
+  group_nest(species) %>%
+  mutate(model = purrr::map(data, ~ lm(bill_length_mm ~ bill_depth_mm, data = .))) %>%
+  mutate(result = purrr::map(model, broom::glance)) %>%
+  tidyr::unnest(result)
+```
+
+
+
+

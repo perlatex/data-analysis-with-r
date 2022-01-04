@@ -1,0 +1,268 @@
+---
+title: "ggplot2之主题设置"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 应用场景
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+penguins <- read_csv("./demo_data/penguins.csv") 
+
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(colour = species))  
+```
+
+这个背景色是灰色的，我不喜欢五十度灰，能否调整下？可以的
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(colour = species)) +
+  theme(
+    panel.background = element_rect(fill = "pink")
+  )
+```
+
+
+# 主题设置
+
+使用方法
+```{r, eval=FALSE}
+theme(element_name = element_function())
+```
+
+这里`element_function()`有四个
+
+```{r, eval=FALSE}
+element_text()
+element_line()
+element_rect()
+element_blank()
+```
+
+望文生义吧，内置元素函数有四个基础类型：
+
+- `element_text()`,  文本，一般用于控制标签和标题的字体风格
+- `element_line()`, 线条，一般用于控制线条或线段的颜色或线条类型
+- `element_rect()`, 矩形区域，一般用于控制背景矩形的颜色或者边界线条类型
+- `element_blank()`, 空白，就是不分配相应的绘图空间，即删去这个地方的绘图元素。
+
+
+每个元素函数都有一系列控制外观的参数，下面我们通过具体的案例来一一介绍吧。
+
+
+
+## 图表整体元素
+
+图表整体元素包括:
+
+| 描述         | 主题元素         | 类型           |
+|--------------|------------------|----------------|
+|整个图形背景  | plot.background  |  element_rect()|
+|图形标题      | plot.title       |  element_text()|
+|图形边距      | plot.margin      |        margin()|
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(colour = species)) +
+  
+  theme(
+    plot.background = element_rect(fill = "orange", color = "black", size = 10),
+    plot.title = element_text(hjust = 1, color = "red", face = "italic"),
+    plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt")
+  )
+```
+
+## 坐标轴元素
+
+坐标轴元素包括:
+
+| 描述         | 主题元素         | 类型           |
+|--------------|------------------|----------------|
+|坐标轴刻度    | axis.ticks       |  element_line()|
+|坐标轴标题    | axis.title       |  element_text()|
+|坐标轴标签    | axis.text        |  element_text()|
+|直线和坐标轴  | axis.line        |  element_line()|
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(colour = species)) +
+  
+  theme(
+    axis.line = element_line(color = "orange", size = 2),
+    axis.title = element_text(color = "red", face = "italic"),
+    axis.ticks = element_line(color = "purple", size = 3),
+    axis.text = element_text(color = "blue"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+
+
+## 面板元素
+
+面板元素包括:
+
+| 描述         | 主题元素         | 类型           |
+|--------------|------------------|----------------|
+|面板背景      | panel.background | element_rect() |
+|面板网格线    | panel.grid       | element_line() |
+|面板边界      | panel.border     | element_rect() |
+
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(colour = species)) +
+  
+  theme(
+    panel.background = element_rect(fill = "orange", color = "red"),
+    panel.grid = element_line(color = "grey80", size = 0.5)
+  )
+```
+
+
+
+
+
+
+
+## 图例元素
+
+图例元素包括:
+
+| 描述         | 主题元素         | 类型           |
+|--------------|------------------|----------------|
+|图例背景      | legend.background|  element_rect() |
+|图例符号      | legend.key       |  element_rect() |
+|图例标签      | legend.text      |  element_text() |
+|图例标题      | legend.title     |  element_text() |
+|图例边距      | legend.margin    |       margin    |
+|图例位置      | legend.postion   |"top", "bottom", "left", "right"|
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(colour = species)) +
+  
+  theme(
+    legend.background = element_rect(fill = "orange"),
+    legend.title = element_text(color = "blue", size = 10),
+    legend.key = element_rect(fill = "grey80"),
+    legend.text = element_text(color = "red"),
+    legend.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt"),
+    legend.position = "bottom"
+  )
+```
+
+
+## 分面元素
+
+分面元素包括:
+
+| 描述         | 主题元素         | 类型           |
+|--------------|------------------|----------------|
+| 分面标签背景 | strip.background | element_rect() |
+| 条状文本     | strip.text       | element_text() |
+| 分面间隔     | panel.spacing    | unit           |
+
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(colour = species)) +
+  facet_wrap(vars(species)) +
+  
+  theme(
+    strip.background = element_rect(fill = "orange"),
+    strip.text = element_text(color = "red"),
+    panel.spacing = unit(0.3, "inch") 
+  )
+```
+
+
+## 练习
+
+在图中找出每条语句所控制的位置
+
+```{r}
+penguins %>%
+  ggplot(aes(bill_length_mm, bill_depth_mm)) +
+  geom_point(aes(color = species)) +
+  
+  theme(
+    legend.background = element_rect(
+      fill = "#fff6c2",
+      color = "black",
+      linetype = "dashed"
+    ),
+    legend.key = element_rect(fill = "grey", color = "brown"),
+    panel.background = element_rect(
+      fill = "#005F59",
+      color = "red", size = 3
+    ),
+    panel.border = element_rect(
+      color = "black",
+      fill = "transparent",
+      linetype = "dashed", size = 3
+    ),
+    plot.background = element_rect(
+      fill = "#a1dce9",
+      color = "black",
+      size = 1.3
+    ),
+    legend.position = "bottom"
+  )
+```
+
+
+
+## 王老师教你偷懒
+
+- `theme_minimal()` 可以去掉灰色背景和网格线
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = species, fill = species)) +
+  geom_bar() + 
+  scale_fill_manual(values = c("#74656E", "#E2D9C1", "#608690")) +
+  theme_minimal() +
+  theme(plot.background = element_rect(fill = "#FBCE74"))
+```
+
+
+- `theme_classic()` 经典风格
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = species, fill = species)) +
+  geom_bar() + 
+  theme_classic(base_size = 25)
+```
+
+
+# 小结
+
+```{r, out.width = '99%', echo = FALSE}
+knitr::include_graphics("images/ggplot2-themes.jpg")
+```
+

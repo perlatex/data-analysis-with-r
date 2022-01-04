@@ -1,0 +1,53 @@
+---
+title: "ggplot2 theme作业"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+# 作业
+
+假定数据是这样
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+
+set.seed(12)
+d1 <- data.frame(x = rnorm(50, 10, 2), type = "Island #1")
+d2 <- data.frame(x = rnorm(50, 18, 1.2), type = "Island #2")
+
+dd <- bind_rows(d1, d2) %>%
+  set_names(c("Height", "Location"))
+
+head(dd)
+```
+
+
+你画图后，交给老板看
+```{r}
+dd %>%
+  ggplot(aes(x = Height, fill = Location)) +
+  geom_histogram(binwidth = 1, color = "white") +
+  scale_fill_manual(values = c("green3", "turquoise3"))
+```
+
+然而，老板有点不满意，希望你要这样改
+```{r, echo=FALSE, out.width='85%'}
+knitr::include_graphics("images/advisor_email.png")
+```
+
+
+请用学到的内容让老板满意吧
+
+

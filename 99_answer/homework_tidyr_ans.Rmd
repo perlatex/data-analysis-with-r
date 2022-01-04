@@ -1,0 +1,62 @@
+---
+title: "tidyr作业"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+这里是虚构的六位同学的各科考试成绩，`NA`代表未参加考试
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+example <- 
+ tibble::tribble(
+   ~name, ~english, ~chinese, ~math, ~sport, ~psy, ~edu,
+     "A",     133,    100,    102,     56,    89,   89,
+     "B",     120,    120,     86,     88,    45,   75,
+     "C",      98,    109,    114,     87,    NA,   84,
+     "D",     120,     78,    106,     68,    86,   69,
+     "E",     110,     99,    134,     98,    75,   70,
+     "F",      NA,    132,    130,     NA,    68,   88
+   )
+example
+```
+
+
+# 作业
+
+- 用各科的均值代替缺失值`NA`
+
+```{r}
+example %>% 
+  mutate(
+    across(where(is.numeric), ~ if_else(is.na(.x), mean(., na.rm = T), .x))
+  )
+
+```
+
+
+- 旋转数据框，即希望数据框的第一列是各科目，然后第二列到最后一列是学生姓名，A, B...F
+
+```{r}
+example %>%
+  tidyr::pivot_longer(
+    cols = -name,
+    names_to = "discipline",
+    values_to = "score"
+  ) %>%
+  tidyr::pivot_wider(
+    names_from = name,
+    values_from = score
+  )
+```
+

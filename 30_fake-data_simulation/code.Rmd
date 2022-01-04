@@ -1,0 +1,121 @@
+---
+title: "Understand statistical methods using fake-data simulation"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+logit <- qlogis
+inv_logit <- plogis
+```
+
+
+## 线性回归模型
+
+
+```{r}
+n <- 100
+beta <- c(2, 3, 4)
+
+fake_1 <-
+  tibble(
+    x1 = rnorm(n, mean = 0, sd = 1),
+    x2 = rnorm(n, mean = 5, sd = 4)
+  ) %>%
+  mutate(
+    y = rnorm(n, mean = beta[1] + beta[2] * x1 + beta[3] * x2, sd = 2)
+  )
+
+head(fake_1)
+```
+
+
+```{r}
+fit1 <- lm(
+  y ~ x1 + x2,
+  data = fake_1
+)
+fit1
+```
+
+
+
+## Logitistic 回归模型
+
+```{r}
+n <- 100
+beta <- c(2, 3, 4)
+
+fake_2 <-
+  tibble(
+    x1 = rnorm(n, mean = 0, sd = 0.4),
+    x2 = rnorm(n, mean = -0.5, sd = 0.4)
+  ) %>%
+  mutate(y = rbinom(n, size = 1, p = inv_logit(beta[1] + beta[2] * x1 + beta[3] * x2)))
+
+head(fake_2)
+```
+
+
+```{r}
+fit2 <- glm(y ~ x1 + x2,
+  data = fake_2,
+  family = binomial(link = "logit")
+)
+fit2
+```
+
+## 多层模型
+
+```{r}
+n <- 100
+
+sd1   <- 2.18
+sd2   <- 6.87
+rho   <- 0.42
+
+Msigma  <- matrix(c(sd1^2, rho * sd1 * sd2,
+                    rho * sd1 * sd2, sd2^2), nrow = 2)
+  
+beta <- 
+  MASS::mvrnorm(n = 5, mu = c(0, 0), Sigma = Msigma) 
+beta
+```
+
+
+
+```{r}
+fake_3 <-
+  tibble(
+    x = rnorm(n, mean = 0, sd = 0.4),
+    g = sample(1:5, size = n, replace = TRUE)
+  ) %>% 
+  mutate( mu = 10 + 5*x + beta[g, 1] + beta[g, 2] * x) %>% 
+  mutate(
+    y = rnorm(n, mean = mu, sd = 2)
+  )
+head(fake_3)
+```
+
+
+
+```{r}
+library(lme4)
+fit3 <- lmer(
+   y ~ 1 + x +  (1 + x | g),
+   data = fake_3,
+   REML = FALSE
+   )
+fit3
+```
+
