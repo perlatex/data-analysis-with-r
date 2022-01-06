@@ -1,4 +1,4 @@
-# survey-data-analysis-with-r
+# data-analysis-with-r
 
 
 <p style="text-align:center;"><img src="data_science.jpg" height="400px" width="450px"></p>
