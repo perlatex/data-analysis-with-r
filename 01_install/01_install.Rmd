@@ -248,3 +248,131 @@ ggplot(midwest, aes(x = area, y = poptotal)) +
 -   安装宏包太慢，怎么解决？
 
 -   安装宏包，遇到报错信息"unable to access index for repository..."？
+
+
+# 如何使用Rstudio Cloud
+
+## 可能
+
+学习R语言，首先需要配置运行环境，但可能遇到
+
+- 安装R和Rstudio路径不规范，
+- 也有可能电脑的版本老旧，
+- 还有就是有些同学的电脑开机用户名是中文，导致在Rmarkdown里运行结果不能正常显示。
+
+这些不顺畅的因素都会带来挫败感，从而影响入门学习的心情。
+
+
+
+本文介绍\color{red}{免安装}的方法！
+
+
+## 云平台 
+
+浏览器打开 https://rstudio.cloud/
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig01.png")
+```
+
+  
+## 注册 
+
+注册一个账号
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig02.png")
+```
+
+  
+## 填入信息 
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig03.png")
+```
+
+
+
+## 登录后创建Project
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig04.png")
+```
+
+## 导入课件
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig05.png")
+```
+\small
+复制 https://github.com/perlatex/data-analysis-with-r 
+
+
+## 开始界面
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig06.png")
+```
+
+
+## 安装宏包
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig07.png")
+```
+
+
+## 安装宏包
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig08.png")
+```
+
+## 打开学习课件
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig09.png")
+```
+
+以上步骤成功后，每次都是从这里开始喔！
+
+## 愉快的玩耍
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig10.png")
+```
+
+
+## 每段代码都成功后，整体可以生成一份文档
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig11.png")
+```
+
+
+
+## 她的样子
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig12.png")
+```
+
+
+## 她在代码的身边
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig13.png")
+```
+
+## 导出到本地
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig14.png")
+```
+
+
+##
+\Huge
+\centering{
+Welcome to R, RStudio, and the tidyverse!
+}
