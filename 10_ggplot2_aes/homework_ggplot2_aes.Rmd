@@ -25,6 +25,9 @@ library(gapminder)
 gapminder
 ```
 
+## 筛选2007年的记录
+
+
 ## 画出2007年人均寿命与人均GDP的散点图 
 (提示：人均GDP为x轴，人均寿命为y轴)
 
