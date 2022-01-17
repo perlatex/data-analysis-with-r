@@ -17,7 +17,7 @@ output:
 
 
 
-# 作业
+# 作业1
 
 ```{r message = FALSE, warning = FALSE}
 library(tidyverse)
@@ -68,6 +68,182 @@ penguins %>%
     across(contains("_"), std)
   )
 ```
+
+
+
+
+# 作业2
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+library(gapminder)  # install.packages("gapminder")
+gapminder
+```
+
+
+这是一份关于人均寿命与人均GDP的统计数据，变量含义：
+
+- country      国家( 142 个国家)  
+- continent    所在洲(五大洲)
+- year         年份(1952 - 2007, 每5年)
+- lifeExp      人均寿命
+- pop          人口数量
+- gdpPercap    人均国民生产总值
+
+
+
+
+1. 找出2007年的数据
+```{r}
+gapminder %>% filter(year == 2007)
+```
+
+2. 找出1952年的数据，并保存
+```{r}
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+
+gapminder_1952
+```
+
+3. 找出亚洲的记录
+```{r}
+gapminder %>% filter(continent == 'Asia')
+```
+
+
+4. 找出2007年美国的记录
+```{r}
+gapminder %>% filter(year == 2007, country == 'United States')
+```
+
+5. 找出2002年中国和泰国记录
+```{r}
+gapminder %>%
+  filter(country %in% c("China", "Thailand"), year == 2002)
+```
+
+6. 按照gdpPercap降序排列
+```{r}
+gapminder %>% arrange(desc(gdpPercap))
+```
+
+7. 找出1992年的数据，然后按照人均寿命升序排序
+
+```{r}
+gapminder %>%
+  filter(year == 1992) %>%
+  arrange(lifeExp)
+```
+
+
+8. 1992年欧洲哪个国家人口最多？
+```{r}
+gapminder %>%
+  filter(year == 1992, continent == 'Europe') %>%
+  arrange(desc(pop))
+```
+
+9. 1962年美洲哪个国家人均寿命最短?
+```{r}
+gapminder %>%
+  filter(year == 1962, continent == 'Americas') %>%
+  arrange(lifeExp)
+```
+
+10. 人口数量换算成以百万单位
+```{r}
+gapminder %>%
+  mutate(pop = pop / 1000000)
+```
+
+
+11. 计算国民生产总值
+```{r}
+gapminder %>% 
+  mutate(gdp = pop * gdpPercap)
+```
+
+12. 计算人均GDP和人均寿命的对数
+```{r}
+gapminder %>% 
+  mutate(
+    gdpPercap_log = log(gdpPercap),
+      lifeExp_log = log(lifeExp)
+  )
+```
+
+13. 统计每个洲的人均寿命
+```{r}
+gapminder %>%
+  group_by(continent) %>%
+  summarise(lifeExp = mean(lifeExp))
+```
+
+
+14. 统计1957年每个洲的人均寿命的中位数和人均GDP的最大值
+```{r}
+gapminder %>%
+  filter(year == 1957) %>%
+  summarize(
+    medianLifeExp = median(lifeExp),
+    maxGdpPercap = max(gdpPercap)
+  )
+```
+
+
+15. 统计每年的人均寿命的中位数和人均GDP的最大值
+```{r}
+gapminder %>%
+  group_by(year) %>%
+  summarize(
+    medianLifeExp = median(lifeExp),
+    maxGdpPercap = max(gdpPercap)
+  )
+```
+
+16. 统计每年人均寿命、人口数量以及人均GDP的均值
+```{r}
+gapminder %>%
+  group_by(year) %>%
+  summarize(
+    across(c(lifeExp, pop, gdpPercap), mean)
+  )
+
+# or
+gapminder %>%
+  group_by(year) %>%
+  summarize(
+    across(where(is.numeric), mean)
+  )
+```
+
+17. 数据集中包含了哪些国家？
+```{r}
+gapminder %>%
+  count(country)
+
+# or
+gapminder %>%
+  distinct(country)
+```
+
+
+
+18. 数据集中每个洲包含多少个国家？
+
+```{r}
+gapminder %>%
+  group_by(continent) %>%
+  summarize(
+    n_countries = n_distinct(country)
+  )
+```
+
+
+
+
+
 
 
 
