@@ -128,7 +128,9 @@ babynames %>% select(ends_with("n"))
 
 3. 选出 `prop` 大于0.08 的所有 `name`
 ```{r}
-babynames %>% filter(prop > 0.08)
+babynames %>% 
+  filter(prop > 0.08) %>% 
+  select(name)
 ```
 
 4. 显示所有名叫 "Sea" 的儿童的行
