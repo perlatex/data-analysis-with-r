@@ -42,7 +42,7 @@ kidiq
 
 4. 构建新的一列`index`，其中 $index = mom_iq/mom_age$
 
-5. 中心化 mom_iq （提示：中心化 = mom_iq值 - 全部mom_iq的均值，`mom_iq - mean(mom_iq)`）
+5. 中心化 mom_iq，然后放到新的一列（提示：中心化 = mom_iq值 - 全部mom_iq的均值，`mom_iq - mean(mom_iq)`）
 
 6. 按mom_hs分组，计算 mom_iq 均值、kid_score的均值以及mom_age的最大值
 

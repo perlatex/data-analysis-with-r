@@ -54,7 +54,7 @@ x[c(TRUE, FALSE, TRUE, FALSE, TRUE)]
 ```
 
 ```{r}
-x[x > 4]
+x[x > 4]    # 选取向量中大于4的元素
 ```
 
 - 如果是命名向量

@@ -65,7 +65,7 @@ kidiq %>%
 ```
 
 
-5. 中心化 mom_iq （提示：中心化 = mom_iq值 - 全部mom_iq的均值，`mom_iq - mean(mom_iq)`）
+5. 中心化 mom_iq，然后放到新的一列（提示：中心化 = mom_iq值 - 全部mom_iq的均值，`mom_iq - mean(mom_iq)`）
 
 ```{r}
 kidiq %>%
