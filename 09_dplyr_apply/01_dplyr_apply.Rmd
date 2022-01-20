@@ -246,6 +246,10 @@ tb1 %>%
 sum(c(1, 2, NA, 4), na.rm = FALSE)
 ```
 
+```{r}
+mean(c(1, 2, NA, 4), na.rm = FALSE)
+```
+
 
 ## 寻找企鹅中的胖子
 
@@ -256,17 +260,17 @@ penguins %>%
 )
 ```
 
-**随堂练习**：用考试成绩的均值代替缺失值
+**随堂练习**：用考试成绩的均值代替缺失值(NA)
 
 ```{r}
 df <- tibble::tribble(
-    ~name,     ~type, ~score,
-  "Alice", "english",    80,
-  "Alice",    "math",    NA,
-    "Bob", "english",    70,
-    "Bob",    "math",    69,
-  "Carol", "english",    NA,
-  "Carol",    "math",    90
+    ~name,      ~type, ~score,
+  "Alice",  "english",    80,
+  "Alice",     "math",    NA,
+    "Bob",  "english",    70,
+    "Bob",     "math",    69,
+  "Carol",  "english",    NA,
+  "Carol",     "math",    90
   )
 df
 ```
@@ -324,7 +328,7 @@ penguins %>%
 penguins %>%
   group_by(species) %>%
   summarise(
-    n = n(),
+    n = n()
   )
 ```
 
