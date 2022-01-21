@@ -1,5 +1,5 @@
 ---
-title: "advance dplyr"
+title: "dplyr across"
 subtitle: "企鹅的故事"
 author: "王小二"
 date: "`r Sys.Date()`"

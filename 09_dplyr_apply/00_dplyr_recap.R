@@ -69,7 +69,10 @@ df %>%
 
 df %>%
   group_by(name) %>%
-  mutate(mean_score = mean(score))
+  mutate(
+    mean_score = mean(score),
+    median_score = median(score)
+  )
 
 
 
