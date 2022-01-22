@@ -37,6 +37,10 @@ kidiq
 1. 说出数据框中每一列的变量类型
 ```{r}
 kidiq %>% 
+  glimpse()
+  
+# or
+kidiq %>% 
   summarise(
     across(everything(), typeof)
   )
@@ -48,6 +52,9 @@ kidiq %>%
   summarise(
     mean = mean(kid_score)
   )
+
+# or
+mean(kidiq$kid_score)
 ```
 
 3. 统计母亲完成高中的比例

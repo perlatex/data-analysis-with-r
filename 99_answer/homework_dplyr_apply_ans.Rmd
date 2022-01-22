@@ -141,14 +141,16 @@ gapminder %>%
 ```{r}
 gapminder %>%
   filter(year == 1992, continent == 'Europe') %>%
-  arrange(desc(pop))
+  arrange(desc(pop)) %>% 
+  slice(1)
 ```
 
 9. 1962年美洲哪个国家人均寿命最短?
 ```{r}
 gapminder %>%
   filter(year == 1962, continent == 'Americas') %>%
-  arrange(lifeExp)
+  arrange(lifeExp) %>% 
+  slice(1)
 ```
 
 10. 人口数量换算成以百万单位
@@ -185,6 +187,7 @@ gapminder %>%
 ```{r}
 gapminder %>%
   filter(year == 1957) %>%
+  group_by(continent) %>%
   summarize(
     medianLifeExp = median(lifeExp),
     maxGdpPercap = max(gdpPercap)
