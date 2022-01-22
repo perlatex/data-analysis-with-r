@@ -147,7 +147,7 @@ penguins %>% filter(sex == "male")
 
 
 ```{r}
-penguins %>% filter(species %in% c("Adelie", "Gentoo"))
+penguins %>% filter(sex == "male")
 ```
 
 
@@ -165,6 +165,14 @@ penguins %>%
 ```{r}
 penguins %>%
   filter(species == "Adelie", bill_length_mm == max(bill_length_mm) )
+```
+
+
+`between()`的用法
+```{r}
+penguins %>% filter(bill_length_mm > 35, bill_length_mm < 40)
+
+penguins %>% filter( between(bill_length_mm, 35, 40) )
 ```
 
 

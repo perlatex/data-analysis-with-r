@@ -1,0 +1,26 @@
+---
+title: "dplyr adv"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+## group_by()
+
+## group_split() 
+
+## group_map() 
+
+## group_modify()
+
+## group_nest()
+
+## group_data(), group_keys(), group_rows()

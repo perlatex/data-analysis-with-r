@@ -1,0 +1,120 @@
+---
+title: "dplyr more"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+```
+
+
+## distinct() 与 n_distinct() 的区别
+```{r}
+df <- tibble::tribble(
+  ~x, ~y, ~z,
+  1, 1, 1,
+  1, 1, 2,
+  1, 1, 1,
+  2, 1, 2,
+  2, 2, 3,
+  3, 3, 1
+)
+df
+```
+
+
+- `distinct()`处理对象是data.frame，功能是**筛选不重复的row**，返回是data.frame
+
+
+```{r}
+df %>%
+  distinct()
+```
+
+
+```{r}
+df %>%
+  distinct(x)
+
+df %>%
+  distinct(x, y)
+```
+
+
+```{r}
+df %>%
+  distinct(x, y, .keep_all = TRUE) # 只保留最先出现的row
+```
+
+
+```{r}
+df %>%
+  distinct(
+    across(c(x, y)),
+    .keep_all = TRUE
+  )
+```
+
+
+```{r}
+df %>%
+  group_by(x) %>%
+  distinct(y, .keep_all = TRUE)
+```
+
+
+
+- `n_distinct()`处理的对象是vector，功能是**统计不同的元素有多少个**，返回数值个数
+```{r}
+c(1, 1, 1, 2, 2, 1, 3, 3) %>% n_distinct()
+```
+
+
+```{r}
+df$z %>% n_distinct()
+```
+
+
+```{r}
+df %>%
+  group_by(x) %>%
+  summarise(
+    n = n_distinct(z)
+  )
+```
+
+
+## bind_rows() 与 bind_cols()
+
+这两个函数用于数据框的合并或者绑定。
+
+- `bind_cols()`, 列绑定，要求两个数据框的row必须相等
+```{r}
+df1 <- tibble(a = 1:2, b = 3:4)
+df2 <- tibble(x = 5:6, y = 7:8)
+
+bind_cols(df1, df2)
+```
+
+
+
+- `bind_rows()`，行绑定，要求两个数据框的列名必须一致
+```{r}
+tb1 <- tibble(a = 1:4, b = 5:8)
+tb2 <- tibble(a = 1:2, b = 3:4)
+
+bind_rows(tb1, tb2)
+```
+
+
