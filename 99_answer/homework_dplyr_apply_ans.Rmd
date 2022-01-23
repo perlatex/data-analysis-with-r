@@ -39,7 +39,7 @@ penguins %>%
   )
 ```
 
-2. 不同岛屿的女企鹅的嘴峰深度均值不同？
+2. 不同岛屿女企鹅嘴峰长度的均值？
 ```{r}
 penguins %>% 
   filter(sex == "female") %>% 
@@ -57,6 +57,7 @@ penguins %>%
     across(contains("_"), mean, na.rm = TRUE)
   )
 ```
+
 4. 各种体征属性的标准化（提示，标准化函数如下）
 ```{r}
 std <- function(x) {
