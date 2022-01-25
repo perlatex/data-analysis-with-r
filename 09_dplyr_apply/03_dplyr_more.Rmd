@@ -34,7 +34,7 @@ df
 ```
 
 
-- `distinct()`处理对象是data.frame，功能是**筛选不重复的row**，返回是data.frame
+- `distinct()`处理对象是data.frame，功能是**保留没有重复的row**，返回是data.frame
 
 
 ```{r}
