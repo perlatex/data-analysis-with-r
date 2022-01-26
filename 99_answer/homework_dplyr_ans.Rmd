@@ -155,8 +155,16 @@ babynames %>% filter(is.na(n))
 babynames %>% filter(name %in% c("Sea", "Anemone"))
 ```
 
-7. 只使用了5次或者6次的姓名
+7. 只使用了5次或者6次的姓名(提示，先求和，再筛选)
 ```{r}
+babynames %>%
+  group_by(name) %>% 
+  summarise(
+    sum_n = sum(n)
+  ) %>% 
+  filter(sum_n == 5 | sum_n == 6) 
+
+
 babynames %>%
   group_by(name) %>%
   summarise(
@@ -173,7 +181,8 @@ babynames %>%
   summarise(
     num = sum(n)
   ) %>%
-  arrange(desc(num))
+  arrange(desc(num)) %>% 
+  slice_max(num, n = 10)
 ```
 
 9. 2015年使用最多的女孩姓名
@@ -181,8 +190,8 @@ babynames %>%
 ```{r}
 babynames %>%
   filter(year == "2015", sex == "F") %>%
-  arrange(desc(n)) %>% 
-  slice(1)
+  slice_max(n) %>% 
+  pull(name)
 ```
 
 10. 统计男孩和女孩的人数

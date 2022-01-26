@@ -56,6 +56,12 @@ penguins %>%
   summarise(
     across(contains("_"), mean, na.rm = TRUE)
   )
+
+penguins %>% 
+  group_by(species) %>% 
+  summarise(
+    across(where(is.numeric) & !year, mean, na.rm = TRUE)
+  )
 ```
 
 4. 各种体征属性的标准化（提示，标准化函数如下）
