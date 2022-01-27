@@ -14,62 +14,33 @@ output:
 ---
 
 
-
-
-# 复习
-
-## "The Grammar of Graphics"
-
-> You provide the data, tell 'ggplot2' how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details.
-
-
-```{r, eval = FALSE}
-ggplot(data = <DATA>, mapping = aes(<MAPPINGS>)) +
-  <GEOM_FUNCTION>() +
-  <GEOM_FUNCTION>() +
-  <SCALE_FUNCTION>() +
-  <THEME_FUNCTION>()
+```{r, eval=FALSE}
+install.packages( 
+ c("ggridges", "see", "palmerpenguins", "datapasta", "colorspace", 
+   "cowplot",  "gganimate", "ggrepel", "ggforce", "janitor", "patchwork", 
+   "readxl",  "showtext", "styler", "remotes", "rnaturalearth") 
+)
 ```
 
 
-
-
-
-1. `data`: 数据框data.frame (注意，不支持向量vector和列表list类型）
-
-
-2. `geoms`: 几何形状，确定我们想画什么样的图，一个`geom_***`确定一种形状。比如
-    - `geom_point()` 画点图
-    - `geom_line()`  画折线图
-    - `geom_smooth()`画平滑曲线
-
-    
-3. `aes`: 数据框中的数据变量**映射**到图形属性。
-   - 什么叫图形属性？就是图中点的位置、形状，大小，颜色等眼睛能看到的东西。常见图形属性包括：
-    + x（x轴方向的位置）
-    + y（y轴方向的位置）
-    + color（点或者线等元素的颜色）
-    + size（点或者线等元素的大小）
-    + shape（点或者线等元素的形状）
-    + alpha（点或者线等元素的透明度）
-    
-   - 什么叫映射？就是一种对应关系，一个图形属性对应着数据框的一列。比如sex变量（有`female`和`male`两组）映射到颜色，那么`female`对应一种颜色，而`male`对应成另一种颜色。 数值上的`female`和`male`两种字符，映射成图形上的两种颜色。
-     
-    
-```{r, echo = FALSE}
-knitr::include_graphics("./images/how_to_plot.png")
-```
-
-
-
-## 数据类型
+# 数据类型
 
 ```{block}
-前面讲到R语言数据类型，有字符串型、数值型、因子型、逻辑型、日期型等，
-ggplot2会将字符串型、因子型、逻辑型、日期型默认为**离散变量**，
-而数值型默认为**连续变量**。
+R语言数据类型：有字符串型、数值型、因子型、逻辑型、日期型等。
 
-我们在而呈现数据的时候，可能会同时用到多种类型的数据，比如
+ggplot2的视角：**离散变量**、**连续变量**、**日期变量**。
+
+
+**离散变量**: 字符串型<chr>, 因子型<fct>, 逻辑型<lgl>
+
+**连续变量**: 双精度数值<dbl>, 整数数值<int>
+
+**日期变量**: 日期<date>, 时间<time>, 日期时间<dttm>
+```
+
+
+
+我们在ggplot2绘图的时候，可能会同时用到多种类型的变量，比如
 
 * 一个离散
 * 一个连续
@@ -80,7 +51,12 @@ ggplot2会将字符串型、因子型、逻辑型、日期型默认为**离散�
 
 * 三个连续
 
+
+
+```{block}
+接下来，我们需要围绕不同数据类型，思考应该选择什么样的形状，回答数据问题。
 ```
+
 
 
 # 开始
@@ -93,13 +69,6 @@ penguins <- read_csv("./demo_data/penguins.csv")
 penguins
 ```
 
-
-
-
-
-```{block}
-接下来，我们需要思考应该选择什么样的形状，回答数据问题。
-```
 
 
 ## 每个种类有多少企鹅
@@ -126,7 +95,7 @@ penguins %>%
 ```
 
 
-是好图吗？怎么改进？
+是好图吗？如果不是，怎么改进？
 
 - 排序 
 ```{r}
@@ -159,7 +128,7 @@ penguins %>%
 ```
 
 
-**课堂练习**：用单独一个颜色高亮Gentoo那根柱子，其他两个柱子用灰色
+**课堂练习**：用单独一个颜色高亮`Gentoo`那根柱子，其他两个柱子用灰色
 
 ```{r}
 penguins %>%
@@ -392,7 +361,7 @@ penguins %>%
 
 ## 增加拟合回归线
 
-### polynomial regression
+### 多项式回归
 ```{r}
 penguins %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
@@ -402,7 +371,7 @@ penguins %>%
 
 
 
-### linear regression
+### 线性回归
 ```{r}
 penguins %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
@@ -412,7 +381,7 @@ penguins %>%
 
 
 
-### logistic regression 
+### 逻辑回归 
 ```{r}
 penguins %>%
   mutate(sex = if_else(sex == "male", 1, 0)) %>%
@@ -428,7 +397,7 @@ penguins %>%
 
 ## 二维密度分布图
 
-二维版本的stat_density()
+`stat_density2d()`是二维版本的`stat_density()`
 
 ```{r}
 penguins %>%
@@ -446,13 +415,35 @@ penguins %>%
   stat_density2d(aes(colour = stat(level)))
 ```
 
+更推荐使用ggdensity的方案
+```{r, fig.asp = 0.6, fig.width=8}
+library(ggdensity) # remotes::install_github("jamesotto852/ggdensity")
 
+penguins %>%
+  ggplot(aes(flipper_length_mm, bill_length_mm, fill = species)) +
+  ggdensity::geom_hdr(xlim = c(160, 240), ylim = c(30, 70)) +
+  geom_point(shape = 21)
+```
 
+## 马赛克图
+```{r}
+penguins %>% 
+  select(sex, species, flipper_length_mm) %>% 
+  mutate(interval = cut(flipper_length_mm, breaks = 8)) %>% 
+  count(sex, interval) %>% 
+  ggplot(aes(y = sex, x = interval, fill = n)) +
+  geom_tile(width = 0.95, height = 0.95, colour = "white") +
+  #scale_x_discrete(name = NULL, expand = c(0, 0)) +
+  #scale_y_discrete(name = NULL, expand = c(0, 0)) +
+  coord_fixed(expand = FALSE) +
+  ggtitle("Palmer's Penguins' dataset")
+```
 
 ## 分组
 
 ggplot2实现分组的方法很多，通常情况下，是把一个**离散变量**映射到以下**图形属性**
 
+- `group`
 - `color`
 - `fill`
 - `alpha`
@@ -648,6 +639,22 @@ ggplot() +
 
 **课堂练习**：自己定义一个函数，然后画出来
 
+
+
+## 地图
+
+```{r}
+library(rnaturalearth) # install.packages("rnaturalearth")
+
+world_map_data <- ne_countries(scale = "medium", returnclass = "sf")
+
+ggplot(data = world_map_data) +
+  geom_sf(fill = "antiquewhite1") +
+  theme(panel.background = element_rect(fill = "aliceblue"))
+```
+
+
+
 # 总结
 
 - `geom_point()`
@@ -662,9 +669,10 @@ ggplot() +
 - `ggridges::geom_density_ridges()`
 - `geom_path()`
 - `geom_segment()`
-- `geom_function`
+- `geom_function()`
+- `geom_sf()`
 - `facet_wrap()`
-- `fct_reorder()`
+- `forcats::fct_reorder()`
 
 
 

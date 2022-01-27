@@ -1,0 +1,116 @@
+---
+title: "ggplot2 grouping"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+```
+
+
+
+## 分组
+
+```{r}
+fake_data <- tibble(
+  country       = rep(c("Germany", "United States", "China"), times = 3),
+  year          = rep(c(2019L, 2020L, 2021L), each = 3),
+  co2_emissions = c(15, 8, 7, 18, 12, 5, 20, 8, 2)
+)
+
+fake_data
+```
+
+同一个国家用线条连接
+```{r}
+fake_data %>%
+  ggplot(aes(x = year, y = co2_emissions)) +
+  geom_line()
+```
+
+不是我们想要的，原因在于，画**线条图**需要指定分组`aes(group = ...)`的，这相当于告诉ggplot2，图中某些点是属于某组群的，然后相同组的点用直线连接起来。
+
+ggplot2里实现分组的方法很多：
+
+- `group     = group`
+- `color     = group + color`
+- `fill      = group + fill`
+- `linetype  = group + linetype` 
+- `shape     = group + shape`
+- `size      = group + size`
+- `alpha     = group + alpha`
+
+
+
+```{r}
+fake_data %>%
+  ggplot(aes(x = year, y = co2_emissions, group = country)) +
+  geom_line()
+```
+
+
+```{r}
+fake_data %>%
+  ggplot(aes(x = year, y = co2_emissions, color = country)) +
+  geom_line()
+```
+
+
+
+
+
+```{r}
+fake_data %>%
+  ggplot(aes(x = year, y = co2_emissions, size = country)) +
+  geom_line()
+```
+
+
+
+
+```{r}
+fake_data %>%
+  ggplot(aes(x = year, y = co2_emissions, alpha = country)) +
+  geom_line()
+```
+
+
+
+```{r}
+fake_data %>%
+  ggplot(aes(x = year, y = co2_emissions, linetype = country)) +
+  geom_line()
+```
+
+
+
+```{r}
+fake_data %>%
+  ggplot(aes(x = year, y = co2_emissions, fill = country)) +
+  geom_line()
+```
+
+
+
+
+## 课堂练习
+
+画出散点图，以国家分组，你能想出哪些方法？
+
+```{r}
+fake_data %>%
+  ggplot(aes(x = year, y = co2_emissions)) +
+  geom_point()
+```

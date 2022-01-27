@@ -1,0 +1,173 @@
+---
+title: "ggplot2 aesthetic mappings recap"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+penguins <- read_csv("./demo_data/penguins.csv") 
+penguins
+```
+
+
+
+# 图形语法
+
+> You provide the data, tell 'ggplot2' how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details.
+
+```{r, eval = FALSE}
+ggplot(data = <DATA>, mapping = aes(<MAPPINGS>)) +
+  <GEOM_FUNCTION>() +
+  <GEOM_FUNCTION>() +
+  <SCALE_FUNCTION>() +
+  <THEME_FUNCTION>()
+```
+
+
+## data
+
+必须是数据框data.frame (注意，不支持向量vector和列表list类型）
+
+
+## ggplot() 创建画布
+
+```{r, eval=FALSE}
+# ggplot(data = <DATA>,
+#        mapping = aes(<MAPPING>))
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = bill_length_mm, y = bill_depth_mm)
+)
+```
+
+
+
+也可以偷懒不写`data =` 和 `mapping =`
+```{r, eval=FALSE}
+# ggplot(<DATA>,
+#        aes(<MAPPING>))
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = bill_length_mm, y = bill_depth_mm)
+)
+```
+
+
+有时候我们更喜欢用管道 `%>%`，
+```{r, eval=FALSE}
+# data %>%
+#   ggplot(mapping = aes(<MAPPING>))
+
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm))
+```
+
+
+## 映射关系
+
+1、什么叫映射？就是一种对应关系，
+
+- 数学语言 `y = f(x)`  数值到数值的映射，比如汽车运行时间对应着行驶的距离。
+- 绘图语言 `aes = f(x)` 数值到图形属性的映射。比如数值的大小对应着图中圆点的大小，或者数值上的`female`和`male`两种字符，映射成图形上的两种颜色。
+
+
+2、什么叫图形属性？就是图中点的位置、形状，大小，颜色等眼睛能看到的东西。常见图形属性包括：
+    + x（x轴方向的位置）
+    + y（y轴方向的位置）
+    + color（点或者线等元素的颜色）
+    + size（点或者线等元素的大小）
+    + shape（点或者线等元素的形状）
+    + alpha（点或者线等元素的透明度）
+    
+
+```{r}
+penguins %>%
+  ggplot(aes(
+        x = bill_length_mm,
+        y = bill_depth_mm,
+    color = species,
+     size = body_mass_g
+  )) +
+  geom_point()
+```
+
+
+
+## geometric object 
+
+几何形状，确定我们想画什么样的图
+
+```{r, eval=FALSE}
+# ggplot(data = <DATA>,
+#        mapping = aes(<MAPPING>)) +
+
+# geom_<NAME_OF_GEOMETRIC_OBJECT>()
+```
+
+一个`geom_***`确定一种形状。比如
+
+- `geom_point()` 画点图
+- `geom_line()`  画折线图
+- `geom_smooth()`画平滑曲线图
+
+    
+
+## 图层
+
+
+- 类似中国的水墨画
+```{r, echo = FALSE}
+knitr::include_graphics("./images/how_to_plot.png")
+```
+
+
+- ggplot2中的 `+` 号很形象
+
+```{r, eval=FALSE}
+# ggplot(data = <DATA>,
+#        mapping = aes(<MAPPING>)) +
+
+# geom_<NAME_OF_GEOMETRIC_OBJECT>() +
+# geom_<NAME_OF_GEOMETRIC_OBJECT>()
+
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+
+
+
+## 映射关系的继承
+
+- 每个图层会继承`ggplot()`里数据和映射关系，**除非**图层自己的数据和映射关系已经存在。
+- 换个方式理解，图层会共享相同的映射关系。
+- 图层与图层之间不会继承关系。
+
+```{r}
+# ggplot(data = <DATA>,
+#        mapping = aes(<MAPPING>)) +
+# geom_<NAME_OF_GEOMETRIC_OBJECT_>(aes(<MAPPING>)) +
+# geom_<NAME_OF_GEOMETRIC_OBJECT_>(aes(<MAPPING>))
+
+
+ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth(aes(group = sex), method = "lm")
+```
+
+
