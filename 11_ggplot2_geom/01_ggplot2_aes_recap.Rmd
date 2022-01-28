@@ -59,17 +59,14 @@ ggplot(
 # ggplot(<DATA>,
 #        aes(<MAPPING>))
 
-ggplot(
-  data = penguins,
-  mapping = aes(x = bill_length_mm, y = bill_depth_mm)
-)
+ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm))
 ```
 
 
 有时候我们更喜欢用管道 `%>%`，
 ```{r, eval=FALSE}
 # data %>%
-#   ggplot(mapping = aes(<MAPPING>))
+#   ggplot(aes(<MAPPING>))
 
 penguins %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm))
@@ -81,10 +78,10 @@ penguins %>%
 1、什么叫映射？就是一种对应关系，
 
 - 数学语言 `y = f(x)`  数值到数值的映射，比如汽车运行时间对应着行驶的距离。
-- 绘图语言 `aes = f(x)` 数值到图形属性的映射。比如数值的大小对应着图中圆点的大小，或者数值上的`female`和`male`两种字符，映射成图形上的两种颜色。
+- 绘图语言 `aes = f(x)` 数值到图形属性的映射。比如数值的大小对应着图中圆点的大小，或者数值上的`female`和`male`两种字符，对应图形上的两种颜色。
 
 
-2、什么叫图形属性？就是图中点的位置、形状，大小，颜色等眼睛能看到的东西。常见图形属性包括：
+2、什么叫图形属性？就是图中点的位置、形状，大小，颜色等眼睛能看到的东西。常见图形属性包括，aes() 中等号左边的：
     + x（x轴方向的位置）
     + y（y轴方向的位置）
     + color（点或者线等元素的颜色）
@@ -92,6 +89,7 @@ penguins %>%
     + shape（点或者线等元素的形状）
     + alpha（点或者线等元素的透明度）
     
+它们位于`aes()`中等号的左边。
 
 ```{r}
 penguins %>%
@@ -170,4 +168,11 @@ ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_smooth(aes(group = sex), method = "lm")
 ```
 
+
+思考：
+```{r}
+ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth(aes(y = flipper_length_mm, group = sex), method = "lm")
+```
 

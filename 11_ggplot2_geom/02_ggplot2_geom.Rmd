@@ -14,6 +14,7 @@ output:
 ---
 
 
+请大家提前安装好以下宏包
 ```{r, eval=FALSE}
 install.packages( 
  c("ggridges", "see", "palmerpenguins", "datapasta", "colorspace", 
@@ -130,6 +131,8 @@ penguins %>%
 
 **课堂练习**：用单独一个颜色高亮`Gentoo`那根柱子，其他两个柱子用灰色
 
+> 思路：前面提到aes(fill = species)是3种species对应3种颜色，那么我们能否构建一个新变量is_Gentoo，它只包含(是Gentoo、不是Gentoo)，正好对应两种颜色（高亮色、灰色）
+
 ```{r}
 penguins %>%
   count(species) %>%
@@ -139,7 +142,7 @@ penguins %>%
   theme_classic()
 ```
 
-问题来了，怎么修改颜色？下节课讲。
+问题来了，怎么修改颜色？下节课讲scales。
 
 
 ## 每个种类嘴峰长度的均值
@@ -157,7 +160,7 @@ penguins %>%
 ```
 
 
-
+同一个物种下再分性别，即同一个物种下有两根柱子
 ```{r}
 penguins %>%
   group_by(species, sex) %>%
@@ -176,7 +179,7 @@ penguins %>%
 ## 嘴峰长度的分布
 
 ### 直方图
-嘴峰长度是连续变量，可以用直方图或者密度图
+嘴峰长度是连续变量，可以用直方图
 ```{r}
 penguins %>%
   ggplot(aes(x = bill_length_mm)) +
@@ -184,6 +187,7 @@ penguins %>%
 ```
 
 ### 密度图
+或者密度图
 ```{r}
 penguins %>%
   ggplot(aes(x = bill_length_mm)) +
@@ -207,8 +211,13 @@ penguins %>%
   geom_density()
 ```
 
+对于Adelie类而言，是不是也存在类似结构？
+
+
+
 ### dot plot
 
+直方图的另外一种版本
 ```{r}
 penguins %>%
   ggplot(aes(x = bill_length_mm, fill = species)) +
@@ -415,7 +424,9 @@ penguins %>%
   stat_density2d(aes(colour = stat(level)))
 ```
 
-更推荐使用ggdensity的方案
+
+我更推荐使用`ggdensity`的方案
+
 ```{r, fig.asp = 0.6, fig.width=8}
 library(ggdensity) # remotes::install_github("jamesotto852/ggdensity")
 
@@ -431,8 +442,10 @@ penguins %>%
   select(sex, species, flipper_length_mm) %>% 
   mutate(interval = cut(flipper_length_mm, breaks = 8)) %>% 
   count(sex, interval) %>% 
+  
   ggplot(aes(y = sex, x = interval, fill = n)) +
   geom_tile(width = 0.95, height = 0.95, colour = "white") +
+  geom_text(aes(label = n), color = "white") +
   #scale_x_discrete(name = NULL, expand = c(0, 0)) +
   #scale_y_discrete(name = NULL, expand = c(0, 0)) +
   coord_fixed(expand = FALSE) +
@@ -483,15 +496,6 @@ penguins %>%
   facet_wrap(vars(species))
 ```
 
-还可以弄得更漂亮点吗？
-
-```{r}
-penguins %>%
-  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
-  geom_point(data = penguins %>% select(-species), color = "gray80") +
-  geom_point(aes(color = species)) +
-  facet_wrap(vars(species))
-```
 
 
 **课堂练习**：用分面画出，不同种类企鹅bill_length_mm的密度分布图
@@ -502,6 +506,19 @@ penguins %>%
   geom_density() +
   facet_wrap(vars(species))
 ```
+
+
+
+散点图的分面，还可以弄得更漂亮点吗？
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(data = penguins %>% select(-species), color = "gray80") +
+  geom_point(aes(color = species)) +
+  facet_wrap(vars(species))
+```
+
 
 
 
@@ -535,7 +552,9 @@ penguins %>%
   geom_point(data = m, aes(y = mean), color = "red", size = 5)
 ```
 
-**注意这张图的继承关系**，包括`data =` 以及 `aes()` 的继承
+**注意这张图的继承关系**，包括`data =` 以及 `aes()` 的继承，具体说：
+第一个图层用的数据是什么，映射关系是什么？
+第二个图层用的数据是什么，映射关系是什么？
 
 
 ## 添加文本标签
@@ -551,7 +570,7 @@ penguins %>%
   ) +
   geom_text(
     data = m,
-    aes(x = sex, y = mean, label = round(mean, 2)),
+    aes(x = sex, y = mean, label = round(mean, 2)), size = 5,
     color = "red", vjust = -1
   )
 ```
