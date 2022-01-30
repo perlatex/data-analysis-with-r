@@ -41,15 +41,14 @@ penguins %>%
 
 ## 丰富的标度体系
 
-ggplot2中标度函数是由"_"分割的三个部分构成的，比如
-```{r, eval=FALSE}
-scale_x_continuous()
-scale_colour_manual()
+ggplot2中标度函数是由"_"分割的三个部分构成的，
+```{r, echo = FALSE}
+knitr::include_graphics("./images/ggplot2_variable_scales.png")
 ```
 
 - scale
 - 视觉属性名 (e.g., colour, shape or x)
-- 标度名 (e.g., continuous, discrete, brewer)
+- 标度名 (e.g., continuous, discrete, brewer, manual)
 
 
 
@@ -321,6 +320,7 @@ penguins %>%
     labels = scales::dollar
   )
 ```
+
 
 ```{r}
 penguins %>% 

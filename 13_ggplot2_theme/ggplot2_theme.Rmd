@@ -256,9 +256,33 @@ penguins %>%
 penguins %>% 
   ggplot(aes(x = species, fill = species)) +
   geom_bar() + 
-  theme_classic(base_size = 25)
+  theme_classic(base_size = 16)
 ```
 
+- `ggtheme`宏包
+
+```{r}
+library(ggthemes) # install.packages("ggthemes")
+
+penguins %>% 
+  ggplot(aes(x = species, fill = species)) +
+  geom_bar(width = 0.8) +
+  theme_economist() + 
+  scale_fill_economist()
+```
+
+- `ggthemr`宏包
+
+```{r}
+library(ggthemr) # devtools::install_github('cttobin/ggthemr')
+ggthemr("dust")
+
+penguins %>% 
+  ggplot(aes(x = species, fill = species)) +
+  geom_bar()
+
+# ggthemr_reset()
+```
 
 # 小结
 
