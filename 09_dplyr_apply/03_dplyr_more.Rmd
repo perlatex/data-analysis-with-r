@@ -118,3 +118,29 @@ bind_rows(tb1, tb2)
 ```
 
 
+## 删除缺失值所在行
+```{r}
+df <- tibble::tribble(
+    ~name,      ~type,  ~score,  ~extra,
+  "Alice",  "english",   80,      10,
+  "Alice",     "math",   NA,       5,
+    "Bob",  "english",   NA,       9,
+    "Bob",     "math",   69,      NA,
+  "Carol",  "english",   80,      10,
+  "Carol",     "math",   90,       5
+)
+df
+```
+
+```{r}
+df %>% 
+  drop_na()
+```
+```{r}
+df %>% 
+  drop_na(score)
+```
+
+
+
+

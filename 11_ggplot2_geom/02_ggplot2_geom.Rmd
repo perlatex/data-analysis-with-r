@@ -131,7 +131,16 @@ penguins %>%
 
 **课堂练习**：用单独一个颜色高亮`Gentoo`那根柱子，其他两个柱子用灰色
 
-> 思路：前面提到aes(fill = species)是3种species对应3种颜色，那么我们能否构建一个新变量is_Gentoo，它只包含(是Gentoo、不是Gentoo)，正好对应两种颜色（高亮色、灰色）
+> 思路1， 用设置的方法
+
+```{r}
+penguins %>%
+  count(species) %>%
+  ggplot(aes(x = species, y = n)) +
+  geom_col(width = 0.5, fill = c("gray", "orange", "gray"))
+```
+
+> 思路2：前面提到aes(fill = species)是3种species对应3种颜色，那么我们能否构建一个新变量is_Gentoo，它只包含(是Gentoo、不是Gentoo)，正好对应两种颜色（高亮色、灰色）
 
 ```{r}
 penguins %>%
