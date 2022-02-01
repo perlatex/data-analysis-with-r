@@ -109,7 +109,7 @@ bind_cols(df1, df2)
 
 
 
-- `bind_rows()`，行绑定，要求两个数据框的列名必须一致
+- `bind_rows()`，行绑定，要求两个数据框的**列名**必须一致
 ```{r}
 tb1 <- tibble(a = 1:4, b = 5:8)
 tb2 <- tibble(a = 1:2, b = 3:4)
@@ -132,10 +132,38 @@ df <- tibble::tribble(
 df
 ```
 
+如果score列中有缺失值`NA`，就删除所在的row
+```{r}
+df %>% 
+  filter(!is.na(score))
+```
+
+或者用`across()`
+```{r}
+df %>% 
+  filter(
+    across(score, ~ !is.na(.x))
+  )
+```
+
+
+所有列，如果有缺失值`NA`，就删除所在的row
+```{r}
+df %>% 
+  filter(
+    across(everything(), ~ !is.na(.x))
+  )
+```
+
+
+
+现在有更简便的方法
 ```{r}
 df %>% 
   drop_na()
 ```
+
+也可指定某一列
 ```{r}
 df %>% 
   drop_na(score)

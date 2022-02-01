@@ -1,0 +1,439 @@
+---
+title: "《R语言数据分析》中期考核"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+# 中期考核要求
+
+-   中期考核共`r 16 + 4`道题，后4道题属于选做题
+-   在完成代码后，渲染生成html格式文档
+-   以自己**姓名+学号**重命名html文档（注意是姓名和学号）
+-   于2022年2月08日（周二）20:00前提交我的邮箱 `38552109@qq.com`
+
+
+
+# 数据集
+
+## 数据读入
+
+作业使用的数据集来源于网站(<https://data.worldbank.org/country>)，它收集了不同洲(continent = 5)、不同国家(country = 215)历年(1961 - 2018)的**经济指标**
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+world_bank_countries <- read_csv("data/world_bank_countries.csv")
+
+glimpse(world_bank_countries)
+```
+
+## 数据变量
+
+数据变量包括
+
+| 变量名                        | 含义                         |
+|:------------------------------|:-----------------------------|
+| country                       | 国家                         |
+| continent                     | 所在洲                       |
+| year                          | 年份                         |
+| access_to_electricity         | 通电比例                     |
+| agricultural_land             | 农业用地比例                 |
+| arable_land                   | 耕地比例                     |
+| birth_rate                    | 出生率                       |
+| co2_emissions_tons_per_capita | 人均二氧化碳排放量           |
+| compulsory_education          | 义务教育时间                 |
+| employers_of_total_population | 就业率                       |
+| forest_land                   | 林地比例                     |
+| gdp_per_capita                | 人均GDP                      |
+| internet_usage                | 互联网普及率                 |
+| life_expectancy_at_birth      | 预期寿命                     |
+| mobile_cellular_subscriptions | 移动电话订阅率               |
+| open_defecation               | 露天排便比例                 |
+| basic_sanitation              | 基础卫生设施比例             |
+| population_density            | 人口密度                     |
+| population_male               | 男性占比                     |
+| population_total              | 总人口                       |
+| overweight                    | 体重超重比例                 |
+| women_in_national_parliaments | 议会中女性人数占比           |
+| female_to_male_labor_force    | 女性劳动力与男性的比例       |
+| renewable_energie_consumption | 可再生能源在能源消费中的占比 |
+
+
+
+
+# 题目
+
+## 数据有多少条记录？
+
+```{r}
+# 215 * 58
+nrow(world_bank_countries)
+```
+
+
+
+## 数据包含多少个国家、多少年的记录？
+
+```{r}
+world_bank_countries %>% count(country)
+
+# better
+world_bank_countries %>% 
+  group_by(country) %>% 
+  summarise(
+    from = min(year),
+    to   = max(year),
+    n    = n()
+  )
+```
+
+## 统计每个洲包含了多少个国家
+
+```{r}
+world_bank_countries %>%
+  group_by(continent) %>%
+  summarise(
+    n = n_distinct(country)
+  )
+```
+
+## 统计每个变量缺失值的个数
+
+```{r}
+world_bank_countries %>%
+  summarise(
+    across(everything(), ~ sum(is.na(.x)))
+  ) %>% 
+  pivot_longer(everything())
+```
+
+## 2009年义务教育时间大于9年的国家占所有国家的比例
+```{r}
+world_bank_countries %>%
+  filter(year == 2009) %>%
+  summarise(
+    prop = sum(compulsory_education > 9, na.rm = TRUE) / n()
+  )
+```
+
+## 统计2008年每个洲寿命期望值的最小值、均值和最大值
+
+```{r}
+world_bank_countries %>%
+  filter(year == 2008) %>%
+  group_by(continent) %>%
+  summarise(
+    min  = min(life_expectancy_at_birth, na.rm = TRUE),
+    mean = mean(life_expectancy_at_birth, na.rm = TRUE),
+    max  = max(life_expectancy_at_birth, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+# better
+world_bank_countries %>%
+  filter(year == 2008) %>%
+  group_by(continent) %>%
+  summarise(
+    across(life_expectancy_at_birth, list(min, mean, max), na.rm = TRUE)
+  )
+```
+
+## 2015年亚洲人口密度前五的国家
+
+```{r}
+world_bank_countries %>%
+  filter(year == 2015, continent == "Asia") %>% 
+  slice_max(population_density, n = 5) %>%
+  select(country, year, population_density)
+```
+
+
+
+
+## 找出2001年每个洲出生率最低的国家
+
+```{r}
+world_bank_countries %>%
+  filter(year == 2001) %>% 
+  group_by(continent) %>%
+  slice_min(birth_rate) %>%
+  select(continent, country, birth_rate)
+```
+
+
+
+## 每个州，出生率波动最大的国家
+
+提示，可计算出生率的标准差，函数为`sd()`，标准差越大，波动越大
+
+```{r}
+world_bank_countries %>%
+  group_by(continent, country) %>% 
+  summarise(
+    sd_birth_rate = sd(birth_rate, na.rm = TRUE)
+  ) %>% 
+  group_by(continent) %>% 
+  slice_max(sd_birth_rate)
+```
+
+
+
+## 画出德国寿命期望值的时间变化图
+
+```{r}
+world_bank_countries %>%
+  filter(country == "Germany") %>%
+  ggplot(aes(year, life_expectancy_at_birth)) +
+  geom_point() +
+  geom_line() +
+  labs(
+    y = "life expectancy",
+    title = "Life expectancy in the Germany from 1960 to 2020",
+    caption = "data: Worldbank World Development Indicators"
+  )
+```
+
+## 画出2017年人均GDP与出生率的散点图
+
+要求不同的洲用不同的颜色
+
+```{r}
+world_bank_countries %>%
+  filter(year == 2017) %>%
+  ggplot(aes(x = gdp_per_capita, y = birth_rate, color = continent)) +
+  geom_point()
+```
+
+## 画出议会中女性人数占比的直方图
+
+要求: 直方图的柱子边框色为"black"; 填充色为"steelblue"; 透明度为0.7
+
+```{r}
+world_bank_countries %>%
+  ggplot(aes(women_in_national_parliaments)) +
+  geom_histogram(
+    fill = "steelblue",
+    color = "black",
+    binwidth = 3,
+    alpha = .7
+  )
+```
+
+## 画出每个洲的各个国家寿命期望值随时间的变化图
+
+要求: 用分面`facet_wrap(vars(continent), ncol = 5)`
+
+```{r}
+world_bank_countries %>%
+  ggplot(aes(x = year, y = life_expectancy_at_birth)) +
+  geom_line(aes(group = country), color = "#B91C1C", alpha = .4) +
+  facet_wrap(vars(continent), ncol = 5)
+```
+
+## 画出2007年不同洲overweight分布的小提琴图
+
+要求: 高亮亚洲
+
+```{r, warning=FALSE, message=FALSE}
+world_bank_countries %>%
+  filter(year == 2017) %>%
+  mutate(is_asia = if_else(continent == "Asia", "yes", "no")) %>% 
+  ggplot(aes(x = continent, y = overweight, fill = is_asia, color = is_asia)) +
+  geom_violin(
+    color = NA,
+    alpha = .7
+  ) +
+  geom_jitter(width = .2) +
+  scale_color_manual(values = c("gray", "orange")) +
+  scale_fill_manual(values = c("gray80", "orange")) +
+  theme(legend.position = "none")
+```
+
+## 画出这四个国家(挪威、芬兰、丹麦、瑞典)可再生能源消耗占比的时间变化图
+
+```{r }
+ world_bank_countries %>%
+  filter(country %in% c("Norway", "Finland", "Denmark", "Sweden")) %>%
+  select(country, year, renewable_energie_consumption) %>%
+  drop_na(renewable_energie_consumption) %>%
+  
+  ggplot(aes(
+    x = year,
+    y = renewable_energie_consumption,
+    color = country
+  )) +
+  geom_line()
+```
+
+## 画出2016年这四个国家(西班牙、中国、俄罗斯和美国)人均二氧化碳排放量的柱状图
+
+要求: 按照高度排序，并在柱子顶部添加具体数值
+
+```{r }
+world_bank_countries %>%
+  filter(
+    country %in% c("Spain", "China", "Russian Federation", "United States"),
+    year %in% c(2016)
+  ) %>%
+  ggplot(aes(
+    x = fct_reorder(country, co2_emissions_tons_per_capita),
+    y = co2_emissions_tons_per_capita
+  )) +
+  geom_col(
+    fill = "steelblue",
+    alpha = .8,
+    color = "black",
+    width = .8,
+    size = 0.4
+  ) +
+  geom_text(
+    aes(label = round(co2_emissions_tons_per_capita, 2)),
+    vjust = -0.5, size = 5
+  ) +
+  scale_y_continuous(expand = c(0, 1))
+```
+
+## 画出中国出生率的时间变化图，并在图中标出出生率最高的点
+
+```{r}
+birth_rate_china <- world_bank_countries %>%
+  filter(country == "China") %>%
+  select(year, birth_rate) %>%
+  mutate(
+    highest_birth_rate = case_when(
+      birth_rate == max(birth_rate) ~ "Highest birth rate\nin China",
+      TRUE ~ ""
+    )
+  )
+
+
+birth_rate_china %>%
+  ggplot(aes(x = year, y = birth_rate)) +
+  geom_area(fill = "grey70", alpha = .5,  color = "grey30") +
+  geom_point() +
+  geom_text(aes(label = highest_birth_rate),
+    nudge_y = 2
+  )
+```
+
+
+
+## 2014年人均GDP前20的国家，画出其耕地比例(arable_land)排名的柱状图
+
+要求，先中心化耕地数值，并按照数值的正负赋不同的颜色
+
+```{r}
+world_bank_countries %>%
+  filter(year == 2017) %>% 
+  slice_max(gdp_per_capita, n = 20) %>% 
+  select(continent, country, gdp_per_capita, arable_land) %>% 
+  drop_na() %>% 
+  mutate(across(arable_land, ~.x - mean(.x))) %>% 
+  ggplot(aes(x = arable_land, y = fct_reorder(country, arable_land))) +
+  geom_col(aes(fill = arable_land > 0), width = 0.8) +
+  theme(legend.position = "none")
+```
+
+
+## 探索寿命期望值与人均GDP的关联
+
+-   方案1
+
+```{r, message=FALSE, warning=FALSE}
+world_bank_countries %>%
+  group_by(year) %>%
+  summarise(
+    across(c(gdp_per_capita, life_expectancy_at_birth), mean, na.rm = T)
+  ) %>%
+  
+  ggplot(aes(life_expectancy_at_birth, gdp_per_capita)) +
+  geom_point(fill = "steelblue", shape = 21, size = 5) +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+-   方案2
+
+```{r, message=FALSE, warning=FALSE}
+world_bank_countries %>%
+  group_by(continent) %>%
+  summarise(
+    across(c(gdp_per_capita, life_expectancy_at_birth) , mean, na.rm = T)
+  ) %>%
+  ggplot(aes(life_expectancy_at_birth, gdp_per_capita)) +
+  geom_point(fill = "steelblue", shape = 21, size = 5) +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+-   方案3
+
+```{r, message=FALSE, warning=FALSE}
+world_bank_countries %>%
+  filter(year == 2000) %>%
+  ggplot(aes(life_expectancy_at_birth, gdp_per_capita)) +
+  geom_point(fill = "steelblue", shape = 21, size = 5) + 
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+-   方案4
+
+```{r, message=FALSE, warning=FALSE}
+world_bank_countries %>%
+  filter(year == 2017) %>%
+  ggplot(aes(
+    x = life_expectancy_at_birth,
+    y = gdp_per_capita
+  )) +
+  geom_point() +
+  geom_smooth(
+    method = "lm", se = FALSE,
+    color = "red"
+  ) +
+  facet_wrap(vars(continent), scales = "free")
+```
+
+## 是不是越穷越爱生小孩
+
+提示：可按人均GDP划分成五个等级，统计各等级下人均GDP的均值和出生率的均值，探索人均GDP与出生率的关联。
+
+```{r}
+world_bank_countries %>%
+  filter(!is.na(gdp_per_capita)) %>%
+  mutate(
+    income_group = case_when(
+      gdp_per_capita < 1000                ~ "Low income",
+      between(gdp_per_capita, 1000, 2500)  ~ "Lower middle income",
+      between(gdp_per_capita, 2500, 5000)  ~ "Middle income",
+      between(gdp_per_capita, 5000, 10000) ~ "Upper middle income",
+      TRUE ~ "High income"
+    )
+  ) %>%
+  group_by(income_group) %>%
+  summarise(
+    mean_gdp_per_capita = mean(gdp_per_capita, na.rm = T),
+    mean_birth_rate = max(birth_rate, na.rm = T)
+  ) %>%
+  ggplot(aes(
+    x = mean_gdp_per_capita,
+    y = mean_birth_rate,
+    label = income_group
+  )) +
+  geom_point() +
+  geom_text(hjust = 0, nudge_y = .5)
+```
