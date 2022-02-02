@@ -181,6 +181,7 @@ penguins %>%
 
 
 ## 修改横坐标刻度为`c(30, 35, 40, 45, 50, 55, 60)`
+这个坐标刻度，类似我们腰带皮带上打孔的意思。
 
 可以很实诚地手动完成
 ```{r}
@@ -195,6 +196,18 @@ penguins %>%
 
 
 也可以偷懒用函数
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() +
+  scale_x_continuous(
+    limits = c(30, 60),
+    breaks = seq(from = 30, to = 60, by = 5)
+  )
+```
+
+
 ```{r}
 penguins %>% 
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
@@ -259,7 +272,7 @@ penguins %>%
 
 ## 修改横坐标标签
 
-让横坐标标签有单位，比如`30mm, 35mm, 40mm, 45mm, 50mm, 55mm, 60mm`
+让横坐标标签有单位（在皮带打孔的位置写上含义），比如`30mm, 35mm, 40mm, 45mm, 50mm, 55mm, 60mm`
 
 你可能是一个很实诚的娃
 ```{r}
@@ -294,7 +307,7 @@ penguins %>%
     name = "这是我的横坐标",
     limits = c(30, 60),
     breaks = scales::breaks_width(width = 5),
-    labels = scales::unit_format(unit = "mm", sep = "")
+    labels = scales::label_number(accuracy = 1, suffix = "mm")
   )
 ```
 
@@ -328,7 +341,7 @@ penguins %>%
   geom_point(aes(colour = species)) +
   scale_x_continuous(
     limits = c(30, 60),
-    labels = scales::label_number(prefix = "CNY", sep = "")
+    labels = scales::label_number(accuracy = 1, prefix = "CNY")
   )
 ```
 
@@ -351,7 +364,7 @@ penguins %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_point(aes(colour = species)) +
   scale_x_continuous(
-    labels = NULL
+    labels = NULL        # vs NA
   )
 ```
 
@@ -452,7 +465,7 @@ penguins %>%
 
 
 我们指定三种颜色，默认按照 "Adelie", "Chinstrap", "Gentoo" 字母的顺序一一对应
- 
+(类似幼儿园的三个小朋友"Adelie", "Chinstrap", "Gentoo"，按照名字排排坐好了，我们按照座次发果果)
 ```{r}
 penguins %>% 
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
@@ -464,7 +477,7 @@ penguins %>%
 
 
 
-也可以按照自己的顺序来对应
+也可以让小朋友和颜色一一对应
 
 ```{r}
 penguins %>%
@@ -540,6 +553,21 @@ penguins %>%
 
 **课堂练习**：完成上一节课的问题，用单独一个颜色高亮Gentoo那根柱子，其他两个柱子用灰色
 
+- 方案1
+```{r}
+penguins %>% 
+  group_by(species) %>% 
+  summarise(
+    mean = mean(bill_length_mm)
+  ) %>% 
+  ggplot(aes(x = species, y = mean, fill = species)) +
+  geom_col(width = 0.5) +
+  scale_fill_manual(
+    values = c("gray", "gray", "red")
+  )
+```
+
+- 方案2 
 ```{r}
 penguins %>% 
   count(species) %>% 

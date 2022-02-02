@@ -37,6 +37,7 @@ fake_data
 ```{r}
 fake_data %>%
   ggplot(aes(x = year, y = co2_emissions)) +
+  geom_point() +
   geom_line()
 ```
 
@@ -52,6 +53,7 @@ ggplot2里实现分组的方法很多：
 - `size      = group + size`
 - `alpha     = group + alpha`
 
+除了美学元素的功能外，还有分组的功能。
 
 
 ```{r}
@@ -102,7 +104,7 @@ fake_data %>%
   geom_line()
 ```
 
-
+请问：为什么这里只有分组，但没有填充色？
 
 
 ## 课堂练习

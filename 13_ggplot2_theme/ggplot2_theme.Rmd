@@ -155,7 +155,7 @@ penguins %>%
 |图例标签      | legend.text      |  element_text() |
 |图例标题      | legend.title     |  element_text() |
 |图例边距      | legend.margin    |       margin    |
-|图例位置      | legend.postion   |"top", "bottom", "left", "right"|
+|图例位置      | legend.postion   |"top", "bottom", "left", "right", "none"|
 
 
 ```{r}
