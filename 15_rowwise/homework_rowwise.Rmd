@@ -13,7 +13,7 @@ output:
     df_print: paged
 ---
 
-# 作业
+## 题目1
 
 增加`prop_water`和`prop_food`两列，计算每天水分和食物的所占比例， 比如第一天water和food都是10.0，那么各自比例都是50%.
 
@@ -32,3 +32,19 @@ d <- tibble::tribble(
 d
 ```
 
+## 题目2
+
+统计每位同学，成绩高于各科均值的个数
+```{r}
+df <- tibble::tribble(
+    ~name, ~chinese, ~engish, ~physics, ~sport, ~music,
+   "Aice",       85,      56,       56,     54,     78,
+    "Bob",       75,      78,       77,     56,     69,
+   "Cake",       69,      41,       88,     89,     59,
+   "Dave",       90,      66,       74,     82,     60,
+    "Eve",       68,      85,       75,     69,     21,
+    "Fod",       77,      74,       62,     74,     88,
+  "Gimme",       56,      88,       75,     69,     34
+  )
+df
+```

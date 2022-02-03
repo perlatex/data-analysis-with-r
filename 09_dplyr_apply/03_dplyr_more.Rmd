@@ -94,6 +94,25 @@ df %>%
   )
 ```
 
+## 比distinct()更知我心
+
+```{r}
+df <- tribble(
+  ~id, ~date, ~store_id, ~sales,
+  1, "2020-03-01", 1, 100,
+  2, "2020-03-01", 2, 100,
+  3, "2020-03-01", 3, 150,
+  4, "2020-03-02", 1, 110,
+  5, "2020-03-02", 3, 101
+)
+
+df %>%
+  janitor::get_dupes(store_id)
+
+df %>%
+  janitor::get_dupes(date)
+```
+
 
 ## bind_rows() 与 bind_cols()
 

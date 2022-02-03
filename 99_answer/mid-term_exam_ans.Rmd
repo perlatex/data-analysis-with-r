@@ -312,13 +312,16 @@ world_bank_countries %>%
 birth_rate_china <- world_bank_countries %>%
   filter(country == "China") %>%
   select(year, birth_rate) %>%
+  # mutate(
+  #   highest_birth_rate = case_when(
+  #     birth_rate == max(birth_rate) ~ "Highest birth rate\nin China",
+  #     TRUE ~ ""
+  #   )
+  # )
   mutate(
-    highest_birth_rate = case_when(
-      birth_rate == max(birth_rate) ~ "Highest birth rate\nin China",
-      TRUE ~ ""
-    )
+    highest_birth_rate = if_else(
+      birth_rate == max(birth_rate), "Highest birth rate\nin China", "")
   )
-
 
 birth_rate_china %>%
   ggplot(aes(x = year, y = birth_rate)) +
@@ -337,7 +340,7 @@ birth_rate_china %>%
 
 ```{r}
 world_bank_countries %>%
-  filter(year == 2017) %>% 
+  filter(year == 2014) %>% 
   slice_max(gdp_per_capita, n = 20) %>% 
   select(continent, country, gdp_per_capita, arable_land) %>% 
   drop_na() %>% 
