@@ -15,7 +15,37 @@ output:
 
 
 
-# 作业
+
+
+## 作业1
+
+运行如下代码
+```{r}
+library(tidyverse)
+library(gapminder)
+
+gapminder %>%
+  filter(continent == "Asia") %>%
+  mutate(year = factor(year)) %>%
+
+  ggplot(aes(x = year, y = country, label = lifeExp %>% round(digits = 0))) +
+  geom_tile(aes(fill = lifeExp)) +
+  geom_text(size = 2.5) +
+  scale_fill_viridis_c("years", limits = c(0, NA), option = "G") +
+  labs(
+    title = "Changes in mean life expectancy in countries witin Asia",
+    x = NULL,
+    y = NULL
+  ) +
+  theme(
+    axis.text.y = element_text(hjust = 0),
+    axis.ticks = element_blank()
+  )
+
+```
+
+
+# 作业2
 
 阅读 <https://bookdown.org/wangminjie/R4DS/eda-height.html>，要求
 
@@ -27,6 +57,3 @@ library(tidyverse)
 penguins <- read_csv("./demo_data/penguins.csv") 
 penguins
 ```
-
-
-
