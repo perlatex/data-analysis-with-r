@@ -177,19 +177,25 @@ penguins
 ```{r, message=FALSE, warning=FALSE}
 penguins %>% 
   ggplot(aes(x = bill_length_mm)) +
-  geom_density()  
+  geom_density()
+```
 
 
+```{r, message=FALSE, warning=FALSE}
 penguins %>% 
   ggplot(aes(x = bill_depth_mm)) +
-  geom_density() 
+  geom_density()
+```
 
 
+```{r, message=FALSE, warning=FALSE}
 penguins %>% 
   ggplot(aes(x = body_mass_g)) +
-  geom_density() 
+  geom_density()
+```
 
 
+```{r, message=FALSE, warning=FALSE}
 penguins %>% 
   ggplot(aes(x = flipper_length_mm)) +
   geom_density() 
@@ -251,7 +257,7 @@ penguins %>%
 
 # 课堂练习
 
-- 用分面画出不同性别的各体征值的箱线图
+- 以体征指标分面，画出不同性别的箱线图
 
 ```{r, fig.width= 16, fig.height= 4}
 penguins %>%

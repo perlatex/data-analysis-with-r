@@ -34,3 +34,4 @@ knitr::include_graphics("images/datapaste1.png")
 knitr::include_graphics("images/datapaste2.png")
 ```
 
+试一试！

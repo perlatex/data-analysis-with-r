@@ -26,6 +26,8 @@ knitr::include_graphics(path = "images/vctr.png")
 
 
 ## 提问
+
+假定`id`是学生编号，`w, x, y, z`是各科成绩
 ```{r}
 library(tidyverse)
 df <- tibble(
@@ -64,7 +66,7 @@ df %>%
   )
 ```
 
-但变量多了，又变成了体力活。
+但变量多了，又变成了体力活。而且如果有缺失值，这种方法也会失效。
 
 
 
@@ -160,18 +162,11 @@ df %>%
 df %>%
   rowwise(id) %>%
   mutate(
-    mean = mean(c_across(is.numeric))
+    mean = mean(c_across(where(is.numeric)))
   )
 ```
 
 
-```{r }
-df %>%
-  rowwise(id) %>%
-  summarise(
-    m = mean(c_across(is.numeric))
-  )
-```
 
 
 

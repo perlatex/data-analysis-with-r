@@ -260,8 +260,13 @@ mpg %>%
 knitr::include_graphics("images/styler.png")
 ```
 
-安装后，然后这两个地方点两下，就发现你的代码整齐很多了。
+安装后，然后这两个地方点两下，就发现你的代码整齐很多了。试一试
 
+```{r}
+mpg %>% 
+filter(cty > 10, 
+                        class == "compact")
+```
 
 ## 参考
 
