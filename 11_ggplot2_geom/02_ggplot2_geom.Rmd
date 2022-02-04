@@ -552,7 +552,31 @@ m <- penguins %>%
 m
 ```
 
+也可以画出均值的位置
+```{r}
+ggplot(data = m, aes(x = sex, y = mean)) +
+  geom_point(color = "red", size = 5)
+```
 
+现在我们把这两个图叠加在一起，**注意这张图的继承关系**，包括`data =` 以及 `aes()` 的继承，具体说：
+
+- 第一个图用的数据是什么，映射关系是什么？
+`data = penguins,   x = sex,  y = body_mass_g` 
+
+- 第二个图用的数据是什么，映射关系是什么？
+`data = m,          x = sex,  y = mean`
+
+
+因此，两个数据框合在一起画图的代码
+
+```{r}
+ggplot() +
+  geom_jitter(data = penguins, aes(x = sex, y = body_mass_g)) +
+  geom_point(data = m, aes(x = sex, y = mean), color = "red", size = 5)
+```
+
+
+最终可以简化成下面的形式
 
 ```{r}
 penguins %>%
@@ -561,9 +585,7 @@ penguins %>%
   geom_point(data = m, aes(y = mean), color = "red", size = 5)
 ```
 
-**注意这张图的继承关系**，包括`data =` 以及 `aes()` 的继承，具体说：
-第一个图层用的数据是什么，映射关系是什么？
-第二个图层用的数据是什么，映射关系是什么？
+
 
 
 ## 添加文本标签
