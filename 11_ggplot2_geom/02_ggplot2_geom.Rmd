@@ -19,7 +19,7 @@ output:
 install.packages( 
  c("ggridges", "see", "palmerpenguins", "datapasta", "colorspace", 
    "cowplot",  "gganimate", "ggrepel", "ggforce", "janitor", "patchwork", 
-   "readxl",  "showtext", "styler", "remotes", "rnaturalearth") 
+   "readxl",  "showtext", "styler", "remotes", "rnaturalearth", "geomtextpath") 
 )
 ```
 
@@ -644,7 +644,22 @@ penguins %>%
 ```
 
 每个物种想有各自的椭圆图？
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point() +
+  geom_path(stat = "ellipse")
+```
 
+```{r}
+library(geomtextpath) 
+
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point() +
+  geom_textpath(aes(label = species), stat = "ellipse", size = 5, hjust = 1) + 
+  theme(legend.position = "none")
+```
 
 ## 函数图
 
