@@ -249,7 +249,7 @@ world_bank_countries %>%
 
 ```{r, warning=FALSE, message=FALSE}
 world_bank_countries %>%
-  filter(year == 2017) %>%
+  filter(year == 2007) %>%
   mutate(is_asia = if_else(continent == "Asia", "yes", "no")) %>% 
   ggplot(aes(x = continent, y = overweight, fill = is_asia, color = is_asia)) +
   geom_violin(

@@ -32,6 +32,23 @@ d <- tibble::tribble(
 d
 ```
 
+- 方法1，先用常规的方法写，目的是弄清每一步的目的
+```{r}
+d %>% 
+  rowwise() %>% 
+  mutate(total = sum(c_across(everything()))) %>% 
+  ungroup() %>% 
+  mutate(
+    across(c(water, food), ~ .x / total)
+  ) %>% 
+  mutate(
+    across(c(water, food), ~scales::percent(.x))
+  ) %>% 
+  select(-total)
+```
+
+
+- 方法2
 ```{r}
 d %>% 
   rowwise() %>% 
@@ -40,6 +57,8 @@ d %>%
   )
 ```
 
+
+- 方法3，方法2的偷懒版本
 ```{r}
 d %>% 
   rowwise() %>% 
@@ -48,6 +67,8 @@ d %>%
   )
 ```
 
+
+- 方法4
 ```{r}
 d %>% 
   rowwise() %>%
