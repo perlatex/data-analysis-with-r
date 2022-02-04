@@ -370,6 +370,41 @@ knitr::include_graphics("images/cloud/fig13.png")
 knitr::include_graphics("images/cloud/fig14.png")
 ```
 
+# 创建自己的工作空间
+
+## 创建自己的项目
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig21.png")
+```
+
+
+## 项目名称
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig22.png")
+```
+
+## 本地文件上传到云端
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig23.png")
+```
+
+
+## 上传文件夹
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig24.png")
+```
+
+
+## 愉快地玩耍
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/cloud/fig25.png")
+```
+
 
 ##
 \Huge

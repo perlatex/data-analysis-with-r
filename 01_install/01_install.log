@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2021/W32TeX) (preloaded format=xelatex 2021.11.25)  2 JAN 2022 12:15
+This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2021/W32TeX) (preloaded format=xelatex 2021.11.25)  4 FEB 2022 13:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1579,6 +1579,117 @@ pdf)
 
 ] [22
 
+] [23
+
+] [24
+
+]
+File: images/cloud/fig01.png Graphic file (type bmp)
+<images/cloud/fig01.png>
+[25
+
+]
+File: images/cloud/fig02.png Graphic file (type bmp)
+<images/cloud/fig02.png>
+[26
+
+]
+File: images/cloud/fig03.png Graphic file (type bmp)
+<images/cloud/fig03.png>
+[27
+
+]
+File: images/cloud/fig04.png Graphic file (type bmp)
+<images/cloud/fig04.png>
+[28
+
+]
+File: images/cloud/fig05.png Graphic file (type bmp)
+<images/cloud/fig05.png>
+[29
+
+]
+File: images/cloud/fig06.png Graphic file (type bmp)
+<images/cloud/fig06.png>
+[30
+
+]
+File: images/cloud/fig07.png Graphic file (type bmp)
+<images/cloud/fig07.png>
+[31
+
+]
+File: images/cloud/fig08.png Graphic file (type bmp)
+<images/cloud/fig08.png>
+[32
+
+]
+File: images/cloud/fig09.png Graphic file (type bmp)
+<images/cloud/fig09.png>
+
+Overfull \vbox (5.79124pt too high) detected at line 490
+ []
+
+[33
+
+]
+File: images/cloud/fig10.png Graphic file (type bmp)
+<images/cloud/fig10.png>
+[34
+
+]
+File: images/cloud/fig11.png Graphic file (type bmp)
+<images/cloud/fig11.png>
+[35
+
+]
+File: images/cloud/fig12.png Graphic file (type bmp)
+<images/cloud/fig12.png>
+
+Overfull \vbox (61.9384pt too high) detected at line 505
+ []
+
+[36
+
+]
+File: images/cloud/fig13.png Graphic file (type bmp)
+<images/cloud/fig13.png>
+[37
+
+]
+File: images/cloud/fig14.png Graphic file (type bmp)
+<images/cloud/fig14.png>
+[38
+
+] [39
+
+]
+File: images/cloud/fig21.png Graphic file (type bmp)
+<images/cloud/fig21.png>
+[40
+
+]
+File: images/cloud/fig22.png Graphic file (type bmp)
+<images/cloud/fig22.png>
+[41
+
+]
+File: images/cloud/fig23.png Graphic file (type bmp)
+<images/cloud/fig23.png>
+[42
+
+]
+File: images/cloud/fig24.png Graphic file (type bmp)
+<images/cloud/fig24.png>
+[43
+
+]
+File: images/cloud/fig25.png Graphic file (type bmp)
+<images/cloud/fig25.png>
+[44
+
+] [45
+
 ]
 \tf@nav=\write7
 \openout7 = `01_install.nav'.
@@ -1591,15 +1702,15 @@ pdf)
 
 (./01_install.aux)
 Package rerunfilecheck Info: File `01_install.out' has not changed.
-(rerunfilecheck)             Checksum: 8AC871047D77EE6A421446890850A50C;238.
+(rerunfilecheck)             Checksum: 3ECD011E401873C641596F937C4FE29F;496.
  ) 
 Here is how much of TeX's memory you used:
- 33779 strings out of 478256
- 736900 string characters out of 5856783
- 1021577 words of memory out of 5000000
- 53510 multiletter control sequences out of 15000+600000
- 421125 words of font info for 88 fonts, out of 8000000 for 9000
+ 34198 strings out of 478256
+ 747860 string characters out of 5856783
+ 1023165 words of memory out of 5000000
+ 53908 multiletter control sequences out of 15000+600000
+ 421133 words of font info for 89 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  101i,13n,138p,1813b,755s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on 01_install.pdf (22 pages).
+Output written on 01_install.pdf (45 pages).
