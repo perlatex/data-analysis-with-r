@@ -1,0 +1,221 @@
+---
+title: "Modeling in Tidyverse"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+
+## tidyverse框架下的建模
+
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+wages <- read_csv("./demo_data/wages.csv")
+
+glimpse(wages)
+```
+
+
+
+```{r}
+mod1 <- lm(
+  formula = earn ~ height,
+  data = wages
+)
+```
+
+
+
+### 规整统计结果
+
+模型的输出结果是一个复杂的list
+
+```{r}
+mod1 %>% summary()
+```
+
+
+```{r}
+summary(mod1)$residuals
+```
+
+
+broom宏包可以帮助我们**规整**模型输出结果。它将常用的100多种模型的输出结果规整成数据框`tibble()`的格式，在模型比较和可视化中就可以方便使用`dplyr`函数了。
+
+`broom` 提供了三个主要的函数:
+
+- `tidy()` 提取模型输出结果的主要信息，比如 `coefficients` 和 `t-statistics`
+- `glance()` 把模型视为一个整体，提取如 `F-statistic`，`model deviance` 或者 `r-squared`等信息
+- `augment()` 模型输出的信息添加到建模用的数据集中，比如`fitted values` 和 `residuals` 
+
+
+```{r}
+library(broom)
+
+mod1 %>% 
+  tidy() %>% 
+  filter(p.value < 0.05)
+```
+
+
+
+```{r}
+mod1 %>% glance()
+```
+
+
+
+```{r}
+mod1 %>%
+  glance() %>%
+  select(adj.r.squared, p.value)
+```
+
+
+为什么红色不在了？
+```{r}
+mod1 %>% 
+  broom::augment() %>%
+  ggplot(aes(x = height, y = earn)) +
+  geom_point() +
+  geom_line(aes(y = .fitted), color = "red") +
+  geom_smooth(method = "lm")
+```
+
+
+
+
+
+
+### 增加拟合值
+
+为了让建模操作更方便，让我们的思维限定在`data.frame`，方便使用`dplyr`，`ggplot2`中的函数。我推荐大家使用`modelr`宏包
+
+```{r}
+library(modelr)
+```
+
+
+```{r}
+# predictions at original x values
+wages %>% modelr::add_predictions(mod1)
+```
+
+
+```{r}
+wages %>% 
+  modelr::add_predictions(mod1) %>% 
+  
+  ggplot(aes(x = height, y = earn)) +
+  geom_point() +
+  geom_line(aes(y = pred), color = "red") 
+```
+
+
+
+### 增加残差值
+```{r}
+wages %>% 
+  modelr::add_predictions(mod1) %>%
+  modelr::add_residuals(mod1)
+```
+
+
+### 增加预测值
+
+```{r}
+wages %>% modelr::add_predictions(mod1)
+```
+
+
+```{r}
+newdata <- data.frame(height = seq(65, 75, by = 1))
+
+newdata %>% modelr::add_predictions(mod1)
+```
+
+
+
+### predict vs fit
+
+- **拟合** , 模型一旦建立，建模和拟合使用的是同一数据
+
+- **预测**， 模型建立后，可以用新的数据进行预测
+
+
+
+### 课堂练习
+
+根据模型**残差标准误**公式
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/RSE_formual.jpeg")
+```
+
+使用`modelr::add_residuals(mod1)`计算残差标准误，还原`summary(mod1)$sigma`的结果，对模型理解就更深刻：
+
+```{r, eval=FALSE}
+wages %>%
+  modelr::add_residuals(mod1) %>% 
+  summarise(
+    
+  )
+```
+
+
+
+### 分组建模
+
+按照性别分组，建立各自的线性回归模型，有没有方法，快速的求出两条直线的截距和斜率？
+
+```{r}
+wages %>%
+  group_by(sex) %>%
+  group_modify(
+    ~ broom::tidy(lm(earn ~ height, data = .))
+  )
+```
+
+
+
+
+
+```{r}
+wages %>%
+  nest_by(sex) %>%
+  mutate(model = list(lm(earn ~ height, data = data))) %>%
+  mutate(
+    coef = list(broom::tidy(model))
+  ) %>% 
+  unnest(coef)
+```
+
+
+或者
+```{r}
+wages %>%
+  nest_by(sex) %>%
+  mutate(model = list(lm(earn ~ height, data = data))) %>%
+  summarise(
+    broom::tidy(model)
+  ) 
+```
+
+
+**课后练习**：看文档学函数
+- `?dplyr::modify()`
+- `?dplyr::nest_by()`
+
+

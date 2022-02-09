@@ -1,0 +1,40 @@
+---
+title: "simulation"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+## 模拟线性回归
+
+
+```{r}
+n <- 100
+beta <- c(2, 3, 4)
+
+fake_data <-
+  tibble(
+    x1 = rnorm(n, mean = 0, sd = 1),
+    x2 = rnorm(n, mean = 5, sd = 4)
+  ) %>%
+  mutate(
+    y = rnorm(n, mean = beta[1] + beta[2] * x1 + beta[3] * x2, sd = 2)
+  )
+head(fake_data)
+```
+
+
+```{r}
+fit <- lm( y ~ x1 + x2,  data = fake_data)
+fit
+```

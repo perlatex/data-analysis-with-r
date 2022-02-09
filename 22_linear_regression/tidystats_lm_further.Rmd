@@ -1,0 +1,464 @@
+---
+title: "lm further"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+## 线性回归的前提假设
+
+线性模型
+$$
+y_n = \alpha + \beta x_n + \epsilon_n \quad \text{where}\quad
+\epsilon_n \sim \operatorname{normal}(0,\sigma).
+$$
+
+线性回归需要满足四个前提假设：
+
+1. **Linearity **
+    - 因变量和每个自变量都是线性关系
+    
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/jhudsl/Linearity1.png")
+knitr::include_graphics(path = "images/jhudsl/Linearity2.png")
+```
+
+
+2. **Indpendence **
+    - 对于所有的观测值，它们的误差项相互之间是独立的
+
+
+
+3. **Normality **
+    - 误差项服从正态分布
+
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/jhudsl/Normality1.png")
+knitr::include_graphics(path = "images/jhudsl/Normality2.png")
+```
+
+
+
+4. **Equal-variance **  
+    - 所有的误差项具有同样方差
+    
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/jhudsl/Homoscedasticity.png")
+```
+
+这四个假设的首字母，合起来就是**LINE**，这样很好记
+
+
+把这**四个前提**画在一张图中
+
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/LINE.png")
+```
+
+
+**课堂练习**：以下是否违背了LINE假设
+
+1. 努力学习与是否通过R语言考试？
+    - *响应变量* 是否通过考试 (Pass or Fail)
+    - *解释变量:* 课后练习时间 (in hours) 
+
+2. 汽车音乐音量大小与司机刹车的反应时
+    - *响应变量* 反应时
+    - *解释变量:* 音量大小 
+
+
+
+## 回到案例，模型1的诊断
+
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+wages <- read_csv("./demo_data/wages.csv")
+
+glimpse(wages)
+```
+
+
+
+
+$$
+\begin{split}
+y_{i}=\beta_{0}+\beta_{1}\textrm{height}_{i}+\epsilon_{i}\quad &\textrm{where} \quad \epsilon_{i}\sim \textrm{N}(0,\sigma^2) 
+\end{split}
+$$
+
+
+
+```{r}
+mod1 <- lm(
+  formula = earn ~ height,
+  data = wages
+)
+```
+
+
+
+我们可以用**残差图**诊断模型是否满足`LINE`假设
+
+```{r, fig.height = 8, fig.asp = 0.8}
+par(mfrow = c(2, 2))
+plot(mod1)
+```
+
+
+
+- 第一张图，Residuals vs. Fitted图, 用于检测**线性假设**。如果是线性关系，会有一条水平Y = 0的红线(dashed line)，残差沿着这条线周围均匀分散，不应该有什么聚集和某种趋势，否则，说明模型还存在我们没有考虑到的模式。
+
+
+- 第二张图（右上），Normal Q-Q图，用于检查残差是否符合**正态性假定**，点沿着直线上是最好的，点越接近线性，残差呈正态分布的可能性就越大。如果偏离直线越多，说明残差分布符合正态分布曲线越不好。
+
+
+
+- 第三张图，Scale-Location, 用于检查**等方差假定**，图中的点沿着水平方向的红线周围均匀分散是最好的。如果红线不是水平直线，或者点过于集中，有明显的正或负趋势，表明方差不是恒定的。
+
+
+
+- 第四张图，Residuals vs. Leverage, 用于检查异常值，或者影响很大的极端值。
+y轴是标准化残差(standardized residuals)，理想情况下，标准化残差的分散程度是恒定的，不会随Leverage的变化而改变。其次，残差很大的点会对模型参数的估计产生不当影响，图中会用红色的虚线画出Cook's Distance，
+红色虚线以外的点，就是异常点，当然，我们这张图没有红色虚线，说明没有异常点^[https://data.library.virginia.edu/diagnostic-plots/]。
+
+
+
+> LINE，其中 LNE 都检查了，唯独没有I，没有**独立性的假设**，因为这个从数据上看不出的，这需要从实验设计和数据获取方法去看。
+
+
+
+
+
+## 模型的改进，来自残差图的提醒
+
+根据残差诊断图的提醒，模型1的解释性不强。因此我们需要改进模型，**捕获**更多的数据特征。
+
+之前是用单个变量`height`预测`earn`，我们可以增加一个预测变量`edu`，稍微扩展一下我们的一元线性模型，就是多元回归模型
+
+$$
+\begin{aligned}
+\text{earn} &= \beta_0 + \beta_1 \text{height} + \beta_2 \text{edu} +\epsilon \\
+\end{aligned}
+$$
+
+R语言代码实现也很简单，只需要把变量`edu`增加在公式的右边
+```{r}
+mod2 <- lm(earn ~ height + edu, data = wages)
+```
+
+同样，我们打印`mod2`看看
+
+```{r}
+mod2
+```
+
+
+更多模型？
+
+
+
+
+## 收入否取决于种族？
+
+我们来看第二个问题，收入否取决于种族？
+
+```{r}
+wages %>% distinct(race)
+```
+
+
+```{r}
+wages %>%
+  ggplot(aes(x = race, y = earn, fill = race)) +
+  geom_boxplot(position = position_dodge()) +
+  scale_y_continuous(limits = c(0, 20000))
+```
+
+
+以race变量作为解释变量，做线性回归
+
+$$
+Y_{i}=\beta_{0}+\beta_{1}\textrm{race}_{i}+\epsilon_{i}\quad \textrm{where}\quad \epsilon_{i}\sim \textrm{N}(0,\sigma^2).
+$$
+
+
+```{r}
+mod3 <- lm(earn ~ race, data = wages)
+mod3
+```
+
+
+race变量就是数据框wages的一个分类变量，代表四个不同的种族。用分类变量做回归，本质上是各组之间的进行比较。我们看到输出结果，只有`race_hispanic`、`race_other`和`race_white`三个系数和`Intercept`截距，`race_black`去哪里了呢？
+
+事实上，race变量里有4组，回归时，选择`black`为**基线**，`hispanic`的系数，可以理解为由`black`**切换**到`hispanic`，引起`earn`收入的变化（效应）
+
+-  对 black 组的估计，`earn = 28372.09 = 28372.09`
+-  对 hispanic组的估计，`earn = 28372.09 + -2886.79 = 25485.30`
+-  对 other 组的估计，`earn = 28372.09 + 3905.32 = 32277.41`
+-  对 white 组的估计，`earn = 28372.09 + 4993.33 = 33365.42`
+
+
+我们看到`hispanic`组的估计最低，最适合做基线，因此可以将race转换为因子变量，这样方便调整因子先后顺序
+```{r}
+wages_fct <- wages %>%
+  mutate(race = factor(race, levels = c("hispanic", "white", "black", "other"))) %>%
+  select(earn, race)
+
+head(wages_fct)
+```
+
+`wages_fct`替换`wages`，然后建立线性模型
+```{r}
+mod4 <- lm(earn ~ race, data = wages_fct)
+mod4
+```
+
+以`hispanic`组作为基线，各组系数也调整了，但加上截距后，实际值是没有变的。
+
+
+**课堂练习**，大家可以用sex变量作为解释变量再试试看
+```{r, eval=FALSE}
+lm(earn ~ sex, data = wages)
+```
+
+
+
+
+
+
+## 增加解释变量
+
+为了更好的解释earn，我们将**身高**和**性别**同时考虑进模型
+
+
+$$
+Y_{i}=\beta_{0}+\beta_{1}\textrm{height}_{i}+\beta_{2}\textrm{sex}_{i}+\epsilon_{i}\quad \textrm{where}\quad \epsilon_{i}\sim \textrm{N}(0,\sigma^2)
+$$
+此时预测变量是一个分类变量和一个连续变量
+
+```{r}
+mod5 <- lm(earn ~ height + sex, data = wages)
+coef(mod5)
+```
+
+- `height = 879.424`  当sex保持不变时，height变化引起的earn变化
+- `sexmale = 16874.158`  当height保持不变时，sex变化(female变为male)引起的earn变化
+
+
+### 换种方式理解
+
+事实上，分类变量在R语言代码里，会转换成0和1这种**虚拟变量**，然后再计算。比如
+
+$$
+Y_{i}=\beta_{0}+\beta_{1}\textrm{height}_{i}+\beta_{2}\textrm{sex}_{i}+\epsilon_{i}
+$$
+
+构建一个新变量gender，将sex中`(male, female)`替换成`(1, 0)`
+
+```{r}
+wages_gender <- wages %>% 
+  mutate(gender = if_else(sex == "male", 1, 0))
+
+wages_gender
+```
+
+
+获得一个等价的模型
+$$
+y_{i}=\beta_{0}+\beta_{1}\textrm{height}_{i}+\beta_{2}\textrm{gender}_{i}+\epsilon_{i}
+$$
+
+
+然后放入`lm()`
+```{r}
+mod5a <- lm(earn ~ height + gender, data = wages_gender)
+coef(mod5a)
+```
+
+我们发现系数没有发生变化，但更容易理解：
+
+在固定的身高上，比较不同性别的收入**差异**:
+
+- 当 `gender = 0` 情形
+
+$$
+\begin{split}
+y_{i}&=\beta_{0}+\beta_{1}\textrm{height}_{i}+\beta_{2}\textrm{gender}_{i}+\epsilon_{i}\\
+     &= \beta_{0}+ \beta_{1}\textrm{height}_{i} + \epsilon_{i}
+\end{split}
+$$
+
+
+
+- 当 `gender = 1` 情形
+
+$$
+\begin{split}
+y_{i}&=\beta_{0}+\beta_{1}\textrm{height}_{i}+\beta_{2}\textrm{gender}_{i}+\epsilon_{i}\\
+     &= \beta_{0}+ \beta_{1}\textrm{height}_{i} + \beta_{2} + \epsilon_{i} \\
+     &= (\beta_{0}+ \beta_{2}) + \beta_{1}\textrm{height}_{i}  + \epsilon_{i}
+\end{split}
+$$
+
+男性和女性的两条拟合直线，斜率相同、截距不同。
+
+
+```{r}
+p1 <- wages_gender %>%
+  ggplot(aes(x = height, y = earn, color = as.factor(gender))) +
+  geom_point(alpha = 0.1) +
+  geom_line(aes(y = predict(mod4a))) +
+  coord_cartesian(ylim = c(0, 100000))
+p1
+```
+
+
+
+## 交互项
+
+然而，模型5的一个局限性，因为模型的结论从图形上看，是两条**平行的直线**：
+
+1. 性别的影响对不同身高的人是相同的，
+2. 或者，不管男性女性，收入随身高的增长是相同的。
+
+虽然我们分组考虑不同性别的影响，但模型结论不一定符合现实情况。
+
+
+
+为了扩展模型能力，允许预测因子之间相互影响，即需要考虑**交互项**。
+
+
+$$
+\begin{split}
+Y_{i}=& \beta_{0}+\beta_{1}\textrm{height}_{i}+\beta_{2}\textrm{gender}_{i} \; +\\
+      &{}\beta_{3}\textrm{height}_{i}\times\textrm{gender}_{i}+\epsilon_{i}\quad \textrm{where}\quad \epsilon_{i}\sim \textrm{N}(0,\sigma^2)
+\end{split}
+$$
+
+```{r}
+mod6 <- lm(earn ~ height + gender + height:gender, data = wages_gender)
+```
+
+
+```{r}
+summary(mod6)
+```
+
+
+不想自己写公式，可以偷懒
+```{r}
+library(equatiomatic)  # install.packages("equatiomatic")
+extract_eq(mod5, use_coefs = TRUE)
+```
+
+
+
+
+
+### 解释
+
+为了方便理解，我们分开来看
+
+$$
+\begin{align*}
+ \textrm{gender}=0: & \\
+ \hat{y}_{i} &= -12166.97 + 564.51\textrm{height}_{i} \\
+ \textrm{gender}=1: & \\
+ \hat{Y}_{i} &= (-12166.97-30510.43)+(564.51 + 701.41)\textrm{height}_{i} \\
+ \end{align*}
+$$
+
+
+
+- 对于女性，height增长1个单位，引起earn的增长`564.5102`
+- 对于男性，height增长1个单位，引起earn的增长`564.5102 + 701.4065 = 1265.92` 
+
+
+
+两条拟合直线，不同的截距和不同的斜率。
+
+
+```{r}
+p2 <- wages %>%
+  ggplot(aes(x = height, y = earn, color = sex)) +
+  geom_point(alpha = 0.1) +
+  geom_line(aes(y = predict(mod5))) +
+  coord_cartesian(ylim = c(0, 100000))
+p2
+```
+
+
+对于男性和女性，截距和系数都不同，因此这种情形**等价于**，按照sex分成两组，男性算男性的斜率，女性算女性的斜率（是不是似曾相识？）
+
+```{r}
+wages %>% 
+  ggplot(aes(x = height, y = earn, color = sex)) +
+  geom_point(alpha = 0.1) +
+  geom_smooth(method = "lm", se = FALSE) +
+  coord_cartesian(ylim = c(0, 100000))
+```
+
+
+
+
+
+关于模型结果的解释，如果觉得王老师讲的不够明白，可以参考这里
+
+```{r}
+library(report)  # install.packages("report")
+report(mod5)
+```
+
+
+## 这又怎么理解呢？
+
+
+```{r}
+mod7 <- lm(earn ~ height + height:gender, data = wages_gender)
+coef(mod7)
+```
+
+
+我们还是按照数学模型来理解，这里对应的数学表达式
+
+$$
+\begin{aligned}
+\text{earn} &= \beta_0 + \beta_1 \text{height} + \beta_4 \text{(height*gender)}+ \epsilon \\
+\end{aligned}
+$$
+
+
+同样假定男性(gender = 1)和女性(gender = 0)，那么
+$$
+\begin{aligned}
+\text{female}\qquad earn &= \beta_0 + \beta_1 \text{height}  +\epsilon \\
+\text{male}\qquad earn &= \beta_0 + \beta_1 \text{height} + \beta_4 \text{(height*1)}+ \epsilon \\
+&= \beta_0 + \beta_1 \text{height} + \beta_4 \text{height}+ \epsilon \\
+& = \beta_0  + (\beta_1 + \beta_4)\text{height}  + \epsilon \\
+\end{aligned}
+$$
+
+
+对照模型mod7的结果，我们可以理解：
+
+- 对于女性(截距$\beta_0$，系数$\beta_1$)，height增长1个单位，引起earn的增长`757.4661`
+- 对于男性(截距$\beta_0$，系数$\beta_1 + \beta_4 $)，height增长1个单位，引起earn的增长`757.4661 + 251.2915 = 1008.758` 
+- 注意到，mod6和mod7是两个不同的模型, 
+  - mod7中男女拟合直线在y轴的截距是相同的，而mod6在y轴的截距是不同的
+
+
+
+
+
