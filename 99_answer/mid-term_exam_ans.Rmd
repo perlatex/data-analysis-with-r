@@ -109,6 +109,32 @@ world_bank_countries %>%
 ```
 
 ## 统计每个变量缺失值的个数
+```{r}
+c(1, 3, NA, NA, NA) %>% is.na() %>% as.numeric() %>% sum()
+c(1, 3, NA, NA, NA) %>% is.na() %>% sum()
+sum(c(1, 3, 4, 1, 5) > 2)
+```
+
+```{r}
+world_bank_countries %>%
+  summarise(
+    across(everything(), function(x) sum(is.na(x)))
+  )
+
+# or
+world_bank_countries %>%
+  summarise(
+    across(everything(),  ~ sum(is.na(.x)))
+  )
+
+# or
+world_bank_countries %>% 
+  summarise(
+    across(everything(),  ~ sum(is.na(.)))
+  ) 
+```
+
+
 
 ```{r}
 world_bank_countries %>%
@@ -147,7 +173,8 @@ world_bank_countries %>%
   filter(year == 2008) %>%
   group_by(continent) %>%
   summarise(
-    across(life_expectancy_at_birth, list(min, mean, max), na.rm = TRUE)
+    across(life_expectancy_at_birth, list(min = min, mean = mean,max = max), na.rm = T, 
+      .names = "{.fn}")
   )
 ```
 
@@ -214,7 +241,8 @@ world_bank_countries %>%
 world_bank_countries %>%
   filter(year == 2017) %>%
   ggplot(aes(x = gdp_per_capita, y = birth_rate, color = continent)) +
-  geom_point()
+  geom_point() +
+  geom_line()
 ```
 
 ## 画出议会中女性人数占比的直方图
@@ -229,6 +257,9 @@ world_bank_countries %>%
     color = "black",
     binwidth = 3,
     alpha = .7
+  )  +
+  theme(
+    panel.background = element_rect(fill = "white")
   )
 ```
 
@@ -240,7 +271,11 @@ world_bank_countries %>%
 world_bank_countries %>%
   ggplot(aes(x = year, y = life_expectancy_at_birth)) +
   geom_line(aes(group = country), color = "#B91C1C", alpha = .4) +
-  facet_wrap(vars(continent), ncol = 5)
+  facet_wrap(vars(continent), ncol = 5) +
+  theme(
+    legend.position = "none",
+    panel.spacing = unit(.8, "cm")
+  )
 ```
 
 ## 画出2007年不同洲overweight分布的小提琴图
@@ -301,7 +336,7 @@ world_bank_countries %>%
   ) +
   geom_text(
     aes(label = round(co2_emissions_tons_per_capita, 2)),
-    vjust = -0.5, size = 5
+    vjust = -0.5, size = 5 # nudge_y = 0.3
   ) +
   scale_y_continuous(expand = c(0, 1))
 ```
@@ -357,63 +392,64 @@ world_bank_countries %>%
 
 ```{r, message=FALSE, warning=FALSE}
 world_bank_countries %>%
-  group_by(year) %>%
-  summarise(
-    across(c(gdp_per_capita, life_expectancy_at_birth), mean, na.rm = T)
-  ) %>%
-  
-  ggplot(aes(life_expectancy_at_birth, gdp_per_capita)) +
-  geom_point(fill = "steelblue", shape = 21, size = 5) +
-  scale_x_log10() +
-  scale_y_log10()
+  filter(year == 2000) %>%
+  ggplot(aes(x = gdp_per_capita, y = life_expectancy_at_birth)) +
+  geom_point(fill = "steelblue", shape = 21, size = 5) + 
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  scale_x_log10() 
 ```
+
 
 -   方案2
 
 ```{r, message=FALSE, warning=FALSE}
 world_bank_countries %>%
-  group_by(continent) %>%
+  group_by(year) %>%
   summarise(
-    across(c(gdp_per_capita, life_expectancy_at_birth) , mean, na.rm = T)
+    across(c(gdp_per_capita, life_expectancy_at_birth), mean, na.rm = T)
   ) %>%
-  ggplot(aes(life_expectancy_at_birth, gdp_per_capita)) +
+  
+  ggplot(aes(x = gdp_per_capita, y = life_expectancy_at_birth)) +
   geom_point(fill = "steelblue", shape = 21, size = 5) +
-  scale_x_log10() +
-  scale_y_log10()
+  scale_x_log10() 
 ```
+
 
 -   方案3
 
 ```{r, message=FALSE, warning=FALSE}
 world_bank_countries %>%
-  filter(year == 2000) %>%
-  ggplot(aes(life_expectancy_at_birth, gdp_per_capita)) +
-  geom_point(fill = "steelblue", shape = 21, size = 5) + 
-  geom_smooth(method = "lm", se = FALSE, color = "red") +
-  scale_x_log10() +
-  scale_y_log10()
+  group_by(continent) %>%
+  summarise(
+    across(c(gdp_per_capita, life_expectancy_at_birth), mean, na.rm = T)
+  ) %>%
+  ggplot(aes(x = gdp_per_capita, y = life_expectancy_at_birth)) +
+  geom_point(fill = "steelblue", shape = 21, size = 5) +
+  scale_x_log10() 
 ```
+
 
 -   方案4
 
 ```{r, message=FALSE, warning=FALSE}
 world_bank_countries %>%
   filter(year == 2017) %>%
-  ggplot(aes(
-    x = life_expectancy_at_birth,
-    y = gdp_per_capita
-  )) +
+  ggplot(aes(x = gdp_per_capita, y = life_expectancy_at_birth)) +
   geom_point() +
   geom_smooth(
     method = "lm", se = FALSE,
     color = "red"
   ) +
+  scale_x_log10() +
   facet_wrap(vars(continent), scales = "free")
 ```
 
 ## 是不是越穷越爱生小孩
 
 提示：可按人均GDP划分成五个等级，统计各等级下人均GDP的均值和出生率的均值，探索人均GDP与出生率的关联。
+```{r}
+world_bank_countries$gdp_per_capita %>% quantile(., na.rm = T)
+```
 
 ```{r}
 world_bank_countries %>%
@@ -424,7 +460,7 @@ world_bank_countries %>%
       between(gdp_per_capita, 1000, 2500)  ~ "Lower middle income",
       between(gdp_per_capita, 2500, 5000)  ~ "Middle income",
       between(gdp_per_capita, 5000, 10000) ~ "Upper middle income",
-      TRUE ~ "High income"
+      TRUE                                 ~ "High income"
     )
   ) %>%
   group_by(income_group) %>%
@@ -439,4 +475,25 @@ world_bank_countries %>%
   )) +
   geom_point() +
   geom_text(hjust = 0, nudge_y = .5)
+```
+
+
+
+## 最后来个动画
+```{r, message = FALSE, warning = FALSE}
+library(gganimate)
+
+world_bank_countries %>% 
+  mutate(year = as.integer(year)) %>% 
+  ggplot(aes(gdp_per_capita, life_expectancy_at_birth, size = population_total, color = country)) +
+  geom_point(alpha = 0.7, show.legend = FALSE) +
+  scale_colour_manual(values = gapminder::country_colors) +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() +
+  facet_wrap(vars(continent)) +
+  labs(title = "Year: {frame_time}", x = "GDP Per capita", y = "life expectancy") +
+  transition_time(year) +
+  ease_aes("linear")
+
+# anim_save("anim.gif")
 ```
