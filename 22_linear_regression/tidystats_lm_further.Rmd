@@ -259,13 +259,16 @@ coef(mod5)
 
 ### 换种方式理解
 
-事实上，分类变量在R语言代码里，会转换成0和1这种**虚拟变量**，然后再计算。比如
 
 $$
 Y_{i}=\beta_{0}+\beta_{1}\textrm{height}_{i}+\beta_{2}\textrm{sex}_{i}+\epsilon_{i}
 $$
 
-构建一个新变量gender，将sex中`(male, female)`替换成`(1, 0)`
+
+事实上，分类变量`sex`在R语言代码里，会转换成0和1这种**虚拟变量**，然后再计算。
+
+
+我们这里显式地构建一个新变量`gender`，将`sex`中`(male, female)`替换成`(1, 0)`
 
 ```{r}
 wages_gender <- wages %>% 
@@ -275,7 +278,7 @@ wages_gender
 ```
 
 
-获得一个等价的模型
+这样，我们获得一个等价的模型
 $$
 y_{i}=\beta_{0}+\beta_{1}\textrm{height}_{i}+\beta_{2}\textrm{gender}_{i}+\epsilon_{i}
 $$
@@ -287,7 +290,7 @@ mod5a <- lm(earn ~ height + gender, data = wages_gender)
 coef(mod5a)
 ```
 
-我们发现系数没有发生变化，但更容易理解：
+我们发现系数没有发生变化，但更容易理解。
 
 在固定的身高上，比较不同性别的收入**差异**:
 
@@ -299,8 +302,6 @@ y_{i}&=\beta_{0}+\beta_{1}\textrm{height}_{i}+\beta_{2}\textrm{gender}_{i}+\epsi
      &= \beta_{0}+ \beta_{1}\textrm{height}_{i} + \epsilon_{i}
 \end{split}
 $$
-
-
 
 - 当 `gender = 1` 情形
 
@@ -369,7 +370,7 @@ extract_eq(mod5, use_coefs = TRUE)
 
 ### 解释
 
-为了方便理解，我们分开来看
+为了方便理解，我们仍然分开来看
 
 $$
 \begin{align*}
@@ -440,7 +441,8 @@ $$
 $$
 
 
-同样假定男性(gender = 1)和女性(gender = 0)，那么
+同样假定男性(gender = 1)和女性(gender = 0)，那么继续分开来看
+
 $$
 \begin{aligned}
 \text{female}\qquad earn &= \beta_0 + \beta_1 \text{height}  +\epsilon \\
@@ -455,8 +457,8 @@ $$
 
 - 对于女性(截距$\beta_0$，系数$\beta_1$)，height增长1个单位，引起earn的增长`757.4661`
 - 对于男性(截距$\beta_0$，系数$\beta_1 + \beta_4 $)，height增长1个单位，引起earn的增长`757.4661 + 251.2915 = 1008.758` 
-- 注意到，mod6和mod7是两个不同的模型, 
-  - mod7中男女拟合直线在y轴的截距是相同的，而mod6在y轴的截距是不同的
+- 注意到`，mod6`和`mod7`是两个不同的模型, 
+  - `mod7`中男女拟合直线在y轴的截距是相同的，而`mod6`在y轴的截距是不同的
 
 
 

@@ -102,7 +102,7 @@ wages %>%
   )
 ```
 
-也有可以用可视化的方法，呈现男女收入的分布情况
+也可以用可视化的方法，呈现男女收入的分布情况
 ```{r}
 wages %>%
   ggplot(aes(x = earn, fill = sex)) + 
@@ -159,12 +159,12 @@ y_{i} &= \alpha + \beta x_{i} + \epsilon_{i} \\
 $$
 先解释一些概念：
 
-- $y_i$ 分成两个部分，即`data = model + error`
+- 观测数据$y_i$ 分成两个部分，即`data = model + error`
    1. $\alpha + \beta x_{i}$ 就是model
    2. $\epsilon_{i}$ 就是error
 
 
-- 模型（期望值）: 
+- 模型，系数与预测变量的线性组合，给出期望值
 $$
 \hat{y}_{i}=\alpha + \beta x_{i}
 $$
