@@ -14,27 +14,76 @@ output:
 ---
 
 
+## 准备工作
 
-## 模拟线性回归
+- 模拟100个正态分布(均值为0、标准差为2)的点 
+```{r}
+rnorm(n = 100, mean = 0, sd = 2)
+```
+
+- 然后构建数据框
+
+```{r}
+df <- data.frame(
+  x = rnorm(n = 100, mean = 0, sd = 2)
+)
+df
+```
+
+- 可视化分布
+
+```{r}
+library(tidyverse)
+
+df %>%
+  ggplot(aes(x = x)) +
+  geom_density()
+```
+
+- 增加数据点
+
+增加数据点，变成10000，再试试
+
+
+## 案例
+
+- 模拟男生的身高
+
+假定在学校里随机选择100个男生，他们的身高分布均值是175cm，分布的标准差为6
+```{r}
+data <-
+  data.frame(
+    height = rnorm(100, mean = 175, sd = 6)
+  )
+
+data
+```
+
+- 模拟男生的体重
+
+假定男生的体重和身高存在一定的关联，比如身高值乘以0.8加上50就很**接近**他的体重，接近的意思，不是说体重一定刚好等于(身高乘以0.8加上50)，而是说(身高乘以0.8加上50)是**期望值**，体重在这个期望值附近波动。
 
 
 ```{r}
-n <- 100
-beta <- c(2, 3, 4)
+alpha <- 50
+beta <- 0.8
 
-fake_data <-
-  tibble(
-    x1 = rnorm(n, mean = 0, sd = 1),
-    x2 = rnorm(n, mean = 5, sd = 4)
-  ) %>%
+df <- data %>%
   mutate(
-    y = rnorm(n, mean = beta[1] + beta[2] * x1 + beta[3] * x2, sd = 2)
+    weight = rnorm(100, mean = alpha + beta * height, sd = 2)
   )
-head(fake_data)
+
+df
+```
+
+- 建立回归模型
+```{r}
+fit <- lm(weight ~ 1 + height, data = df)
 ```
 
 
+- 检查模型是否能捕获系数
 ```{r}
-fit <- lm( y ~ x1 + x2,  data = fake_data)
 fit
 ```
+
