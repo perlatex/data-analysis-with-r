@@ -31,7 +31,7 @@ glimpse(wages)
 
 ```{r}
 mod1 <- lm(
-  formula = earn ~ height,
+  formula = earn ~ 1 + height,
   data = wages
 )
 ```
@@ -99,6 +99,43 @@ mod1 %>%
 
 
 
+### 拟合和预测
+
+模型方程一旦建立好了
+$$
+\operatorname{\widehat{earn}} = --126523.359 + 2387.196 \; \text{height } 
+$$
+
+给定一个height值，就可以得到相应的earn. 如果带入的 height 是原来建模时候的height 值 就叫拟合，如果带入的是新的height值，就叫预测。很显然，拟合也是一种预测。比如
+```{r}
+coef(mod1)
+```
+
+- 拟合
+```{r}
+-126523.359 + 2387.196 * wages$height
+```
+
+- 预测
+```{r}
+new_height <- seq(65, 70, by = 1)
+-126523.359 + 2387.196 * new_height
+```
+很显然，对于一元回归模型，每个x值对应一个拟合值，拟合值都在一条直线上，即拟合直线。
+
+
+我们也可以用`fitted()`函数得到拟合值。
+```{r}
+fitted(mod1)
+```
+
+
+可以是用`predict()`函数得到预测值。
+```{r}
+new <- tibble(height = seq(65, 70, by = 1))
+predict(mod1, newdata = new)
+```
+
 ### 增加拟合值
 
 为了让建模操作更方便，让我们的思维限定在`data.frame`，方便使用`dplyr`，`ggplot2`中的函数。我推荐大家使用`modelr`宏包
@@ -125,6 +162,33 @@ wages %>%
 
 
 
+
+
+### 增加预测值
+
+```{r}
+newdata <- data.frame(height = seq(65, 70, by = 1))
+
+newdata %>% 
+  modelr::add_predictions(mod1)
+```
+
+数据框进、数据框出，非常方便。
+
+
+
+::: {.rmdnote}
+
+fit vs predict
+
+- **拟合**, 模型一旦建立，建模和拟合使用的是同一数据
+
+- **预测**，模型建立后，可以用新的数据进行预测
+
+::: 
+
+
+
 ### 增加残差值
 ```{r}
 wages %>% 
@@ -133,32 +197,8 @@ wages %>%
 ```
 
 
-### 增加预测值
 
-```{r}
-wages %>% modelr::add_predictions(mod1)
-```
-
-
-```{r}
-newdata <- data.frame(height = seq(65, 75, by = 1))
-
-newdata %>% modelr::add_predictions(mod1)
-```
-
-
-
-### predict vs fit
-
-- **拟合** , 模型一旦建立，建模和拟合使用的是同一数据
-
-- **预测**， 模型建立后，可以用新的数据进行预测
-
-
-
-### 课堂练习
-
-根据模型**残差标准误**公式
+**课堂练习** 根据模型**残差标准误**公式
 
 ```{r, echo=FALSE, out.width = '100%'}
 knitr::include_graphics("images/RSE_formual.jpeg")
@@ -178,13 +218,34 @@ wages %>%
 
 ### 分组建模
 
-按照性别分组，建立各自的线性回归模型，有没有方法快速地求出两条直线的截距和斜率？
+按照性别分组，建立各自的线性回归模型，
+
+```{r}
+wages_female <- wages %>%
+  filter(sex == "female")
+
+fit_female <- lm(earn ~ 1 + height, data = wages_female)
+fit_female
+```
+
+
+
+```{r}
+wages_male <- wages %>%
+  filter(sex == "male")
+
+fit_male <- lm(earn ~ 1 + height, data = wages_male)
+fit_male
+```
+
+
+有没有方法快速地求出两条直线的截距和斜率？
 
 ```{r}
 wages %>%
   group_by(sex) %>%
   group_modify(
-    ~ broom::tidy(lm(earn ~ height, data = .))
+    ~ broom::tidy(lm(earn ~ 1 + height, data = .))
   )
 ```
 
@@ -195,7 +256,7 @@ wages %>%
 ```{r}
 wages %>%
   nest_by(sex) %>%
-  mutate(model = list(lm(earn ~ height, data = data))) %>%
+  mutate(model = list(lm(earn ~ 1 + height, data = data))) %>%
   mutate(
     coef = list(broom::tidy(model))
   ) %>% 
@@ -207,7 +268,7 @@ wages %>%
 ```{r}
 wages %>%
   nest_by(sex) %>%
-  mutate(model = list(lm(earn ~ height, data = data))) %>%
+  mutate(model = list(lm(earn ~ 1 + height, data = data))) %>%
   summarise(
     broom::tidy(model)
   ) 
