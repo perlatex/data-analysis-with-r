@@ -91,14 +91,18 @@ wages %>%
 wages %>% count(sex)
 ```
 
+```{r}
+wages %>% count(race)
+```
+
+
 男女这两组的身高均值分别是多少？收入的均值分别是多少？
 ```{r}
 wages %>%
   group_by(sex) %>%
   summarise(
     n = n(),
-    mean_height = mean(height),
-    mean_earn = mean(earn)
+    across(c(height, earn), mean)
   )
 ```
 
@@ -128,7 +132,7 @@ wages %>%
 
 - 受教育程度越高，挣钱越多？
 
-- 如果知道年龄、性别和受教育程度，我们能预测他的收入情况吗？在多大范围是可信的？
+- 如果知道年龄、性别和受教育程度，我们能预测他的收入情况吗？预测在多大范围是可信的？
 
 
 从统计学的角度回答以上问题，需要引入统计模型。
@@ -183,6 +187,7 @@ $$
 模型中的参数($\alpha$, $\beta$, 和 $\sigma^2$) 通过最小二乘法计算得出：
 
 > 使得残差的平方和最小
+
 ```{r out.width = '85%', echo = FALSE}
 knitr::include_graphics("images/best_fit.png")
 ```
@@ -226,9 +231,16 @@ lm(formula = y ~ x, data = __)
 等不及了，马上运行代码吧
 ```{r}
 mod1 <- lm(
-  formula = earn ~ height,
+  formula = earn ~ 1 + height,
   data = wages
 )
+```
+
+
+注意，以下两者是等价的
+```{r, eval=FALSE}
+lm(formula = earn ~     height,  data = wages)
+lm(formula = earn ~ 1 + height,  data = wages)
 ```
 
 
@@ -241,9 +253,10 @@ print(mod1)
 它告诉我们，建立的线性回归模型是
 
 $$
-\hat y = -126532 + 2387 \; x 
+\operatorname{\widehat{earn}} = -126532 + 2387 \; \text{height } 
 $$
 
+-126532 乘以1，加上 2387 乘以height
 
 ### 模型输出
 
@@ -315,12 +328,12 @@ $$
 
 
 
-- 对于斜率$\beta = 2387$意味着，当一个人的身高是68英寸时，他的预期收入$earn = -126532 + 2387 \times 68= 35806$ 美元， 换个方式说，身高$height$每增加一个1英寸, 收入$earn$会增加2387美元。
+- 对于斜率$\beta = 2387$意味着，当一个人的身高是68英寸时，他的预期收入$earn = -126532 + 2387 \times 68= 35793$ 美元，如果是69英寸时，他的预期收入$earn = -126532 + 2387 \times 69= 38180$ 美元，换个方式说，身高$height$每增加一个1英寸, 收入$earn$会增加2387美元。
 
 - 对于截距$\alpha = -126532$，即当身高为0时，期望的收入值-126532。呵呵，人的身高不可能为0，所以这是一种极端的理论情况，现实不可能发生。
 
 
-- $R^2$ = 0.08503意味着**该模型**只能解释8%的收入随身高变化的特征
+- $R^2$ = 0.08503意味着**该模型**只能解释8%的**收入随身高变化的特征**
 
 ```{r}
 wages %>%
