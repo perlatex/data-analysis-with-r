@@ -1,0 +1,33 @@
+---
+title: "How to plot this picture using ggplot2"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+## 缘起
+
+前几天看新闻的时候，发现一张图，勾起了我的兴趣，打算重复这张图
+
+```{r, out.width = '75%', echo = FALSE, fig.pos = "center"}
+knitr::include_graphics("images/cpi.png")
+```
+
+
+## 寻找数据
+
+原图的右下角告诉了数据来源，于是找到这个网站<https://fred.stlouisfed.org/series/CPIAUCSL>，可获取数据
+
+
+## 通货膨胀率公式
+
+```{r, out.width = '75%', echo = FALSE, fig.pos = "center"}
+knitr::include_graphics("images/Inflation-Formula.jpg")
+```
