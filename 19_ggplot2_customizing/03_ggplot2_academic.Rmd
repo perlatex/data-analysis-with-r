@@ -189,6 +189,18 @@ df_peng_stats %>%
   )
 ```
 
+## 图4 
+```{r}
+library(ggdist)
+
+penguins %>%
+  ggplot(aes(y = species, x = bill_length_mm, fill = species)) +
+  stat_slab(aes(thickness = stat(pdf*n)), scale = 0.7) +
+  stat_dotsinterval(side = "bottom", scale = 0.7, slab_size = NA) +
+  scale_fill_brewer(palette = "Set2") +
+  ggtitle("This is rain cloud plot!")
+```
+
 
 ## 保存
 
