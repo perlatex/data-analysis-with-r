@@ -215,7 +215,7 @@ mod2
 但要记住，所有模型都是人的"意淫"。
 
 
-## 收入否取决于种族？
+## 收入是否取决于种族？
 
 我们来看第二个问题，收入否取决于种族？
 
@@ -278,7 +278,7 @@ head(wages_fct)
 
 `wages_fct`替换`wages`，然后建立线性模型
 ```{r}
-mod4 <- lm(earn ~ race, data = wages_fct)
+mod4 <- lm(earn ~ 1 + race, data = wages_fct)
 mod4
 ```
 
@@ -306,7 +306,7 @@ $$
 此时预测变量是一个分类变量和一个连续变量
 
 ```{r}
-mod5 <- lm(earn ~ height + sex, data = wages)
+mod5 <- lm(earn ~ 1 + height + sex, data = wages)
 coef(mod5)
 ```
 
@@ -343,7 +343,7 @@ $$
 
 然后放入`lm()`
 ```{r}
-mod5a <- lm(earn ~ height + gender, data = wages_gender)
+mod5a <- lm(earn ~ 1 + height + gender, data = wages_gender)
 coef(mod5a)
 ```
 
@@ -377,7 +377,7 @@ $$
 wages_gender %>%
   ggplot(aes(x = height, y = earn, color = as.factor(gender))) +
   geom_point(alpha = 0.1) +
-  geom_line(aes(y = predict(mod4a))) +
+  geom_line(aes(y = predict(mod5a))) +
   coord_cartesian(ylim = c(0, 100000))
 ```
 
@@ -405,7 +405,7 @@ Y_{i}=& \beta_{0}+\beta_{1}\textrm{height}_{i}+\beta_{2}\textrm{gender}_{i} \; +
 $$
 
 ```{r}
-mod6 <- lm(earn ~ height + gender + height:gender, data = wages_gender)
+mod6 <- lm(earn ~ 1 + height + gender + height:gender, data = wages_gender)
 ```
 
 
@@ -451,7 +451,7 @@ $$
 wages %>%
   ggplot(aes(x = height, y = earn, color = sex)) +
   geom_point(alpha = 0.1) +
-  geom_line(aes(y = predict(mod5))) +
+  geom_line(aes(y = predict(mod6))) +
   coord_cartesian(ylim = c(0, 100000))
 ```
 
@@ -482,7 +482,7 @@ report(mod6)
 
 
 ```{r}
-mod7 <- lm(earn ~ height + height:gender, data = wages_gender)
+mod7 <- lm(earn ~ 1 + height + height:gender, data = wages_gender)
 coef(mod7)
 ```
 
@@ -513,8 +513,17 @@ $$
 - 对于女性(截距$\beta_0$，系数$\beta_1$)，height增长1个单位，引起earn的增长`757.4661`
 - 对于男性(截距$\beta_0$，系数$\beta_1 + \beta_4 $)，height增长1个单位，引起earn的增长`757.4661 + 251.2915 = 1008.758` 
 - 注意到`，mod6`和`mod7`是两个不同的模型, 
-  - `mod7`中男女拟合直线在y轴的截距是相同的，而`mod6`在y轴的截距是不同的
+  - `mod6`中男女拟合直线在y轴的截距是不同的，而`mod7`中在y轴的截距是相同的
 
+
+
+```{r}
+wages %>%
+  ggplot(aes(x = height, y = earn, color = sex)) +
+  geom_point(alpha = 0.1) +
+  geom_line(aes(y = predict(mod7))) +
+  coord_cartesian(ylim = c(0, 100000))
+```
 
 
 

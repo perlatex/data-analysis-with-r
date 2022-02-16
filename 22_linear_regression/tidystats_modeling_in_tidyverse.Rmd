@@ -225,6 +225,28 @@ wages %>%
 
 
 
+**课堂练习**，上一章模型`mod7`中男女两条拟合直线是截距相同、斜率不同，但是看不出相交，你能用可视化的方法验证？
+
+```{r}
+wages_gender <- wages %>% 
+  mutate(gender = if_else(sex == "male", 1, 0))
+
+mod7 <- lm(earn ~ 1 + height + height:gender, data = wages_gender)
+
+newdata <- 
+  data.frame(height = seq(0, 70, by = 1)) %>% 
+  tidyr::crossing(gender = c(0, 1))
+
+newdata %>% 
+  modelr::add_predictions(mod7) %>% 
+  
+  ggplot(aes(x = height, y = pred, group = gender, color = as.factor(gender))) +
+  geom_point() +
+  geom_line() 
+```
+
+
+
 ### 分组建模
 
 按照性别分组，建立各自的线性回归模型，
