@@ -374,12 +374,11 @@ $$
 
 
 ```{r}
-p1 <- wages_gender %>%
+wages_gender %>%
   ggplot(aes(x = height, y = earn, color = as.factor(gender))) +
   geom_point(alpha = 0.1) +
   geom_line(aes(y = predict(mod4a))) +
   coord_cartesian(ylim = c(0, 100000))
-p1
 ```
 
 
@@ -418,7 +417,7 @@ summary(mod6)
 不想自己写公式，可以偷懒
 ```{r}
 library(equatiomatic)  # install.packages("equatiomatic")
-extract_eq(mod5, use_coefs = TRUE)
+extract_eq(mod6, use_coefs = TRUE)
 ```
 
 
@@ -449,12 +448,11 @@ $$
 
 
 ```{r}
-p2 <- wages %>%
+wages %>%
   ggplot(aes(x = height, y = earn, color = sex)) +
   geom_point(alpha = 0.1) +
   geom_line(aes(y = predict(mod5))) +
   coord_cartesian(ylim = c(0, 100000))
-p2
 ```
 
 
@@ -476,7 +474,7 @@ wages %>%
 
 ```{r}
 library(report)  # install.packages("report")
-report(mod5)
+report(mod6)
 ```
 
 
