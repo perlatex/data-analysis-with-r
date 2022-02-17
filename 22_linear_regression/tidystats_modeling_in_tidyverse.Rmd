@@ -233,6 +233,12 @@ wages_gender <- wages %>%
 
 mod7 <- lm(earn ~ 1 + height + height:gender, data = wages_gender)
 
+# 首先，模型 mod7 是height,gender两个预测变量。
+# 因此在模型预测的时候，提供的新数据也应该包含 height,gender
+# 其次，为了看到y轴截距，height的值应该覆盖到0，所以`height = seq(0, 70, by = 1)`
+# 最后，还要考虑性别分组
+
+
 newdata <- 
   data.frame(height = seq(0, 70, by = 1)) %>% 
   tidyr::crossing(gender = c(0, 1))
