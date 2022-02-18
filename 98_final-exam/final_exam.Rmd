@@ -1,0 +1,62 @@
+---
+title: "《R语言数据分析》期末考核"
+subtitle: "重复Nature期刊上的一篇文章"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 题目
+
+这是Nature期刊上的一篇文章[Nature. 2004 September 30; 431(7008)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3173856/#SD2)，文章的主要结论在这张图
+
+```{r, out.width = '90%', echo = FALSE}
+knitr::include_graphics(path = "images/tileshop.jpg")
+```
+
+文章作者分析了2004年之前所有奥运会上男子和女子100米短跑冠军成绩，通过线性回归模型大胆预测：
+
+- 在2156年的时候奥运会上会有重大突破
+- 女子短跑运动员正在缩小与男子的差距，也许有一天会超过男子
+
+
+我抱着好奇和批判的心态，在补充材料里找到了文章使用的数据，这些数据都是公开的。
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(modelr)
+library(readxl)
+
+raw <- read_excel("./demo_data/olympics.xlsx")
+raw
+```
+
+
+这个数据包含3个变量，具体含义如下：
+
+| 变量         	| 含义       	|
+|:-------------	|:-----------	|
+| Olympic_year 	| 奥运会年份 	|
+| Men_score    	| 男子成绩   	|
+| Women_score  	| 女子成绩   	|
+
+
+
+
+# 作业要求
+
+- 重复文章的分析过程和图片
+
+- 网络搜索，补全这几年的数据，重新建模，看看作者的观点是否依然成立
+
+
