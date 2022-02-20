@@ -92,7 +92,11 @@ penguins %>% select(bill_length_mm, flipper_length_mm)
 penguins %>% select(contains("length"))
 ```
 
+## 选择最后一列
 
+```{r}
+penguins %>% select(last_col())
+```
 
 ## 选择数值型的列
 
