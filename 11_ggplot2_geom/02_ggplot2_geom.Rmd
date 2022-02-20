@@ -14,6 +14,9 @@ output:
 ---
 
 
+> 用 ggplot2 画图，有种恋爱的感觉: "你懂我的图谋不轨，我懂你的故作矜持"。
+
+
 请大家提前安装好以下宏包
 ```{r, eval=FALSE}
 install.packages( 
@@ -654,6 +657,18 @@ penguins %>%
   )
 ```
 
+## 云雨图
+
+```{r}
+library(ggdist)
+
+penguins %>%
+  ggplot(aes(y = species, x = bill_length_mm, fill = species)) +
+  stat_slab(aes(thickness = stat(pdf*n)), scale = 0.7) +
+  stat_dotsinterval(side = "bottom", scale = 0.7, slab_size = NA) +
+  scale_fill_brewer(palette = "Set2") +
+  ggtitle("This is rain cloud plot!")
+```
 
 
 ## 椭圆图
@@ -741,4 +756,3 @@ ggplot(data = world_map_data) +
 
 
 
-> 用 ggplot2 画图，有种恋爱的感觉: "你懂我的图谋不轨，我懂你的故作矜持"。
