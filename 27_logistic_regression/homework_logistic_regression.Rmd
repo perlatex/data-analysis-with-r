@@ -1,0 +1,102 @@
+---
+title: "logistic regression"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+# 案例
+
+`Darlingtonia`是一种罕见的食虫猪笼草，它长出的叶子，形成一个瓶状陷阱，里面充满了吸引黄蜂的花蜜。数据集中的观察是关于猪笼草陷阱的高度(`leafHeight`)以及是否有黄蜂访问过该叶子(`visited`)。
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(here)
+
+darl <- read_csv(
+  here("data", "darlingtonia.csv"), 
+  comment = "#",
+  col_types = "dl"
+  )
+darl
+```
+
+
+## 缺失值检查
+
+
+
+
+## 可视化
+
+画出`有黄蜂到访`和`没黄蜂到访`叶子高度的分布
+
+
+# 写出logistic 回归模型的数学表达式
+
+$$
+\begin{align*}
+\text{visited}_{i} &\sim \mathrm{Binomial}(1, \;p_{i}) \\
+\text{logit}(p_{i}) &= \alpha + \beta \cdot \text{leafHeight}_{i} \\
+\end{align*}
+$$
+
+
+## 模型代码
+
+```{r}
+m <- glm(
+  visited ~ 1 + leafHeight, 
+  data = darl, 
+  family = binomial(link = "logit")
+)
+
+summary(m)
+```
+
+## 解释系数的含义
+
+```{r}
+coef(m)[2]
+```
+
+
+```{r}
+exp(coef(m)[2])
+```
+
+
+
+```{r}
+inv_logit <- function(x) {
+  exp(x) / (1 + exp(x))
+}
+
+inv_logit(coef(m)[1] + coef(m)[2] * mean(darl$leafHeight))
+```
+
+
+
+
+## 不同高度叶子的黄蜂到访概率
+
+黄蜂到访概率是叶子高度的函数，为了可视化展示他们两者的关系，我们需要准备一个数据框，包含叶子高度从低到高变化的一系列值，利用模型预测相应的概率值。
+
+```{r}
+newdata <- 
+  tibble(
+    leafHeight = seq(min(darl$leafHeight),  max(darl$leafHeight), length = 100)
+  )
+```
+
+然后看模型会给出什么样的相应的概率值。
+

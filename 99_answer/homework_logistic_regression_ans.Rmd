@@ -1,0 +1,186 @@
+---
+title: "logistic regression"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+# 案例
+
+`Darlingtonia`是一种罕见的食虫猪笼草，它长出的叶子，形成一个瓶状陷阱，里面充满了吸引黄蜂的花蜜。数据集中的观察是关于猪笼草陷阱的高度(`leafHeight`)以及是否有黄蜂访问过该叶子(`visited`)。
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(here)
+
+darl <- read_csv(
+  here("data", "darlingtonia.csv"), 
+  comment = "#",
+  col_types = "dl"
+  )
+darl
+```
+
+
+## 缺失值检查
+
+```{r}
+darl %>% 
+  summarise(
+    across(everything(), ~sum(is.na(.x)))
+  ) %>% 
+  pivot_longer(everything())
+```
+
+
+## 可视化
+
+画出`有黄蜂到访`和`没黄蜂到访`叶子高度的分布
+
+```{r}
+darl %>% 
+  ggplot(aes(x = leafHeight, colour = visited)) +
+  geom_line(stat = "density") + 
+  labs(x = "Leaf height [cm]", y = "Density")
+```
+
+# 写出logistic 回归模型的数学表达式
+
+$$
+\begin{align*}
+\text{visited}_{i} &\sim \mathrm{Binomial}(1, \;p_{i}) \\
+\text{logit}(p_{i}) &= \alpha + \beta \cdot \text{leafHeight}_{i} \\
+\end{align*}
+$$
+
+
+## 模型代码
+
+```{r}
+m <- glm(
+  visited ~ 1 + leafHeight, 
+  data = darl, 
+  family = binomial(link = "logit")
+)
+
+summary(m)
+```
+
+## 解释系数的含义
+
+```{r}
+coef(m)[2]
+```
+
+叶子长度增长一个单位，对应着黄蜂到访概率的**log-odds值**增加了0.115
+
+```{r}
+exp(coef(m)[2])
+```
+
+叶子长度增长一个单位，对应着黄蜂到访概率的 **odds值** 增长了1.12倍
+
+
+
+
+```{r}
+inv_logit <- function(x) {
+  exp(x) / (1 + exp(x))
+}
+
+inv_logit(coef(m)[1] + coef(m)[2] * mean(darl$leafHeight))
+```
+
+当叶子长度为所有叶子长度的均值时，黄蜂到访的概率。
+
+
+
+
+## 不同高度叶子的黄蜂到访概率
+
+黄蜂到访概率是叶子高度的函数，为了可视化展示他们两者的关系，我们需要准备一个数据框，包含叶子高度从低到高变化的一系列值，利用模型预测相应的概率值。
+
+```{r}
+newdata <- 
+  tibble(
+    leafHeight = seq(min(darl$leafHeight),  max(darl$leafHeight), length = 100)
+  )
+```
+
+然后看模型会给出什么样的相应的概率值。
+```{r}
+tb <- m %>%
+  broom::augment(
+    newdata = newdata,
+    type.predict = c("response"),  # probability scale
+    se_fit = TRUE
+  )
+tb
+```
+
+```{r}
+darl %>% 
+  ggplot(aes(x = leafHeight, y = as.numeric(visited))) +
+  geom_point() +
+  geom_line(
+    data = tb,
+    aes(y = .fitted), 
+    color = "red"
+  ) +
+  labs(x = "Leaf Height [cm]",  y = "Probability of visitation")
+```
+
+
+## 置信区间
+
+上一节，给出不同高度叶子的黄蜂到访概率值，即概率的预测值。除此以外，我们还需要给每个预测值的95%置信区间。
+
+具体方法和上一节类似，也是需要先提供一个数据框，包含叶子高度从低到高变化的一系列值，但和上一节不同的是，我们并不是让模型直接给出每个叶子对应的黄蜂到访概率，而是让模型先给出每个叶子高度对应的预测因子线性组合的值，及其标准误，计算置信区间后，最后利用连接函数的反函数(`inv_logit()`) 转换到概率值，具体代码如下
+
+```{r}
+pred_df <- m %>%
+  broom::augment(
+    newdata = newdata,
+    type.predict = c("link"),    ##  linear scale
+    se_fit = TRUE
+  )
+pred_df
+```
+
+```{r}
+tbl <- pred_df %>%
+  mutate(
+    fitted = inv_logit(.fitted),
+    upper  = inv_logit(.fitted + (2 * .se.fit)),
+    lower  = inv_logit(.fitted - (2 * .se.fit))
+  )
+tbl
+```
+
+
+最后，画出预测概率和预测概率的95%置信区间
+
+```{r, fig.cap = "Estimated probability of visitation plus pointwise 95% confidence interval"}
+darl %>% 
+  ggplot(aes(x = leafHeight, y = as.numeric(visited))) +
+  geom_point() +
+  geom_ribbon(
+    data = tbl,
+    aes(x = leafHeight, ymin = lower, ymax = upper), 
+    inherit.aes = FALSE, 
+    alpha = 0.2,
+    fill = "steelblue2"
+  ) +
+  geom_line(data = tbl, aes(y = fitted)) +
+  labs(x = "Leaf Height [cm]",  y = "Probability of visitation")
+```
+

@@ -44,7 +44,7 @@ gredata
 
 # 问题
 
-录取是否与学生GRE考试成绩有关系？我们能用GRE成绩**预测**录取情况吗？
+`录取是否`与学生GRE考试成绩有关系？我们能用GRE成绩**预测**录取情况吗？
 
 
 ## 探索
@@ -287,7 +287,7 @@ inv_logit(coef(model_logit)[1] + coef(model_logit)[2] * 800)  - inv_logit(coef(m
 
 ### 拟合
 
-下面，我们用三种方式计算原数据框中每个`gre`值对应的录取概率
+下面，我们用三种方式计算不同`gre`值对应的录取概率
 
 1. 手工完成
 
@@ -370,7 +370,7 @@ gredata %>%
 
 ### 预测
 
-有时候，我们需要对给定的GRE分数，用建立的模型**预测**被录取的概率。这里也有几个方法
+有时候，我们要**预测**被录取的概率，这就需要先准备一个数据框，包含从低到高变化的gre成绩，然后利用模型预测相应的概率值。这里也有几个方法
 
 1. 用`predict()`
 ```{r}
@@ -416,8 +416,11 @@ summary(model_logit2)
 
 ### 简单预测
 
-模型 `model_logit2` 是`gre`, `gpa`和`rank`三个解释变量， 因此，在模型预测的时候，提供的新数据框也应该包含 `gre`, `gpa`和`rank`三列。
-简单起见，`gre`值为所有同学的平均`gre`值；`gpa`值为所有同学的平均`gpa`值；`rank`为学校声望的四个等级。
+模型 `model_logit2` 是`gre`, `gpa`和`rank`三个解释变量， 因此，在模型预测的时候，提供的新数据框也应该包含 `gre`, `gpa`和`rank`三列。简单起见，
+
+- `gre`值为所有同学的平均`gre`值；
+- `gpa`值为所有同学的平均`gpa`值；
+- `rank`为学校声望的四个等级。
 
 ```{r}
 newdata2 <-
@@ -435,7 +438,7 @@ newdata2
 model_logit2 %>%
   broom::augment(
     newdata = newdata2,
-    type.predict = c("response"),
+    type.predict = c("response"), # probability scale
     se_fit = TRUE
   )
 ```
@@ -461,28 +464,30 @@ newdata3 <-
 newdata3
 ```
 
-由此可以画出，来自不同声望等级院校的学生，研究生录取概率随GRE成绩的变化。这里为了画出置信区间，我们先估算线性组合的拟合值(即logit scale)，连同标准误计算置信区间后，再转回到概率。
+由此可以画出，来自不同声望等级院校的学生，研究生录取概率随GRE成绩的变化。这里为了画出置信区间，我们并不是让模型直接给出录取概率，而是让模型先给出预测因子线性组合的值及其标准误，计算置信区间后，最后利用连接函数的反函数(`inv_logit()`) 转换到概率值，具体代码如下
 
 ```{r}
 model_logit2 %>%
   broom::augment(
     newdata = newdata3,
-    type.predict = c("link"),
+    type.predict = c("link"), ##  linear scale
     se_fit = TRUE
   ) %>%
   mutate(
-    prob = inv_logit(.fitted),
-    LL = inv_logit(.fitted - (1.96 * .se.fit)),
-    UL = inv_logit(.fitted + (1.96 * .se.fit))
+     prob = inv_logit(.fitted),
+    lower = inv_logit(.fitted - (1.96 * .se.fit)),
+    upper = inv_logit(.fitted + (1.96 * .se.fit))
   ) %>%
   ggplot(aes(x = gre, y = prob)) +
   geom_ribbon(
-    aes(ymin = LL, ymax = UL, fill = rank),
+    aes(ymin = lower, ymax = upper, fill = rank),
     alpha = 0.3
   ) +
   geom_line(aes(colour = rank), size = 1) +
   theme_minimal()
 ```
+
+
 
 # 参考
 
