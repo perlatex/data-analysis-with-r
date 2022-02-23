@@ -90,7 +90,7 @@ df <- penguins %>%
 df
 ```
 
-先分组，然后构建新的列：列表列
+先分组，然后每一组的体征数据`nest()`聚合成一个数据框，species的3个类别对应3个数据框，放在data这一列下面。此时形成的data这一列，它不是向量，而是列表，因此就叫**列表列**
 
 ```{r}
 tb <- df %>% 
@@ -111,7 +111,13 @@ tb$data[[1]]
 tb$data %>% typeof()
 ```
 
- 
+也可以使用 `unnest()` 还原打开
+```{r}
+tb %>% 
+  unnest()
+```
+
+
 可以同时创建多个列表列
 
 ```{r}
@@ -143,7 +149,7 @@ df %>%
 ```
 
 
-#### tidyr::summarise()
+#### dplyr::summarise()
 
 用dplyr数据处理的 `group_by()` 和 `summarize()`组合可以将向量分组后分别统计成单个值, 比如使用`mean()`, `sd()`函数
 
@@ -156,7 +162,7 @@ df %>%
 ```
 
 
-事实上，`summarize()`还可以创建**列表列**。 比如下面这种形式， 每组下的bill_length_mm的值不做计算，保留成原状，即每组对应一个向量。
+事实上，`summarize()`还可以创建**列表列**。比如下面这种形式， 每组下的bill_length_mm的值不做计算，保留成原状，即每组对应一个向量。
 
 ```{r}
 df_collapsed <- df %>% 
@@ -167,6 +173,17 @@ df_collapsed <- df %>%
 
 df_collapsed
 ```
+
+数据框分组再进入`summarise()`汇总，此时进入`summarise()`的是由`bill_lenght_mm`分隔成的3个向量，其工作原理类似
+
+```{r}
+a <- 1:3
+b <- 4:5
+c <- 6:10
+
+list(a, b, c)
+```
+
 
 `list()`函数让构建的新的一列data是列表列，它的每个元素都是一个向量，对应一个species组。这种方法和`nest()`方法很相似，不同在于，
 `summarise() + list()` 构建的列表列其元素是原子型向量，而`nest()`构建的是tibble类型.
