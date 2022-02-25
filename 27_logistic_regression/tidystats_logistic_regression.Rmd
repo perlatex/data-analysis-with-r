@@ -14,6 +14,14 @@ output:
 ---
 
 
+前一节课讲了线性回归，课后有同学问我，怎么理解“回归”的意思。
+
+> 我们生活总也经常用这个词，比如，回归生活、回归家庭，回归到原来的状态，回到出发时候的状态等等。我们数据分析中的回归，差不多也是这个意思。
+
+> 可以假设，图中的每一个点原初都是从一条**看不见的直线**对应位置上跳出去的，回归的意思就是，让每个点都回到这条直线上去，找到这条看不见的直线，就是我们的任务。
+
+
+
 线性模型需要满足四个假设条件。如果某个条件不满足呢，比如，我们的被解释变量是**考试通过**和**不通过**二元变量，显然，不满足线性关系，这种情形应该怎么处理呢？先看一个案例。
 
 
@@ -159,7 +167,13 @@ inv_logit(linear)
 
 `成绩 --> 成绩的线性组合 --> 概率 --> 是否录取(0/1)`
 
+ <here>                     <here>
 
+| GRE 	| linear 	| Prob 	| admit |
+|-----	|--------	|------	|:-----:|
+| 850 	|        	|      	|   0   |
+| 657 	|        	|      	|   1   |
+| 891 	|        	|      	|   1   |
 
 
 
@@ -180,7 +194,7 @@ $$
 - 这里 $p_i$ 就是被录取的概率。
 
 
-- `logit()`是连接函数（还记得前面那个伟大的函数？伟大的函数就是这个连接函数的反函数）
+- `logit()`是连接函数（还记得前面那个伟大的函数？伟大的函数就是这个连接函数的反函数），是线性组合值与概率值的桥梁。它的定义如下
 $$
 \begin{align*}
 \text{logit}(p_{i}) &= \log\Big(\frac{p_{i}}{1 - p_{i}}\Big)
@@ -199,13 +213,13 @@ $$
 \end{align*}
 $$
 
-有时也称$\text{logit}(p_{i})$为对数比率(log-odds).
+有时也称$\text{logit}(p_{i})$为概率的对数比率(log-odds).
 
 
 
 ## 代码实现
 
-按照上面表达式，用**glm**函数写代码，
+按照上面表达式，用**glm**函数写代码，(generalized linear models)
 
 ```{r}
 model_logit <- glm(
@@ -253,7 +267,7 @@ $$
 
 有点难以理解，好吧。
 
-我们把`logit`移到等式右边，等式左边由**对数比率**变成**概率**，更符合人的直觉。上面公式可以写成
+我们把`logit`移到等式右边，等式左边由**概率的对数比率**变成**概率**，更符合人的直觉。上面公式可以写成
 
 $$
  P( \operatorname{admit} = \operatorname{1} )  = \text{logit}^{-1}(\alpha + \beta_{1}\operatorname{gre})
@@ -285,9 +299,13 @@ inv_logit(coef(model_logit)[1] + coef(model_logit)[2] * 800)  - inv_logit(coef(m
 ```
 
 
+**课堂练习**，计算GRE为900分的录取概率
+
+
+
 ### 拟合
 
-下面，我们用三种方式计算不同`gre`值对应的录取概率
+拟合，就是计算原数据中每个`gre`值对应的录取概率。下面，我们用三种方式计算
 
 1. 手工完成
 
@@ -349,6 +367,8 @@ logit_probs %>%
   theme_minimal()
 ```
 
+
+
 ```{r}
 library(ggdist)
 
@@ -370,9 +390,23 @@ gredata %>%
 
 ### 预测
 
-有时候，我们要**预测**被录取的概率，这就需要先准备一个数据框，包含从低到高变化的gre成绩，然后利用模型预测相应的概率值。这里也有几个方法
+预测，就是指定新的`gre`值，求出对应的录取概率。这就需要先准备一个数据框，包含从低到高变化的`gre`成绩，然后利用模型计算相应的概率值。这里也有几个方法
 
-1. 用`predict()`
+
+1. 手动完成
+
+```{r}
+tibble(
+  gre = c(200, 500, 700, 800)
+) %>% 
+  mutate(
+    prob = inv_logit(coef(model_logit)[1] + coef(model_logit)[2] * gre)
+  )
+  
+```
+
+
+2. 用`predict()`
 ```{r}
 newdata <- tibble(
   gre = c(200, 500, 700, 800)
@@ -385,7 +419,7 @@ newdata %>%
 ```
 
 
-2. 用`broom`包，更顺滑（注意，预测时用的参数是`newdata =` ）
+3. 用`broom`包，更顺滑（注意，预测时用的参数是`newdata =` ）
 ```{r}
 model_logit %>%
   broom::augment(
@@ -411,6 +445,10 @@ model_logit2 <- glm(
 
 summary(model_logit2)
 ```
+
+
+**课堂练习**，调整`rank`因子顺序，让`rank4`作为基线
+
 
 
 
@@ -447,6 +485,26 @@ model_logit2 %>%
 
 
 
+**课堂练习**， 假定来自一本院校、`gre`成绩600分，`gpa`成绩分布是`c(2, 3, 4, 5)`的四位同学，录取的概率分别是多大？
+
+
+```{r}
+nd <- tibble(
+  gre = 600,
+  gpa = c(2, 3, 4, 5),
+  rank = factor(1, levels = c(1, 2, 3, 4))
+)
+
+model_logit2 %>%
+  broom::augment(
+    newdata = nd,
+    type.predict = c("response"), 
+    se_fit = TRUE
+  )
+```
+
+
+
 ### 复杂预测
 
 在每个`rank`学校声望等级下，让 `gpa` 保持均值水平，`gre`成绩从200到800变化，构造成新的数据框
@@ -470,7 +528,7 @@ newdata3
 model_logit2 %>%
   broom::augment(
     newdata = newdata3,
-    type.predict = c("link"), ##  linear scale
+    type.predict = c("link"),         ## linear scale
     se_fit = TRUE
   ) %>%
   mutate(
