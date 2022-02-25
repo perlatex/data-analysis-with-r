@@ -157,6 +157,8 @@ pred_df %>%
     breaks = seq(1900, 2252, by = 16),
     labels = as.character(seq(1900, 2252, by = 16))
   ) +
+  annotate(geom = "text", x = 1932, y = 9.50, label = "R^2 = 0.882", color = "blue") +
+  annotate(geom = "text", x = 1990, y = 12.5, label = "R^2 = 0.789", color = "red") +
   theme_classic() +
   theme(
     legend.position = "bottom",
