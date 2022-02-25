@@ -20,7 +20,7 @@ output:
 请大家提前安装好以下宏包
 ```{r, eval=FALSE}
 install.packages( 
- c("ggridges", "see", "palmerpenguins", "datapasta", "colorspace", 
+ c("ggridges", "see", "palmerpenguins", "datapasta", "colorspace", "sf",
    "cowplot",  "gganimate", "ggrepel", "ggforce", "janitor", "patchwork", 
    "readxl",  "showtext", "styler", "remotes", "rnaturalearth", "geomtextpath") 
 )
@@ -731,6 +731,51 @@ world_map_data <- ne_countries(scale = "medium", returnclass = "sf")
 ggplot(data = world_map_data) +
   geom_sf(fill = "antiquewhite1") +
   theme(panel.background = element_rect(fill = "aliceblue"))
+```
+
+```{r}
+# 读取四川县界地图
+
+library(sf)
+sichuan <- st_read("./mapdata/sichuan_xianjie.shp")
+
+ggplot(sichuan) + 
+  geom_sf() 
+```
+
+四川火锅最辣的地方
+```{r}
+hotpot <- tibble::tribble(
+  ~NAME,    ~taste,
+  "乐山市",  "hot",
+  "仁寿县",  "hot",
+  "内江市",  "hot",
+  "青川县",  "hot",
+  "红原县",  "hot"
+  )
+
+hotpot
+```
+
+```{r}
+sichuan %>%
+  left_join(hotpot, by = "NAME") %>%
+  mutate(
+    taste = replace_na(taste, "not very hot")
+  ) %>%
+  ggplot() +
+  geom_sf(aes(fill = taste)) +
+  scale_fill_manual(
+    values = c("hot" = "#fc9272", "not very hot" = "gray80")
+  ) +
+  geom_sf_text(
+    data = ~ filter(., taste == "hot"),
+    aes(label = NAME),
+    size = 3
+  ) +
+  theme(
+    legend.position = "none"
+  )
 ```
 
 
