@@ -169,11 +169,11 @@ inv_logit(linear)
 
  <here>                     <here>
 
-| GRE 	| linear 	| Prob 	| admit |
-|-----	|--------	|------	|:-----:|
-| 850 	|        	|      	|   0   |
-| 657 	|        	|      	|   1   |
-| 891 	|        	|      	|   1   |
+| GRE 	| linear | Prob | admit |
+|-----	|--------|------|:-----:|
+| 850 	|        |      |   0   |
+| 657 	|        |      |   1   |
+| 891 	|        |      |   1   |
 
 
 
@@ -191,10 +191,10 @@ $$
 
 
 
-- 这里 $p_i$ 就是被录取的概率。
+- 这里 $p_i$ 就是每位同学被录取的概率，通过抛这个硬币决定是否$admit_i$
 
 
-- `logit()`是连接函数（还记得前面那个伟大的函数？伟大的函数就是这个连接函数的反函数），是线性组合值与概率值的桥梁。它的定义如下
+- `logit()`是连接函数（还记得前面那个伟大的函数？伟大的函数就是这个连接函数的反函数），它的定义如下
 $$
 \begin{align*}
 \text{logit}(p_{i}) &= \log\Big(\frac{p_{i}}{1 - p_{i}}\Big)
@@ -205,7 +205,7 @@ $$
 logit <- function(x) log(x / (1 - x))
 ```
 
-- 预测变量 $gre$ 的线性组合**模拟的**正是连接函数的返回值
+- 连接函数是连接**线性组合值**与**概率值**的桥梁。
 
 $$
 \begin{align*}
@@ -215,11 +215,18 @@ $$
 
 有时也称$\text{logit}(p_{i})$为概率的对数比率(log-odds).
 
-
+- 我更喜欢这样写
+$$
+\begin{align*}
+\quad p_{i} &= \text{logit}^{-1}(\alpha + \beta \cdot\text{gre}_{i}) \\
+\end{align*}
+$$
 
 ## 代码实现
 
-按照上面表达式，用**glm**函数写代码，(generalized linear models)
+按照上面表达式，用**glm**函数写代码(generalized linear models),
+
+(注意代码和数学公式的对应关系：1 + gre的线性组合 通过logit的转换后，形成概率值，概率支配着binomial硬币正反面，最终确定admit的0和1)
 
 ```{r}
 model_logit <- glm(
