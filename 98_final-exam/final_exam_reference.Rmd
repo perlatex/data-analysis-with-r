@@ -180,8 +180,8 @@ pred_df %>%
 
 补全这几年的数据，重新建模，看看作者的观点是否依然成立
 
+## 更新数据
 
-## 导入数据
 ```{r}
 raw_update <- read_excel("./demo_data/olympics_update.xlsx")
 raw_update
@@ -190,8 +190,6 @@ raw_update
 
 
 ## 建模和可视化
-
-以下代码和之前的完全一样
 
 ```{r}
 df <- raw_update %>%
@@ -250,4 +248,4 @@ df %>%
 ## 结论
 
 
-
+# 对本课程的意见和建议
