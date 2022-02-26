@@ -312,7 +312,7 @@ inv_logit(coef(model_logit)[1] + coef(model_logit)[2] * 800)  - inv_logit(coef(m
 
 ### 拟合
 
-拟合，就是计算原数据中每个`gre`值对应的录取概率。下面，我们用三种方式计算
+拟合，就是计算原数据中每个`gre`值对应的录取概率。下面，我们用四种方式计算
 
 1. 手工完成
 
@@ -353,8 +353,15 @@ gredata %>%
 ```
 
 
+3. 使用`modelr`包
 
-3. 使用`broom`包
+```{r}
+gredata %>% 
+   modelr::add_predictions(model_logit, type = "response")
+```
+
+
+4. 使用`broom`包
 ```{r}
 logit_probs <- model_logit %>% 
   broom::augment(
@@ -397,15 +404,17 @@ gredata %>%
 
 ### 预测
 
-预测，就是指定新的`gre`值，求出对应的录取概率。这就需要先准备一个数据框，包含从低到高变化的`gre`成绩，然后利用模型计算相应的概率值。这里也有几个方法
+预测，就是指定新的`gre`值，求出对应的录取概率。这就需要先准备一个数据框，包含从低到高变化的`gre`成绩，然后利用模型计算相应的概率值。这里也有四个方法
 
 
 1. 手动完成
 
 ```{r}
-tibble(
+newdata <- tibble(
   gre = c(200, 500, 700, 800)
-) %>% 
+)
+
+newdata %>% 
   mutate(
     prob = inv_logit(coef(model_logit)[1] + coef(model_logit)[2] * gre)
   )
@@ -415,10 +424,6 @@ tibble(
 
 2. 用`predict()`
 ```{r}
-newdata <- tibble(
-  gre = c(200, 500, 700, 800)
-)
-
 newdata %>%
   mutate(
     pred_prob = predict(model_logit, newdata = newdata, type = "response"),
@@ -426,7 +431,15 @@ newdata %>%
 ```
 
 
-3. 用`broom`包，更顺滑（注意，预测时用的参数是`newdata =` ）
+3. 使用`modelr`包，更Tidyverse
+```{r}
+newdata %>% 
+   modelr::add_predictions(model_logit, type = "response")
+```
+
+
+
+4. 用`broom`包，更顺滑（注意，预测时用的参数是`newdata =` ）
 ```{r}
 model_logit %>%
   broom::augment(

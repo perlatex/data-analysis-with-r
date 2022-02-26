@@ -110,11 +110,13 @@ df %>%
 ```
 
 ```{r}
-df %>%
+res <- df %>%
   group_by(sex) %>%
   group_modify(
     ~ broom::glance(lm(winning_time ~ 1 + Olympic_year, data = .))
   )
+
+res
 ```
 
 
@@ -157,8 +159,12 @@ pred_df %>%
     breaks = seq(1900, 2252, by = 16),
     labels = as.character(seq(1900, 2252, by = 16))
   ) +
-  annotate(geom = "text", x = 1932, y = 9.50, label = "R^2 = 0.882", color = "blue") +
-  annotate(geom = "text", x = 1990, y = 12.5, label = "R^2 = 0.789", color = "red") +
+  annotate(
+    geom = "text", x = 1932, y = 9.50, 
+    label = paste0("R^2 =", round(res$r.squared[1], 3)), color = "blue") +
+  annotate(
+    geom = "text", x = 1990, y = 12.5, 
+    label = paste0("R^2 =", round(res$r.squared[2], 3)), color = "red") +
   theme_classic() +
   theme(
     legend.position = "bottom",
