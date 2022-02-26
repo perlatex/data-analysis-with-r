@@ -152,3 +152,65 @@ df_predict %>%
     )
   )
 ```
+
+
+
+# 更清晰的方法
+
+充分说明了tidyverse方法的先进性
+
+```{r}
+df <- raw %>%
+  pivot_longer(
+    cols      = -Olympic_year,
+    names_to  = "sex",
+    values_to = "winning_time"
+  )
+```
+
+
+
+```{r}
+fit_model <- function(df) lm(winning_time ~ 1 + Olympic_year, data = df)
+
+newdata <- tibble(
+  Olympic_year = as.numeric(seq(1900, 2252, by = 4))
+)
+
+
+df_predict <- df %>%
+  group_by(sex) %>%
+  nest() %>%
+  mutate(mod = map(data, fit_model)) %>%
+  mutate(
+    predictions = map(mod, ~ broom::augment(.x, newdata = newdata, interval = "prediction"))
+  ) %>%
+  select(sex, predictions) %>%
+  unnest(predictions)
+
+df_predict
+```
+
+
+
+```{r}
+df_predict %>%
+  ggplot(aes(x = Olympic_year, y = .fitted, group = sex, color = sex)) +
+  geom_point(data = df, aes(y = winning_time)) +
+  geom_smooth(data = df, aes(y = winning_time), method = "lm", se = FALSE) +
+  geom_line(linetype = "dashed", size = 2) +
+  geom_line(aes(y = .lower), color = "blue", linetype = "dashed") +
+  geom_line(aes(y = .upper), color = "blue", linetype = "dashed") +
+  scale_x_continuous(
+    breaks = seq(1900, 2252, by = 16),
+    labels = as.character(seq(1900, 2252, by = 16))
+  ) +
+  theme_classic() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      size = 10, angle = 45, colour = "black",
+      vjust = 1, hjust = 1
+    )
+  )
+```
