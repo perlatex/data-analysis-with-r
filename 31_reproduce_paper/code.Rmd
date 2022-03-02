@@ -1,0 +1,570 @@
+---
+title: "复现一篇文章"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: FALSE
+    df_print: paged
+---
+
+
+现在论文的要求和水准比以往提高了，若用线性回归模型写文章，审稿人会觉得水平不够。当前主流用多层线性模型、广义线性模型或者贝叶斯分析。上节课我们学习了Logistic回归（广义线性回归模型的一种），趁热打铁，我们打算在`cnki`上找一篇文章来继续学习下。
+
+
+找一篇文章来复现，不是一件容易的事情：
+- 最近公开发表的
+- 能拿到原数据的（因为版权和隐私的原因，国内很多文章都不提供原始数据）
+- 文章不涉及太多专业知识（需要照顾不同学科的同学）
+
+
+
+很幸运，我们找到了这一篇文章，
+
+>《基于Logistic回归心脏病判断的统计分析》, 曲阜师范大学学报(自然科学版) 2022, 48(01), 10-18
+
+> 作者是曲阜师范大学统计学院的徐珂老师和赵胜利教授。
+
+
+因此，**本节课的任务是复现这篇论文**。
+
+
+
+# 0 引言
+(文字描述)
+
+
+# 1 基本概念和研究方法
+
+本文的主要研究方法有两个，数据可视化和logistic回归模型；所需要的辅助软件有R语言编程和SPSS软件。数据可视化是一种媒介，将繁杂的数据以清晰可查的图像呈现出来；另外，logistic回归是一种广义线性回归，选择logistic回归模型主要是基于数据的因变量是0-1型分类变量，且残差和因变量都服从二项分布，选择的自变量和logistic概率是线性关系.
+
+
+
+# 2 数据说明与处理
+
+数据集《心脏病诊断数据集》是公开的，来自克利夫兰医学中心的270个病人实例数据，含13个属性记录
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+df <- read_csv("./data/raw_heart.csv")
+glimpse(df)
+```
+
+## 2.1 数据说明
+
+文章中数据类型分的很细，但在R语言中常用的数据类型有(数值型、字符串、逻辑型和因子型)，因此在可视化和建模中，要学会数据类型之间的转换。
+
+
+## 2.2 数据处理
+(作者只是文字描述)
+
+
+# 3 描述性统计分析
+
+我们分析目标即心脏病患病的状况（1代表患病，0代表不患病），总共有270个无缺失值的数据，其中：
+没有患心脏病人数是150，没有患心脏病的比例是55.6%; 
+患有心脏病的人数是120，患有心脏病的比例是44.4%．
+
+
+- 缺失值 
+```{r}
+df %>%
+  summarise(
+    across(everything(), ~ sum(is.na(.x)))
+  )
+```
+
+```{r}
+# or
+df %>% 
+  purrr::map(is.na) %>% 
+  purrr::map_df(sum)
+```
+
+
+
+
+
+- 患病比例
+
+```{r}
+df %>%
+  group_by(target) %>% 
+  summarise(
+    n = n(),
+    prop = n / nrow(df)
+  )
+```
+
+
+- 偏度与峰度(https://www.r-bloggers.com/2020/11/skewness-and-kurtosis-in-statistics/)
+```{r}
+Skewness <- function(x) {
+  mean(((x - mean(x)) / sd(x))^3)
+}
+
+Kurtosis <- function(x) {
+  mean(((x - mean(x)) / sd(x))^4) - 3
+}
+```
+
+
+
+
+- 描述统计表
+
+方法1
+```{r}
+df %>% 
+  pivot_longer(cols = everything()) %>% 
+  group_by(name) %>% 
+  summarise(
+    across(everything(), 
+      list(
+        min        = min,
+        max        = max,
+        mean       = mean,
+        sd         = sd,
+        Skewness   = Skewness, # 或者使用 psych::skew
+        Kurtosis   = Kurtosis  # 或者使用 psych::kurtosi
+      ))
+  )
+```
+
+方法2
+```{r}
+df %>%
+  summarise(
+    across(
+      everything(),
+      list(
+        min        = min,
+        max        = max,
+        mean       = mean,
+        sd         = sd,
+        Skewness   = Skewness, # 或者使用 psych::skew
+        Kurtosis   = Kurtosis  # 或者使用 psych::kurtosi
+      )
+    )
+  ) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = c("variable", ".value"),
+    names_pattern = "(.*)_(.*)"
+  )
+```
+
+
+
+方法3
+```{r}
+psych::describe(df)
+```
+
+> 感觉作者这里可能是个笔误，应该是偏度与峰度的标准误，而不是标准差
+
+
+
+##  3.2 变量间的相关性
+
+```{r, fig.width= 8, fig.height= 8}
+library(corrplot)
+heartcor <- cor(df)
+
+corrplot(heartcor, method = "number", type = "lower")
+```
+
+
+
+```{r, fig.width= 8, fig.height= 8}
+corrplot.mixed(heartcor, order = "AOE")
+```
+
+
+## 3.3 各自变量与因变量的关系
+
+### 3.3.1 心脏病和年龄、性别的关系
+
+- 性别的患病比例
+```{r}
+df %>%
+  group_by(sex) %>%
+  summarise(
+    prop = sum(target) / n(),
+    heath = 1 - prop
+  )
+```
+
+
+- 各年龄段患病比例
+```{r}
+df %>%
+  mutate(
+    age_range = case_when(
+      age <= 18            ~ "children",
+      between(age, 19, 45) ~ "youth",
+      between(age, 46, 59) ~ "middle-aged",
+      age >= 60            ~ "old-aged",
+      TRUE                 ~ NA_character_
+    )
+  ) %>%
+  group_by(age_range) %>%
+  summarise(
+    prop = sum(target) / n()
+  )
+```
+
+
+
+
+### 3.3.2 心脏病和胸痛类型、最高心率的关系
+```{r}
+df %>%
+  mutate(cp = as.factor(cp)) %>%
+  count(target, cp) %>%
+  ggplot(aes(x = fct_rev(cp), y = n, fill = factor(target))) +
+  geom_col(position = position_dodge())
+```
+
+
+```{r}
+df %>%
+  ggplot(aes(x = age, y = thalach, color = as.factor(target))) +
+  geom_point()
+```
+
+> 有没有发现作者的图二（右）有些不严谨?
+
+
+观察到最高心率的变化趋势是随着年龄的增长而不断的降低，可以用下图进一步支持
+
+```{r}
+df %>%
+  mutate(
+    age_range = case_when(
+      age <= 18            ~ "children",
+      between(age, 19, 45) ~ "youth",
+      between(age, 46, 59) ~ "middle-aged",
+      age >= 60            ~ "old-aged",
+      TRUE                 ~ NA_character_
+    )
+  ) %>%
+  group_by(age_range, target) %>%
+  summarise(
+    value = mean(thalach)
+  ) %>% 
+  mutate(
+    age_range = factor(age_range, levels = c("youth", "middle-aged", "old-aged"))
+  ) %>% 
+  ggplot(aes(x = age_range, y = value, fill = factor(target))) +
+  geom_col(position = position_dodge()) +
+  labs(x = NULL)
+```
+
+如果用小提琴图，效果可能更好。
+
+
+
+### 3.3.3 心脏病和心绞痛、静息血压的关系
+```{r}
+df %>%
+  count(exang, target) %>%
+
+  ggplot(aes(x = exang, y = n, fill = factor(target))) +
+  geom_col(position = position_dodge())
+```
+
+
+关于图3(右)
+
+```{r}
+df %>%
+  mutate(target = as.factor(target)) %>% 
+  ggplot(aes(x = target, y = trestbps)) +
+  geom_violin() +
+  geom_boxplot(fill = "gray") 
+```
+
+> 感觉这里应该要报告下`t.test()`的结果，然后给出**患病人群的血压是较高于普通人群的**这个结论！
+
+```{r}
+t.test(
+  trestbps ~ target, 
+  data = df
+)
+```
+
+
+`ggstatsplot`将数据可视化和统计建模统一在图形中，绘制带有统计检验信息的图形，提高数据探索的速度和效率。
+
+```{r}
+library(ggstatsplot)
+df %>% 
+  ggbetweenstats( 
+    x = target,
+    y = trestbps
+  )
+```
+
+
+
+## 3.4 自变量之间的关系
+
+### 3.4.3 主血管数和静息血压、年龄和胆固醇的关系
+
+```{r}
+library(ggbeeswarm)
+df %>%
+  ggplot(aes(x = ca, y = trestbps, color = factor(target))) +
+  geom_beeswarm()
+```
+
+> 主血管数和患病有很大的相关性，可以给出统计结果
+
+
+
+```{r}
+df %>%
+  ggplot(aes(x = age, y = chol, color = factor(target))) +
+  geom_point()
+```
+
+# 4 模型的建立和优化
+## 4.1 模型的初步回归
+```{r}
+mod1 <- glm(
+  target ~ sex + cp + trestbps + chol + thalach + exang + ca + thal,
+  data = df,
+  family = binomial(link = "logit")
+)
+
+summary(mod1)
+```
+
+> 正负号完全相反，我感觉作者建模的时候把 0 和 1 顺序搞反了，我们翻转之后，得出与文中一样的系数
+
+```{r}
+tb <- df %>% 
+  mutate(
+    target = if_else(target == 1, 0, 1)
+  )
+
+mod_rev <- glm(
+  target ~ sex + cp + trestbps + chol + thalach + exang + ca + thal,
+  data = tb,
+  family = binomial(link = "logit")
+)
+
+summary(mod_rev)
+```
+
+
+先上神器
+
+```{r}
+library(equatiomatic)
+equatiomatic::extract_eq(mod1)
+```
+
+
+
+```{r}
+broom::tidy(mod1, conf.int = TRUE, conf.level = 0.95)
+```
+关于**相关性与系数的正负号**
+
+> 文章“除了最高心率是负相关之外其余都是正相关，跟我们在数据可视化部分的分析所得结论是可以相对应的”
+
+- 在一元回归的时候，两者是一致的
+- 在多元回归的时候，两者并不一致
+
+
+##  4.2 多重共线性检验
+
+计算方差膨胀因子(variance inflation factor，VIF)
+
+ - VIF的最小可能值为1（不存在多重共线性）。
+ - 一般来说，VIF值超过5或10表示有共线性问题。
+ 
+
+```{r}
+car::vif(mod1)
+```
+
+
+
+## 4.3 加入因子变量
+
+将性别(sex), 胸痛类型(cp), 运动引起的心绞痛(exang), 转换成因子类型
+
+```{r}
+df_fct <- df %>%
+  mutate(
+    sex   = factor(sex,   levels = c(1, 0)),       # 以sex = 1   为基线
+    cp    = factor(cp,    levels = c(4, 3, 2, 1)), # 以cp  = 4   为基线
+    exang = factor(exang, levels = c(1, 0))        # 以exang = 1 为基线
+  )
+df_fct
+```
+
+
+```{r}
+mod2 <- glm(
+  target ~ sex + cp + trestbps + chol + thalach + exang + ca + thal,
+  data = df_fct,
+  family = binomial(link = "logit")
+)
+
+summary(mod2)
+```
+
+
+1. 模型(2)的Residual deviance值 186.38 比 模型(1)的 193.05 小那么点点。 
+
+2. 以性别sex为例，其他因素不变的情况下，女性`sex = 0`患病的风险是男性`sex = 1`的
+```{r}
+exp(-1.627406)   # 倍数
+```
+反过来说，男性患病风险是女性的5倍。（作者使用男性为基线，导致解释有点绕）
+ 
+3. 明白 `-2倍的对数似然比`? 它的计算过程是这样的
+
+```{r}
+df_fct %>%
+  modelr::add_predictions(mod2, type = "response") %>%
+  mutate(
+    dev = map2_dbl(target, pred, ~ -2 * dbinom(x = .x, size = 1, prob = .y, log = TRUE))
+  ) %>% 
+  summarise(
+    deviance = sum(dev)
+  )
+```
+
+## 4.4 标准归一化后回归
+
+数据缩放很多种方式：
+
+- 标准化
+```{r}
+standardization_scale <- function(x) {
+  (x - mean(x)) / sd(x)
+}
+```
+
+- 归一化
+```{r}
+normalizaiton_scale <- function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}
+```
+
+- 中心化
+```{r}
+centering_scale <- function(x) {
+  x - mean(x)
+}
+```
+
+
+
+作者这里的描述有些歧义。事实上，作者做了两个模型
+```{r}
+df_std <- df %>%
+  mutate(
+    across(-target, standardization_scale)
+  )
+df_std
+
+mod3a <- glm(
+  target ~ sex + cp + trestbps + chol + thalach + exang + slope + ca + thal,
+  data = df_std,
+  family = binomial(link = "logit")
+)
+
+summary(mod3a)
+```
+
+
+
+
+
+```{r}
+df_norm <- df %>%
+  mutate(
+    across(-target, normalizaiton_scale)
+  ) %>%
+  mutate(
+    across(c(sex, exang), as.factor)
+  )
+df_norm
+
+mod3b <- glm(
+  target ~ sex + cp + trestbps + chol + thalach + exang + slope + ca + thal,
+  data = df_norm,
+  family = binomial(link = "logit")
+)
+
+summary(mod3b)
+```
+
+作者选择了`mod3b`来呈现
+
+
+
+## 4.5 模型的检验
+
+模型拟合，给出每种线性组合对应的概率值，如果概率 >= 0.5，模型预测结果视为1，否则视为0，最后与真实观察值对比，看预测的准确性。
+
+- 对应模型mod1而言
+```{r}
+df %>%
+  modelr::add_predictions(mod1, type = "response") %>%
+  mutate(pred = if_else(pred >= 0.5, 1, 0)) %>%
+  mutate(diff = if_else(pred == target, 1, 0)) %>%
+  group_by(target) %>%
+  summarise(
+    n = n(),
+    correct_rate = sum(diff) / n()
+  )
+```
+
+- 对应模型mod3b而言
+```{r}
+df_norm %>%
+  modelr::add_predictions(mod3b, type = "response") %>%
+  mutate(pred = if_else(pred >= 0.5, 1, 0)) %>%
+  mutate(diff = if_else(pred == target, 1, 0)) %>%
+  group_by(target) %>%
+  summarise(
+    n = n(),
+    correct_rate = sum(diff) / n()
+  )
+```
+
+> 表5，我的结果和原文不一样：
+
+原文的数据集应该是固定的，也就说，不管哪个模型，数据集中target = 0 和 target = 1 数量应该是确定的。但是文章给出
+
+- `mod1` 的时候，患病和不患病的数量 =  215 + 55
+- `mod3b`的时候，患病和不患病的数量 =  189 + 81
+
+
+关于模型比较，可以这样
+```{r}
+drop_in_dev <- anova(mod1, mod3b, test = "Chisq")
+drop_in_dev
+```
+
+# 5 结论和建议
+
+
+
+# 6 感谢
+
+非常感谢作者们非常出色的工作，目前我们的复现工作还不成熟、也不严谨，我们将虚心学习，欢迎批评指正，不断完善和改进！
