@@ -1,0 +1,335 @@
+---
+title: "ggplot2之几何形状1"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+请大家提前安装好以下宏包
+```{r, eval=FALSE}
+install.packages( 
+ c("ggridges", "see", "palmerpenguins", "datapasta", "colorspace", "sf",
+   "cowplot",  "gganimate", "ggrepel", "ggforce", "janitor", "patchwork", 
+   "readxl",  "ragg", "styler", "remotes", "rnaturalearth", "geomtextpath") 
+)
+```
+
+
+# 数据类型
+
+```{block}
+R语言数据类型：有字符串型、数值型、因子型、逻辑型、日期型等。
+
+ggplot2的视角：**离散变量**、**连续变量**、**日期变量**。
+
+
+**离散变量**: 字符串型<chr>, 因子型<fct>, 逻辑型<lgl>
+
+**连续变量**: 双精度数值<dbl>, 整数数值<int>
+
+**日期变量**: 日期<date>, 时间<time>, 日期时间<dttm>
+```
+
+
+
+我们在ggplot2绘图的时候，可能会同时用到多种类型的变量，比如
+
+* 一个离散
+* 一个连续
+
+* 两个离散
+* 两个连续
+* 一个离散, 一个连续
+
+* 三个连续
+
+
+
+```{block}
+接下来，我们需要围绕不同数据类型，思考应该选择什么样的形状，回答数据问题。
+```
+
+
+
+# 开始
+
+还是用企鹅数据
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+penguins <- read_csv("./demo_data/penguins.csv")
+penguins
+```
+
+
+
+## 每个种类有多少企鹅
+
+统计每个种类企鹅的数量，然后画出来。
+
+按照常规的思路，我们一般会先统计，然后喂给`ggplot()`，
+```{r}
+penguins %>%
+  count(species) %>%
+  ggplot(aes(x = species, y = n)) +
+  geom_point()
+```
+
+
+
+这种情形，常用柱状图，因此可以选择`geom_col()`这种几何形状
+
+```{r}
+penguins %>%
+  count(species) %>%
+  ggplot(aes(x = species, y = n)) +
+  geom_col()
+```
+
+
+是好图吗？如果不是，怎么改进？
+
+- 排序 
+```{r}
+penguins %>%
+  count(species) %>%
+  ggplot(aes(x = fct_reorder(species, n), y = n)) +
+  geom_col(width = 0.5)
+```
+
+- 翻转 
+```{r}
+penguins %>%
+  count(species) %>%
+  ggplot(aes(y = fct_reorder(species, n), x = n)) +
+  geom_col(width = 0.5)
+```
+
+
+- 配色
+
+```{r}
+penguins %>%
+  count(species) %>%
+  ggplot(aes(x = fct_reorder(species, n), y = n, fill = species)) +
+  geom_col(width = 0.5)
+```
+
+```{block}
+色彩是一种很强的刺激（信息），一般会有三种作用：分组，强调，量化。如果你的图不想表达这三种意思，那图中尽可能的不要用太多色彩
+```
+
+
+**课堂练习**：用单独一个颜色高亮`Gentoo`那根柱子，其他两个柱子用灰色
+
+> 思路1， 用设置的方法
+
+```{r}
+penguins %>%
+  count(species) %>%
+  ggplot(aes(x = species, y = n)) +
+  geom_col(width = 0.5, fill = c("gray", "orange", "gray"))
+```
+
+> 思路2：前面提到aes(fill = species)是3种species对应3种颜色，那么我们能否构建一个新变量is_Gentoo，它只包含(是Gentoo、不是Gentoo)，正好对应两种颜色（高亮色、灰色）
+
+```{r}
+penguins %>%
+  count(species) %>%
+  mutate(is_Gentoo = if_else(species == "Gentoo", "yes", "no")) %>%
+  ggplot(aes(x = fct_reorder(species, n), y = n, fill = is_Gentoo)) +
+  geom_col(width = 0.5) +
+  theme_classic()
+```
+
+问题来了，怎么修改颜色？下节课讲scales。
+
+
+## 每个种类嘴峰长度的均值
+
+先求出不同种类企鹅嘴峰长度的均值，然后画图
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    mean = mean(bill_length_mm)
+  ) %>%
+  ggplot(aes(x = species, y = mean)) +
+  geom_col(width = 0.5)
+```
+
+
+同一个物种下再分性别，即同一个物种下有两根柱子
+```{r}
+penguins %>%
+  group_by(species, sex) %>%
+  summarise(
+    mean = mean(bill_length_mm)
+  ) %>%
+  ggplot(aes(x = species, y = mean, fill = sex)) +
+  geom_col(width = 0.5, position = position_dodge(0.6))
+```
+
+
+
+
+
+
+## 嘴峰长度的分布
+
+### 直方图
+嘴峰长度是连续变量，可以用直方图
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm)) +
+  geom_histogram()
+```
+
+### 密度图
+或者密度图
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm)) +
+  geom_density()
+```
+
+
+为什么是两个峰？如何探究背后的原因？种类不同导致的？性别不同导致的？还是所在岛屿不同导致的？
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, color = species)) +
+  geom_density()
+```
+
+
+```{r}
+penguins %>%
+  filter(species == "Gentoo") %>%
+  ggplot(aes(x = bill_length_mm, color = sex)) +
+  geom_density()
+```
+
+对于Adelie类而言，是不是也存在类似结构？
+
+
+
+### dot plot
+
+直方图的另外一种版本
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, fill = species)) +
+  geom_dotplot(binwidth = .5)
+```
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_dotplot(
+    binaxis  = "y",
+    stackdir = "down",
+    dotsize  = 0.4,
+    position = position_nudge(-0.025)
+  )
+```
+
+
+## 不同种类，嘴峰长度分布
+
+这里一个是离散变量，一个是连续变量。可以选择不同的几何形状来呈现
+
+
+### 散点图
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_point()
+```
+
+
+
+### 抖散图
+点重叠的处理方案
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_jitter()
+```
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm, color = species)) +
+  geom_point(
+    position = position_jitter(width = 0.3, height = 0.06),
+    alpha = 0.9,
+    shape = 21,
+    size = 3
+  )
+```
+
+### 箱线图
+可以用箱线图（箱线图可以显示分布的中位数、分位数等）
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_boxplot() +
+  geom_jitter()
+```
+
+```{r}
+penguins %>%
+  ggplot(aes(
+    x = fct_reorder(species, bill_length_mm, median),
+    y = bill_length_mm
+  )) +
+  geom_boxplot() +
+  geom_jitter()
+```
+
+
+
+### 小提琴图
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_violin(fill = "grey90") +
+  geom_jitter()
+```
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_violin() +
+  geom_boxplot(width = .1, fill = "black", outlier.colour = NA) +
+  stat_summary(fun = median, geom = "point", fill = "red", shape = 21, size = 4)
+```
+
+
+
+
+
+### 山峦图
+```{r}
+library(ggridges)
+penguins %>%
+  ggplot(aes(y = species, x = bill_length_mm, fill = species)) +
+  ggridges::geom_density_ridges(alpha = 0.5)
+```
+
+

@@ -14,16 +14,11 @@ output:
 ---
 
 
+# 案例
 
-```{r, message = FALSE, warning = FALSE}
+```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
-```
 
-
-
-## 分组
-
-```{r}
 fake_data <- tibble(
   country       = rep(c("Germany", "United States", "China"), times = 3),
   year          = rep(c(2019L, 2020L, 2021L), each = 3),
@@ -43,7 +38,7 @@ fake_data %>%
 
 不是我们想要的，原因在于，画**线条图**需要指定分组`aes(group = ...)`的，这相当于告诉ggplot2，图中某些点是属于某组群的，然后相同组的点用直线连接起来。
 
-ggplot2里实现分组的方法很多：
+ggplot2实现分组的方法很多，通常情况下，是把一个**离散变量**映射到以下**图形属性**
 
 - `group     = group`
 - `color     = group + color`
@@ -53,9 +48,9 @@ ggplot2里实现分组的方法很多：
 - `size      = group + size`
 - `alpha     = group + alpha`
 
-除了美学元素的功能外，还有分组的功能。
+也就说，这些图形属性，除了美学元素的功能外，还有分组的功能。
 
-
+于是我们添加分组
 ```{r}
 fake_data %>%
   ggplot(aes(x = year, y = co2_emissions, group = country)) +
@@ -71,14 +66,11 @@ fake_data %>%
 
 
 
-
-
 ```{r}
 fake_data %>%
   ggplot(aes(x = year, y = co2_emissions, size = country)) +
   geom_line()
 ```
-
 
 
 
@@ -107,12 +99,75 @@ fake_data %>%
 请问：为什么这里只有分组，但没有填充色？
 
 
-## 课堂练习
 
-画出散点图，以国家分组，你能想出哪些方法？
+
+
+# 课堂练习
+
+用企鹅数据，画出散点图，以species分组，你能想出哪些方法？
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+penguins <- read_csv("./demo_data/penguins.csv")
+penguins
+```
+
+
 
 ```{r}
-fake_data %>%
-  ggplot(aes(x = year, y = co2_emissions)) +
-  geom_point()
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(color = species))
 ```
+
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(shape = species))
+```
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(alpha = species))
+```
+
+
+
+还有一种分组方法，就是**分面**
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() +
+  facet_wrap(vars(species))
+```
+
+
+
+**课堂练习**：用分面画出，不同种类企鹅`bill_length_mm`的密度分布图
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, color = species)) +
+  geom_density() +
+  facet_wrap(vars(species))
+```
+
+
+
+散点图的分面，还可以弄得更漂亮点吗？
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(data = penguins %>% select(-species), color = "gray80") +
+  geom_point(aes(color = species)) +
+  facet_wrap(vars(species), ncol = 3)
+```
+
+
+
+

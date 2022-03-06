@@ -1,0 +1,83 @@
+---
+title: "ggplot2 grouping"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+# 世界地图
+
+```{r}
+library(rnaturalearth) # install.packages("rnaturalearth")
+
+world_map_data <- ne_countries(scale = "medium", returnclass = "sf")
+
+ggplot(data = world_map_data) +
+  geom_sf(fill = "antiquewhite1") +
+  theme(panel.background = element_rect(fill = "aliceblue"))
+```
+
+
+
+## 四川地图
+
+读取四川县界地图
+```{r}
+library(sf)
+sichuan <- st_read("./mapdata/sichuan_xianjie.shp")
+
+ggplot(sichuan) + 
+  geom_sf() 
+```
+
+四川火锅最辣的地方
+```{r}
+hotpot <- tibble::tribble(
+  ~NAME,    ~taste,
+  "乐山市",  "hot",
+  "仁寿县",  "hot",
+  "内江市",  "hot",
+  "青川县",  "hot",
+  "红原县",  "hot"
+  )
+
+hotpot
+```
+
+```{r}
+sichuan %>%
+  left_join(hotpot, by = "NAME") %>%
+  mutate(
+    taste = replace_na(taste, "not very hot")
+  ) %>%
+  
+  ggplot() +
+  geom_sf(aes(fill = taste)) +
+  scale_fill_manual(
+    values = c("hot" = "#fc9272", "not very hot" = "gray80")
+  ) +
+  geom_sf_text(
+    data = ~ filter(., taste == "hot"),
+    aes(label = NAME),
+    size = 3
+  ) +
+  theme(
+    legend.position = "none"
+  )
+```
+
+
+```{r}
+ggsave(filename = "sichuan.png", width = 10.5, height = 8, device = ragg::agg_png, dpi = 300)
+```
+
