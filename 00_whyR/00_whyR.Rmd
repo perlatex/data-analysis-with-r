@@ -100,6 +100,12 @@ knitr::include_graphics("images/tiobe-index.png")
 
 [TIOBE index](https://www.tiobe.com/tiobe-index/)
 
+## R语言应用
+
+```{r echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/Rbooks.png")
+```
+
 
 ## 安装很方便
 

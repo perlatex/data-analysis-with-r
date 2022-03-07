@@ -15,6 +15,16 @@ output:
 
 
 
+请大家提前安装好以下宏包
+```{r, eval=FALSE}
+install.packages( 
+ c("ggridges", "see", "palmerpenguins", "datapasta", "colorspace", "sf",
+   "cowplot",  "gganimate", "ggrepel", "ggforce", "janitor", "patchwork", 
+   "gapminder",  "ragg", "styler", "remotes", "rnaturalearth", "geomtextpath") 
+)
+```
+
+
 # 开始
 
 还是用企鹅数据
@@ -81,9 +91,18 @@ df <- tibble::tribble(
   2009,     6.7,       7,
   2010,     8.2,       9
   )
+```
 
+```{r}
 df %>% 
-  ggplot(aes(year)) +
+  ggplot(aes(x = year, y = predict)) +
+  geom_line()
+```
+
+
+```{r}
+df %>% 
+  ggplot(aes(x = year)) +
   geom_ribbon(aes(ymin = 0, ymax = predict), fill = "skyblue")
 ```
 
@@ -415,7 +434,22 @@ ggplot() +
 **课堂练习**：自己定义一个函数，然后画出来
 
 
+## 让你的数据骚动起来
+```{r}
+library(gganimate)
+library(gapminder)
 
+gapminder %>% 
+  ggplot(aes(gdpPercap, lifeExp, size = pop, color = country)) +
+  geom_point(alpha = 0.7, show.legend = FALSE) +
+  scale_colour_manual(values = gapminder::country_colors) +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() +
+  facet_wrap(vars(continent)) +
+  labs(title = "Year: {frame_time}", x = "GDP Per capita", y = "life expectancy") +
+  transition_time(year) +
+  ease_aes("linear")
+```
 
 
 # 总结

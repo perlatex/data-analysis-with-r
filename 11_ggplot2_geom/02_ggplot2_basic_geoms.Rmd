@@ -15,14 +15,6 @@ output:
 
 
 
-请大家提前安装好以下宏包
-```{r, eval=FALSE}
-install.packages( 
- c("ggridges", "see", "palmerpenguins", "datapasta", "colorspace", "sf",
-   "cowplot",  "gganimate", "ggrepel", "ggforce", "janitor", "patchwork", 
-   "readxl",  "ragg", "styler", "remotes", "rnaturalearth", "geomtextpath") 
-)
-```
 
 
 # 数据类型
