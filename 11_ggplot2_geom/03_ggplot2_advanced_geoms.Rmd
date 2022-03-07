@@ -208,6 +208,36 @@ penguins %>%
 
 
 
+## 添加文本标签
+
+每支球队的[进攻和防守](https://www.basketball-reference.com/leagues/NBA_2022.html)
+
+```{r}
+NBA2022 <- read_rds("./demo_data/NBA2022.rds")
+```
+
+```{r}
+NBA2022 %>% 
+  select(team, orb, drb) %>%
+  ggplot(aes(x = orb, y = drb)) +
+  geom_point(size = 3) +
+  geom_text(aes(label = team))
+```
+
+```{r}
+NBA2022 %>% 
+  select(team, orb, drb) %>%
+  ggplot(aes(x = orb, y = drb)) +
+  geom_point(size = 3) +
+  geom_vline(aes(xintercept = mean(orb)),
+             linetype = "dashed",
+             size = 1.2) +
+  geom_hline(aes(yintercept = mean(drb)),
+             linetype = "dashed",
+             size = 1.2) +
+  ggrepel::geom_text_repel(aes(label = team))
+```
+
 
 ## 图层叠加
 
@@ -261,20 +291,6 @@ penguins %>%
   geom_point(data = m, aes(y = mean), color = "red", size = 5)
 ```
 
-
-
-
-## 添加文本标签
-
-在点的位置**添加**文本标签
-```{r}
-penguins %>%
-  group_by(species) %>% 
-  slice_sample(n = 2) %>% 
-  
-  ggplot(aes(x = bill_length_mm, y = body_mass_g)) +
-  geom_text(aes(label = species))
-```
 
 
 如何在点的位置添加具体数值文本？
@@ -340,8 +356,6 @@ penguins %>%
     panel.grid = element_blank()
   )
 ```
-
-
 
 
 
@@ -468,6 +482,7 @@ gapminder %>%
 
 
 - `geom_text()`
+- `ggrepel::geom_text_repel()`
 - `geom_pointrange()`
 - `geom_linerange()`
 - `geom_ribbon()`
