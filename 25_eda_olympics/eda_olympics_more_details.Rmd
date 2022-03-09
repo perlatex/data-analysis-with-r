@@ -198,15 +198,28 @@ df_predict %>%
   ggplot(aes(x = Olympic_year, y = .fitted, group = sex, color = sex)) +
   geom_point(data = df, aes(y = winning_time)) +
   geom_smooth(data = df, aes(y = winning_time), method = "lm", se = FALSE) +
-  geom_line(linetype = "dashed", size = 2) +
+  geom_line(linetype = "dashed", size = 1) +
   geom_line(aes(y = .lower), color = "blue", linetype = "dashed") +
   geom_line(aes(y = .upper), color = "blue", linetype = "dashed") +
+  scale_color_manual(
+    values = c(Men_score = "#0000AA", Women_score = "#AA0000")
+  ) +
+  scale_y_continuous(name = "winning time(s)") +
   scale_x_continuous(
+    name = "year",
     breaks = seq(1900, 2252, by = 16),
     labels = as.character(seq(1900, 2252, by = 16))
   ) +
+  annotate(
+    geom = "text", x = 1932, y = 9.50, label = "r^2 == 0.882", color = "blue", parse = TRUE
+  ) +
+  annotate(
+    geom = "text", x = 1990, y = 12.5, label = "r^2 == 0.789", color = "red", parse = TRUE
+  ) +
   theme_classic() +
   theme(
+    panel.background = element_rect(fill = "aliceblue"),
+    plot.background = element_rect(fill = "aliceblue"),
     legend.position = "none",
     axis.text.x = element_text(
       size = 10, angle = 45, colour = "black",
