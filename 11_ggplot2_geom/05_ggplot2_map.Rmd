@@ -18,6 +18,7 @@ output:
 # 世界地图
 
 ```{r}
+library(tidyverse)
 library(rnaturalearth) # install.packages("rnaturalearth")
 
 world_map_data <- ne_countries(scale = "medium", returnclass = "sf")
@@ -71,9 +72,33 @@ sichuan %>%
     aes(label = NAME),
     size = 3
   ) +
-  theme(
-    legend.position = "none"
-  )
+  theme(legend.position = "none")
+```
+
+
+王老师是个好吃嘴，梦想吃遍四川每个县，而且还打个分
+```{r}
+hotpot <- tibble(
+  NAME = sichuan$NAME,
+  taste = sample(1:12, length(sichuan$NAME), replace = TRUE)
+)
+```
+
+```{r}
+sichuan %>%
+  left_join(hotpot, by = "NAME") %>%
+  ggplot() +
+  geom_sf(aes(fill = taste)) +
+  geom_sf_text(
+    data = ~ filter(., taste == 12),
+    aes(label = NAME),
+    size = 3
+  ) +
+  colorspace::scale_fill_continuous_sequential(
+    palette = "Peach",
+    rev = TRUE
+  ) +
+  theme(legend.position = "none")
 ```
 
 
