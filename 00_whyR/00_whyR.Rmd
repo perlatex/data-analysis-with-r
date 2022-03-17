@@ -291,6 +291,7 @@ knitr::include_graphics("images/meme.png")
 knitr::include_graphics("images/data_science.jpg")
 ```
 
+- 提出一个科学问题，用数学语言加以描述，最后用代码实现
 - 数据科学是为社会科学服务的，我们会有很多案例
 - 编程是工具，统计是灵魂，专业是核心
 
