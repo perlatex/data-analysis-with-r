@@ -1,0 +1,111 @@
+---
+title: "dplyr adv"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+pollution <- tibble::tribble(
+       ~city,   ~size, ~amount,
+  "New York", "large",      23,
+  "New York", "small",      14,
+    "London", "large",      22,
+    "London", "small",      16,
+   "Beijing", "large",     121,
+   "Beijing", "small",      56
+  )
+
+pollution
+```
+
+
+
+## group_by() + summarise()
+```{r}
+pollution %>% 
+  summarise(
+    mean = mean(amount),
+    sum = sum(amount),
+    n = n()
+  )
+```
+
+
+```{r}
+pollution %>% 
+  group_by(city) %>% 
+  summarise(
+    mean = mean(amount),
+    sum = sum(amount),
+    n = n()
+  )
+```
+
+
+```{r out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/group_by_summarise.png")
+```
+
+
+
+## group_by() + mutate()
+```{r}
+pollution %>% 
+  mutate( mean = mean(amount) )
+```
+
+
+```{r}
+pollution %>% 
+  group_by(city) %>% 
+  mutate( mean = mean(amount)  )
+```
+
+```{r out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/group_by_mutate.png")
+```
+
+
+
+## group_by() + arrange()
+```{r}
+pollution %>% 
+  arrange(desc(amount))
+```
+
+
+```{r}
+pollution %>% 
+  group_by(city) %>% 
+  arrange(desc(amount))
+```
+
+
+## group_by() + filter()
+```{r}
+pollution %>% 
+  filter( amount > mean(amount)  )
+```
+
+
+```{r}
+pollution %>% 
+  group_by(city) %>% 
+  filter( amount > mean(amount)  )
+```
+
+
+
