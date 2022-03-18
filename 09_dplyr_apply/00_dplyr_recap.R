@@ -51,15 +51,14 @@ df %>%
 
 
 
-# summarise()
+# group_by()
+
+## group_by() + summarise()
 df %>%
-  summarise(
+  summarise(  
     mean_score = mean(score)
   )
 
-
-
-# group_by() + summarise()
 df %>%
   group_by(name) %>%
   summarise(
@@ -67,12 +66,27 @@ df %>%
   )
 
 
+
+## group_by() + mutate()
+df %>%
+  mutate( mean_score = mean(score)  )
+
 df %>%
   group_by(name) %>%
-  mutate(
-    mean_score = mean(score),
-    median_score = median(score)
-  )
+  mutate( mean_score = mean(score)  )
+
+
+
+
+## group_by() + filter()
+df %>%
+  filter( score > mean(score)  )
+
+df %>%
+  group_by(name) %>%
+  filter( score > mean(score)  )
+
+
 
 
 
@@ -107,3 +121,4 @@ df1 %>% right_join(df2, by = "name")
 
 # full_join()
 df1 %>% full_join(df2, by = "name")
+
