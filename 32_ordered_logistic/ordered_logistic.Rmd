@@ -1,0 +1,377 @@
+---
+title: "有序分类回归"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+# logistic回归
+
+- **二元logistic回归**：Y为定类且为2个，比如是否购买(1购买；0不购买)
+- **多分类logistic回归**：Y为定类且选项大于2个，比如总统候选人偏好(特朗普、希拉里、卢比奥)
+- **有序logistic回归**：Y为定类且有序，幸福感(不幸福、比较幸福和非常幸福)
+
+
+
+## 生活中的有序logistic回归
+
+- 人们在肯德基里点餐，一般都会买可乐，可乐有四种型号(small, medium, large or extra large)，选择何种型号的可乐会与哪些因素有关呢？是否购买了汉堡、是否购买了薯条，消费者的年龄等。我们这里考察的被解释变量，可乐的大小就是一个有序的值。
+
+- 问卷调查。问大三的学生是否申请读研究生，有三个选项：1不愿意，2有点愿意，3非常愿意。那么这里的被解释变量是三个有序的类别，影响读研意愿的因素可能与父母的教育水平、本科阶段学习成绩、经济压力等有关。
+
+
+
+
+# 案例
+
+教育代际传递。通俗点说子女的教育程度是否受到父母教育程度的影响。我这个案例思路参考了南京大学池彪的《教育人力资本的代际传递研究》硕士论文，这篇文章思路很清晰，建议大家可以看看。
+
+
+## 数据
+
+根据文中提供的数据来源，我们下载2016年的中国家庭追踪调查数据[CFPS](http://www.isss.pku.edu.cn/cfps/)，并整理了部分数据。
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+
+cfps <- readr::read_rds("./demo_data/cfps.rds")
+head(cfps)
+```
+
+```{r, echo=FALSE, out.width = "80%"}
+knitr::include_graphics(path = "images/variables.png")
+```
+
+
+
+### 预处理
+
+为了方便处理，减少分类，我们将大专以及大专以上的都归为一类
+
+```{r}
+df <- cfps %>%
+  mutate(
+    across(starts_with("edu"), ~ if_else(.x %in% c(5, 6, 7, 8), 5, .x))
+  )
+df
+```
+
+
+
+```{r}
+df %>% count(edu)
+df %>% count(edu_f)
+df %>% count(edu_m)
+```
+
+
+
+## 问题的提出
+
+问题的提出：
+
+- 学历上父母是否门当户对？
+- 父母的受教育程度对子女的受教育水平是正向影响？
+- 父亲和母亲谁的影响大？
+- 对男孩影响大？还是对女孩影响大？
+- 以上情况城乡有无差异？
+
+
+### 父母门当户对？
+
+数据还是比较有意思的，我们来看看父母是否门当户对。
+
+
+多大比例选择门当户对?
+
+```{r}
+df %>%
+  summarise(
+    eq_n = sum(edu_m == edu_f),
+    n = n()
+  ) %>%
+  mutate(prop = eq_n / n)
+```
+
+
+```{r}
+df %>%
+  count(edu_m, edu_f) %>%
+  group_by(edu_m) %>%
+  mutate(prop = n / sum(n)) %>%
+  ungroup()
+```
+
+
+```{r}
+df %>%
+  count(edu_m, edu_f) %>%
+  group_by(edu_m) %>%
+  mutate(percent = n / sum(n)) %>%
+  select(-n) %>%
+  pivot_wider(
+    names_from = edu_f,
+    values_from = percent
+  )
+```
+
+
+
+
+
+### 母亲的教育程度对子女的影响
+```{r, fig.showtext= TRUE}
+library(ggridges)
+df %>%
+  mutate(
+    across(edu_m, as.factor)
+  ) %>%
+  ggplot(aes(x = edu, y = edu_m)) +
+  geom_density_ridges() +
+  scale_x_continuous(limits = c(0, 6), breaks = c(1:5)) +
+  labs(
+    title = "The influence of mother's education on children in the family",
+    subtitle = "The greater the number, the higher the level of education",
+    x = "Education level of children",
+    y = "Education level of Mother"
+  )
+```
+
+
+
+
+
+
+### 父亲和母亲谁的影响大
+
+这里需要用到**有序logistic回归**。
+为了理解模型的输出，我们需要先简单介绍下模型的含义。假定被解释变量$Y$有$J$类且有序，那么$Y$ 小于等于某个具体类别$j$的累积概率，可以写为$P(Y \le j)$，这里$j = 1, \cdots, J-1$. 
+
+从而，小于等于某个具体类别$j$的**比率**就可以定义为
+
+
+$$\frac{P(Y \le j)}{P(Y>j)}$$
+对这个比率取对数，就是我们熟知的logit
+
+$$log \frac{P(Y \le j)}{P(Y>j)} = logit (P(Y \le j)).$$
+
+有序logistic回归的数学模型
+
+$$logit (P(Y \le j)) = \alpha_{j} + \beta_{1}x_1 + \beta_{2}x_2 $$
+$\alpha$ 是截距 $\beta$ 是回归系数，注意到有序分类 logistic 回归模型中就有 $J-1$ 个 logit 模型。对于每个模型，系数是相同的，截距不同。
+
+
+
+
+在R语言中，我们可以使用`MASS::polr`函数，但需要注意的是，使用这个函数，对应的模型表达式为，斜率符号写为负号
+
+$$logit (P(Y \le j)) = \alpha_{j} - \beta_{1}x_1 - \beta_{2}x_2 $$
+
+
+下面我们通过代码来演示
+
+
+```{r}
+library(MASS)
+
+df1 <- df %>%
+  mutate(
+    across(c(edu, sex, urban), as.factor),
+    across(edu, fct_inseq, ordered = TRUE)
+  )
+
+mod_mass <- polr(
+  edu ~ edu_f + edu_m + sex + num_siblings + urban,
+  data = df1,
+  method = c("logistic")
+)
+
+summary(mod_mass)
+```
+
+
+输出结果得到有序分类 logistic 回归模型中截距和回归系数的最大似然估计值，确定出回归方程为：
+
+
+```{r, echo=FALSE}
+library(equatiomatic)
+extract_eq(mod_mass, use_coefs = TRUE)
+```
+
+
+
+
+
+
+
+### 系数的解释
+
+先将系数转换成odds ratios(OR)
+
+```{r}
+coef(mod_mass) %>% exp()
+```
+
+- 在其它因素不变的情况下，父亲教育程度每增加一个等级（比如，大专到本科），
+  会增加子女教育程度向上提高一个级别的概率1.58倍，也就是增加了58%。
+- 在其它因素不变的情况下，母亲教育程度每提高一个等级，会增加提升子女教育水平的概率1.66倍.
+- 从子女的性别差异来看, 在其它因素不变的情况下，女性的受教育水平向上提高一个级别的概率更大，是男性的(1/0.630)倍，或者说，男性受教育水平向上提高一个级别的概率比女性减少37%(1 - 0.63).
+- 从城乡差异来看，城镇子女提升教育水平的概率是农村的2.6倍
+
+
+### 边际效应
+
+```{r, message=FALSE, warning=FALSE}
+library(margins)
+
+# me_mass <- marginal_effects(mod_mass, variables = "sex")
+
+me_mass <- marginal_effects(mod_mass, variables = "edu_m")
+me_mass %>% 
+  head()
+```
+
+
+从边际效应图可以看到，随着父母教育程度的增加，子女低学历的的概率减少，高学历的概率增加
+
+
+
+## 其他方法
+
+### ordinal 
+
+```{r }
+library(ordinal)
+
+mod_ordinal <- clm(edu ~ edu_f + edu_m + sex + num_siblings + urban,
+  data = df1,
+  link = "logit",
+  thresholds = "flexible"
+)
+
+broom::tidy(mod_ordinal)
+```
+
+
+
+
+
+### brms
+
+
+```{r message=TRUE, warning=TRUE}
+library(brms)
+
+mod_brms <- brm(
+  edu ~ edu_f + edu_m + sex + num_siblings + urban,
+  data = df1,
+  family = cumulative(link = "logit")
+  )
+
+mod_brms
+```
+
+
+
+```{r}
+brms::conditional_effects(
+  mod_brms1, 
+  effects = "edu_m", 
+  categorical = TRUE
+)
+```
+
+
+
+### rstanarm
+```{r}
+library(rstanarm)
+
+mod_arm <- stan_polr(
+  factor(edu) ~ edu_f + edu_m + sex + num_siblings + urban,
+  data = df1,
+  prior = R2(0.3, "mean")
+  )
+
+mod_arm
+```
+
+### Stan
+
+```{r, warning=FALSE, message=FALSE}
+library(tidybayes)
+library(bayesplot)
+library(rstan)
+
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+stan_program <- "
+data {
+  int<lower=2> K;
+  int<lower=0> N;
+  int<lower=1> D;
+  int<lower=1,upper=K> y[N];
+  matrix[N, D] x;
+}
+parameters {
+  vector[D] beta;
+  ordered[K-1] cutpoint;
+}
+model {
+
+  for (n in 1:N) {
+    target += ordered_logistic_lpmf(y[n] | x[n] * beta, cutpoint);
+  }
+
+}
+"
+
+stan_data <- df %>% 
+  tidybayes::compose_data(
+    N   = n,
+    K   = 5,  
+    D   = 5,
+    y   = edu,  
+    x   = model.matrix(~ 0 + edu_f + edu_m + sex + num_siblings + urban, .)
+  )
+
+m <- stan(model_code = stan_program, data = stan_data)
+```
+
+
+
+
+```{r}
+m %>% 
+  tidybayes::spread_draws(beta[i]) %>% 
+  tidybayes::mean_qi()
+
+m %>% 
+  tidybayes::spread_draws(cutpoint[j]) %>% 
+  tidybayes::mean_qi()
+```
+
+
+
+
+
+# 后续
+
+个人感觉这个问题还可以扩展

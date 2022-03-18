@@ -1,0 +1,30 @@
+---
+title: "stringr作业"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+# 作业
+
+找出所有单词中，元音重复两次的单词，比如`good`, `see`
+```{r}
+library(tidyverse)
+library(words)      # install.packages("word")
+
+words %>% 
+  as_tibble() %>% 
+  filter(
+    str_detect(word,  "([aeiou])\\1")
+  )
+```

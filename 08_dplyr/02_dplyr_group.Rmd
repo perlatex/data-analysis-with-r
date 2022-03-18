@@ -80,18 +80,6 @@ knitr::include_graphics("images/group_by_mutate.png")
 
 
 
-## group_by() + arrange()
-```{r}
-pollution %>% 
-  arrange(desc(amount))
-```
-
-
-```{r}
-pollution %>% 
-  group_by(city) %>% 
-  arrange(desc(amount))
-```
 
 
 ## group_by() + filter()
