@@ -306,6 +306,13 @@ penguins %>%
 
 ```{r}
 penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) + 
+  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
+  geom_jitter()
+```
+
+```{r}
+penguins %>%
   ggplot(aes(x = species, y = bill_length_mm)) +
   geom_violin() +
   geom_boxplot(width = .1, fill = "black", outlier.colour = NA) +
