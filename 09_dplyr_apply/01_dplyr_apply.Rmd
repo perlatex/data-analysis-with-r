@@ -227,7 +227,11 @@ penguins %>%
   slice_max(bill_length_mm)
 ```
 
-
+```{r}
+penguins %>% 
+  group_by(species) %>% 
+  slice_max(bill_length_mm)
+```
 
 ## separate
 ```{r}
