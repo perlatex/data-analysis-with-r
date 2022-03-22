@@ -96,4 +96,7 @@ pollution %>%
 ```
 
 
+```{r out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/group_by_filter.png")
+```
 

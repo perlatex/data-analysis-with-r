@@ -151,7 +151,7 @@ penguins %>% filter(sex == "male")
 
 
 ```{r}
-penguins %>% filter(sex == "male")
+penguins %>% filter(species == "Adelie")
 ```
 
 
@@ -273,7 +273,7 @@ sum(c(1, 2, NA, 4), na.rm = FALSE)
 ```
 
 ```{r}
-mean(c(1, 2, NA, 4), na.rm = FALSE)
+mean(c(1, 2, NA, 4), na.rm = TRUE)
 ```
 
 
@@ -359,7 +359,7 @@ penguins %>%
 ```
 
 
-统计某个变量中**各组**出现的次数，可以使用`count()`函数
+统计某个变量中各**类别**出现的次数，可以使用`count()`函数
 
 ```{r}
 penguins %>% count(species)
