@@ -309,6 +309,10 @@ df %>%
   mutate(newscore = if_else(is.na(score), mean_score, score))
 ```
 
+
+打开<https://tidydatatutor.com/vis.html>，复制以上代码，看看每一步发生了什么？
+
+
 ## 给企鹅身材分类
 
 ```{r}
