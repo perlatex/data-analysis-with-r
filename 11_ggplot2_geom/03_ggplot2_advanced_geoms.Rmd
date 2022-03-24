@@ -425,6 +425,16 @@ penguins %>%
   theme(legend.position = "none")
 ```
 
+## 极坐标系
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = body_mass_g)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  #expand_limits(y = c(0, 60)) +
+  coord_polar(start = 0, theta = "y")
+```
 
 ## 函数图
 
