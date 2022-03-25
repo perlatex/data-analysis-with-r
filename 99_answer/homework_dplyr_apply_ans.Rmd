@@ -54,6 +54,13 @@ penguins %>%
 penguins %>% 
   group_by(species) %>% 
   summarise(
+   across( c(ends_with("_mm"), body_mass_g), mean)
+  )
+
+
+penguins %>% 
+  group_by(species) %>% 
+  summarise(
     across(contains("_"), mean, na.rm = TRUE)
   )
 
@@ -150,6 +157,10 @@ gapminder %>%
   filter(year == 1992, continent == 'Europe') %>%
   arrange(desc(pop)) %>% 
   slice(1)
+
+gapminder %>% 
+  filter(year == 1992, continent == 'Europe') %>%
+  slice_max(pop)
 ```
 
 9. 1962年美洲哪个国家人均寿命最短?
@@ -158,6 +169,10 @@ gapminder %>%
   filter(year == 1962, continent == 'Americas') %>%
   arrange(lifeExp) %>% 
   slice(1)
+
+gapminder %>% 
+  filter(year == 1962, continent == "Americas") %>% 
+  slice_min(lifeExp)
 ```
 
 10. 人口数量换算成以百万单位
