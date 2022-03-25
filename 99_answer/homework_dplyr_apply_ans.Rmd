@@ -258,6 +258,15 @@ gapminder %>%
 18. 数据集中每个洲包含多少个国家？
 
 ```{r}
+gapminder %>% 
+  count(continent, country) %>% 
+  group_by(continent) %>% 
+  summarise(
+    n_countries = n()
+  )
+```
+
+```{r}
 gapminder %>%
   group_by(continent) %>%
   summarize(
