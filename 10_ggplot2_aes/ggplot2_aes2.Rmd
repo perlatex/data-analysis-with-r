@@ -147,21 +147,40 @@ ggplot(data = penguins) +
 knitr::include_graphics("images/a-3new.png")
 ```
 
-- `ggplot()` 初始化绘图，相当于打开了一张纸，准备画画。
+1. `ggplot()` 初始化绘图，相当于打开了一张纸，准备画画。
+```{r}
+ggplot()
+```
 
-- `ggplot(data = penguins)` 表示使用penguins这个**数据框**来画图。
+2. `ggplot(data = penguins)` 表示使用penguins这个**数据框**来画图。
+```{r}
+ggplot(data = penguins)
+```
 
-- `+`表示添加图层。
+3. `+`表示添加图层。
+```{r, error=TRUE}
+ggplot(data = penguins) +
+```
 
-- `geom_point()`表示绘制散点图。
 
-- `aes()`表示数值到视觉属性之间的映射。
-  
+4. `geom_point()`表示绘制散点图。
+```{r, error=TRUE}
+ggplot(data = penguins) +
+  geom_point()
+```
+
+5. `aes()`表示数值到视觉属性之间的映射。
   `aes(x = bill_length_mm, y = bill_depth_mm)`，意思是
     变量bill_length_mm作为（映射为）**x轴方向的位置**，
     变量bill_depth_mm 作为（映射为）**y轴方向的位置**。
+    
+```{r}
+ggplot(data = penguins) +
+  geom_point( aes(x = bill_length_mm, y = bill_depth_mm)  )
+```
 
-- `aes()`除了位置上映射，还可以实现色彩、形状或透明度等视觉属性的映射
+
+6. `aes()`除了位置上映射，还可以实现色彩、形状或透明度等视觉属性的映射
 
 
 
@@ -291,6 +310,14 @@ ggplot(penguins) +
 ```
 
 
+```{r}
+ggplot(penguins) +
+  geom_smooth(
+    aes(x = bill_length_mm, y = bill_depth_mm, color = species),
+    method = "lm"
+   )
+```
+
 
 # 图层叠加
 
@@ -351,7 +378,7 @@ ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, color = sex)) +
 
 ## 图层之间没有继承关系
 
-思考图中会有几种颜色？几条曲线？
+思考图中会有几种颜色？几条直线？
 
 ```{r}
 ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
@@ -391,7 +418,7 @@ ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
 ```
 
 
-## 使用管道
+## 推荐使用管道
 
 ```{r}
 penguins %>% 
@@ -412,7 +439,8 @@ penguins %>%
 
 
 ```{r eval = FALSE}
-ggplot(penguins, aes(x = ___, y = ___)) +
+penguins %>% 
+  ggplot(aes(x = ___, y = ___)) +
   geom_point() +
   geom_smooth() +
   geom_smooth() 
@@ -458,8 +486,25 @@ ggsave("my_last_plot.pdf", width = 8, height = 6, dpi = 300)
 
 # 思考
 
-一个点，有位置、颜色、大小、形状外，还有哪些属性？如果画线条，应该有哪些视觉属性？
+1. 根据课件里的内容，说说颜色为什么渐变色？
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = body_mass_g)) +
+  geom_point()
+```
+
+
+
+2. 一个点，有位置、颜色、大小、形状外，还有哪些属性？如果画线条，应该有哪些视觉属性？
 
   - 打开 <https://ggplot2tor.com/aesthetics>
   - 输入 geom_point 或者 geom_line 试试
+
+
+3. 预习并思考，如何实现
+  - 横坐标刻度变成 `c(30, 35, 40, 45, 50, 55, 60)`
+  - 企鹅种类"Chinstrap" 对应黑色,  "Gentoo" 对应橘色, "Adelie" 对应蓝色
+  - 增加标题和副标题
+  - 背景色默认是灰色，如何变成白色 
 
