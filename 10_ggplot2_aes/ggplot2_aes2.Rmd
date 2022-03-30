@@ -503,7 +503,17 @@ penguins %>%
   - 输入 geom_point 或者 geom_line 试试
 
 
-3. 预习并思考，如何实现
+3. 为什么这张图会报错
+
+```{r}
+ggplot(penguins) +
+  geom_point(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(x = sex, y = body_mass_g))
+```
+
+
+
+4. 预习并思考，如何实现
   - 横坐标刻度变成 `c(30, 35, 40, 45, 50, 55, 60)`
   - 企鹅种类"Chinstrap" 对应黑色,  "Gentoo" 对应橘色, "Adelie" 对应蓝色
   - 增加标题和副标题
