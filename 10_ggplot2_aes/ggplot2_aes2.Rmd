@@ -378,7 +378,7 @@ ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, color = sex)) +
 
 ## 图层之间没有继承关系
 
-思考图中会有几种颜色？几条直线？
+思考：图中的点有几种颜色？直线有几条？
 
 ```{r}
 ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
@@ -414,7 +414,7 @@ ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
 ```{r}
 ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
   geom_point() +
-  geom_smooth(method = "lm", aes(color = sex)) 
+  geom_smooth(aes(color = sex), method = "lm") 
 ```
 
 
@@ -424,7 +424,7 @@ ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
 penguins %>% 
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
   geom_point() +
-  geom_smooth(method = "lm", aes(color = sex)) 
+  geom_smooth(aes(color = sex), method = "lm") 
 ```
 
 
@@ -486,7 +486,7 @@ ggsave("my_last_plot.pdf", width = 8, height = 6, dpi = 300)
 
 # 思考
 
-1. 根据课件里的内容，说说颜色为什么渐变色？
+1. 根据课件里的内容，说说这里的颜色为什么是渐变色？
 
 ```{r}
 penguins %>% 
