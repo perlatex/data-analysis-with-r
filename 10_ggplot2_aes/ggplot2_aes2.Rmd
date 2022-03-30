@@ -124,6 +124,7 @@ ggplot(data = ___) +
 继续用科考人员收集的企鹅体征来演示。我们会用到penguins数据集其中的四个变量
 
 ```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
 penguins <- read_csv("./demo_data/penguins.csv") 
 
 penguins %>%
