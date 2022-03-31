@@ -1,0 +1,81 @@
+---
+title: "我是一只快乐的小企鹅"
+author: "王小胖"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center"
+)
+```
+
+
+
+## 引言
+
+我们是一群快乐的小企鹅！
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+
+---
+
+## 我的小身板
+
+
+|variable          |class   |description |
+|:-----------------|:-------|:-----------|
+|species           |integer | 企鹅种类 (Adelie, Gentoo, Chinstrap) |
+|island            |integer | 所在岛屿 (Biscoe, Dream, Torgersen) |
+|bill_length_mm    |double  | 嘴峰长度 (单位毫米) |
+|bill_depth_mm     |double  | 嘴峰深度 (单位毫米)|
+|flipper_length_mm |integer | 鰭肢长度 (单位毫米) |
+|body_mass_g       |integer | 体重 (单位克) |
+|sex               |integer | 性别 |
+|year              |integer | 记录年份 |
+
+
+---
+
+## 比比谁的身材好
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarize(across(where(is.numeric), mean, na.rm = TRUE))
+```
+
+---
+
+## 看一看
+
+```{r, fig.asp = 0.6}
+penguins %>%
+  ggplot(aes(flipper_length_mm, body_mass_g, group = species)) +
+  geom_point(aes(colour = species, shape = species), alpha = 0.7) +
+  scale_color_manual(values = c("darkorange", "purple", "cyan4")) +
+  theme_minimal() 
+```
+
+
+---
+
+## 结语
+
+我是一只快乐的小企鹅！
