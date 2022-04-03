@@ -1,0 +1,52 @@
+---
+title: "ggplot2之标度作业"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+# 作业
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+penguins <- read_csv("./demo_data/penguins.csv") 
+
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth(method = "lm")
+```
+
+要求实现：
+
+  - 横坐标刻度变成 `c(30, 35, 40, 45, 50, 55, 60)`
+  - 企鹅种类"Chinstrap" 对应黑色,  "Gentoo" 对应橘色, "Adelie" 对应蓝色
+  - 增加标题和副标题
+  - 背景色默认是灰色，如何变成白色 
+  
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth(method = "lm") +
+  scale_x_continuous(
+    limits = c(30, 60),
+    breaks = seq(30, 60, by = 5)
+  ) +
+  scale_color_manual(values = c("black", "orange", "blue")) +
+  labs(title = "这是标题", subtitle = "这是副标题") +
+  theme(panel.background = element_rect(fill = "white"))
+```
+  
+  
