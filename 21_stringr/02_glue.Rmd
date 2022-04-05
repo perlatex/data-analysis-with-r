@@ -1,0 +1,102 @@
+---
+title: "字符串处理2"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+glue: Join and output complex strings
+
+
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(stringr)
+library(glue)
+```
+
+
+## Functions of glue
+
+Variables can be passed directly into strings
+```{r}
+name <- "Fred"
+glue('My name is {name}.')
+```
+
+
+```{r}
+name <- "Fred"
+age <- 30
+
+glue('My name is {name},',
+  ' my age is {age},',
+  ' next year is {age + 1}.')
+```
+
+
+
+```{r}
+book <- "The Formation of Vegetable Mould through the Action of Worms"
+author <- "Charles Darwin"
+year <- 1881
+
+
+# note the use of single quote to escape double quotes
+glue(
+  "The author {author}", 
+  ' also wrote "{book}"', 
+  " in {year}."
+)
+```
+
+
+## within dplyr pipelines
+
+```{r}
+library(palmerpenguins)
+penguins %>% 
+  drop_na() %>% 
+  group_by(species) %>% 
+  summarise(
+    mean_length = round(mean(bill_length_mm), 2)
+  ) %>% 
+  mutate(description = glue("This {species} has a mean bill length of {mean_length}"))
+```
+
+## Vectorised operation
+
+```{r}
+patient <- tibble::tribble(
+     ~id,  ~gender_age,
+     "1",   "m-34",
+     "2",   "f-24",
+     "3",   "m-53",
+     "4",   "f-44",
+     "5",   "m-24",
+     "6",   "f-30"
+  )
+patient
+```
+
+
+```{r}
+patient %>% 
+  separate(gender_age, into = c("gender", "age")) %>% 
+  glue_data("This case is {age} years old and reports gender as '{gender}'. ")
+```
+
+
+## 参考
+
+- <https://glue.tidyverse.org/>
