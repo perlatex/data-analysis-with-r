@@ -20,6 +20,12 @@ output:
 读取demo_data文件夹下kidiq.RDS文件
 
 - 可以使用`readr::read_rds()`或者`readRDS()`
+```{r}
+library(readr)
+d <- read_rds("./demo_data/kidiq.RDS")
+d
+```
+
 - 请说出数据框中每一列的变量类型
 
 | 变量       	| 含义             	|

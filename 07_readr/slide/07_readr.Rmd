@@ -59,17 +59,26 @@ knitr::include_graphics("./images/Rproject.png")
 R语言提供了很多读取数据的函数。
 \footnotesize
 
-文件格式                       |       **R** 函数 
-:---------------------------   |       :----------------------
-.txt                           |       `read.table()`
-.csv                           |       `read.csv()` and `readr::read_csv()`
-.xls and .xlsx                 |       `readxl::read_excel()` and `openxlsx::read.xlsx()`
-.sav(SPSS files)               |       `haven::read_sav()` and `foreign::read.spss()`
-.Rdata or rda                  |       `load()`
-.rds                           |       `readRDS()` and `readr::read_rds()` 
-.dta                           |       `haven::read_dta()` and `haven::read_stata()`
-.sas7bdat(SAS files)           |       `haven::read_sas()`
-Internet                       |       `download.file()`
+|文件格式               | **R** 函数                                        |
+|:----------------------|:--------------------------------------------------|
+|.txt                   | `read.table()`                                    |
+|.csv                   | `read.csv()` and `readr::read_csv()`              |
+|.xls and .xlsx         | `readxl::read_excel()` and `openxlsx::read.xlsx()`|
+|.sav(SPSS files)       | `haven::read_sav()` and `foreign::read.spss()`    |
+|.Rdata or rda          | `load()`                                          |
+|.rds                   | `readRDS()` and `readr::read_rds()`               |
+|.dta                   | `haven::read_dta()` and `haven::read_stata()`     |
+|.sas7bdat(SAS files)   | `haven::read_sas()`                               |
+|Internet               | `download.file()`                                 |
+
+
+## Tidyverse 各种宏包
+
+```{r, out.width='100%', fig.align='center', echo=FALSE}
+knitr::include_graphics("./images/tidyverse_import.png")
+```
+
+\footnotesize 图片来源 <https://rworkshop.uni.lu/>
 
 
 ## 文件路径
