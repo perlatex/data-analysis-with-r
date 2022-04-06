@@ -71,6 +71,10 @@ length(x)
 sort(x)
 ```
 
+```{r}
+sort(x, decreasing = TRUE)
+```
+
 找出向量元素的唯一值，就是给出**去重后**的数据
 ```{r}
 a <- c("a", "b", "b", "c", "d", "a", "g", "c", "d")

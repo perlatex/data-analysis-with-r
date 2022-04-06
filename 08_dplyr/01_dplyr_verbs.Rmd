@@ -58,7 +58,9 @@ mutate(.data = df, extra = reward)
       - 要么与数据框的行数等长，比如这里向量长度为6；
       - 要么长度为1，即，新增的这一列所有的值都是一样的(循环补齐机制)。
      
-
+```{r}
+mutate(.data = df, extra = 10) 
+```
 
 ```{r, out.width = '60%', echo = FALSE}
 knitr::include_graphics("images/dplyr-mutate.png")
@@ -89,12 +91,6 @@ c(1:10) %>% sum()
 ```
 
 
-在Windows系统中可以通过`Ctrl + Shift + M` 快捷键产生 `%>%`，苹果系统对应的快捷键是`Cmd + Shift + M`。
-
-
-```{r, out.width = "100%", echo=FALSE}
-knitr::include_graphics("images/keyboard/keyboard_pipe.png")
-```
 
 通过下图图示可以看到管道操作符就像生产线上的传送带一样，将数据运入函数中。
 ```{r out.width = '45%', echo = FALSE}
@@ -115,6 +111,15 @@ c(-10:10) %>% abs() %>% sum() %>% sqrt()
 ```
 
 
+
+在Windows系统中可以通过`Ctrl + Shift + M` 快捷键产生 `%>%`，苹果系统对应的快捷键是`Cmd + Shift + M`。
+
+
+```{r, out.width = "100%", echo=FALSE}
+knitr::include_graphics("images/keyboard/keyboard_pipe.png")
+```
+
+
 那么，之前增加学生奖励分成绩的语句 `mutate(df, extra = reward)`，也可以使用管道
 
 ```{r out.width = '65%', echo = FALSE}
@@ -128,9 +133,12 @@ df %>% mutate(extra = reward)
 ```
 
 
-
-```{r out.width = '50%', echo = FALSE}
-knitr::include_graphics("images/mutate-function.png")
+管道的优势非常明显
+```{r}
+df %>% 
+  mutate(extra = reward) %>% 
+  mutate(extra1 = 1:6) %>% 
+  mutate(extra2 = 20)
 ```
 
 
@@ -143,7 +151,7 @@ df %>%
 ```
 
 
-也自定义`calc_square()`函数
+也可自定义`calc_square()`函数
 ```{r}
 calc_square <- function(x) {
   x^2
@@ -153,6 +161,13 @@ df %>%
   mutate(new_col = calc_square(score))
 ```
 
+
+计算总分，也很方便
+```{r}
+df %>% 
+  mutate(extra = reward) %>% 
+  mutate(total = score + extra)
+```
 
 
 ## 保存为新的数据框
@@ -306,21 +321,27 @@ df %>% filter(type == "english")
 
 ### 逻辑算符
 
-多个参数的情形，本质上是逻辑与的关系，每个条件都要满足
+多个参数的情形，本质上是**逻辑与**的关系，即每个条件都要满足
 
 ```{r}
 df %>% filter(type == "english" & score >= 75)
 ```
 
-也可以使用其他的布尔算符。比如，找出**成绩等于70**或者**成绩等于90**的行
+也可以使用**逻辑或**。比如，找出**成绩等于70**或者**成绩等于90**的行
 ```{r}
 df %>% filter(score == 70 | score == 90)
 ```
 
 
+找出成绩等于70，或者等于80，或者等于90的行
+```{r}
+df %>% filter(score == 70 | score == 80 | score == 90)
+```
+
+
 与上等价，但更有效的方法
 ```{r}
-df %>% filter(score %in% c(70, 90))
+df %>% filter(score %in% c(70, 80, 90))
 ```
 
 
@@ -346,7 +367,7 @@ df %>%
 ```
 
 
-计算所有同学的考试成绩的标准差
+计算所有同学考试成绩的标准差
 ```{r}
 df %>% 
   summarise(sd_score = sd(score))
@@ -484,7 +505,7 @@ df1 %>% full_join(df2, by = "name")
 ```
 
 
-## 内联结`inner_join()`
+## 内联结 `inner_join()`
 
 只保留name条目相同地记录
 ```{r}
