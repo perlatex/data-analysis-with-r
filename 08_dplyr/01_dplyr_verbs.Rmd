@@ -277,7 +277,23 @@ df %>%
   rename(total_score = total)
 ```
 
+## 调整列的顺序 `relocate()`
 
+```{r}
+df %>% 
+  relocate(total)
+```
+
+```{r}
+df %>% 
+  relocate(total, .after = name)
+```
+
+
+```{r}
+df %>% 
+  relocate(total, .before = type)
+```
 
 
 ## 筛选 `filter()`
@@ -324,10 +340,15 @@ df %>% filter(type == "english")
 多个参数的情形，本质上是**逻辑与**的关系，即每个条件都要满足
 
 ```{r}
+df %>% filter(type == "english", score >= 75)
+```
+
+等价于
+```{r}
 df %>% filter(type == "english" & score >= 75)
 ```
 
-也可以使用**逻辑或**。比如，找出**成绩等于70**或者**成绩等于90**的行
+也存在使用**逻辑或**的情形。比如，找出**成绩等于70**或者**成绩等于90**的行
 ```{r}
 df %>% filter(score == 70 | score == 90)
 ```

@@ -100,3 +100,28 @@ pollution %>%
 knitr::include_graphics("images/group_by_filter.png")
 ```
 
+## group_by() + arrange()
+
+```{r}
+pollution %>% 
+  arrange(amount)
+```
+
+
+```{r}
+pollution %>% 
+  group_by(city) %>% 
+  arrange(amount)
+```
+
+```{r}
+pollution %>% 
+  group_by(city) %>% 
+  arrange(amount, .by_group = TRUE) 
+```
+
+
+```{r}
+pollution %>% 
+  arrange(city, amount) 
+```
