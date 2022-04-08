@@ -76,6 +76,13 @@ tba %>%
 # aesthetic?
 ```
 
+```{r}
+# 用这种方法验证
+tba %>% 
+  ggplot(aes(x, y, group = interaction(x, g), colour = g)) +
+  geom_line() + 
+  geom_point(size = 4)
+```
 
 
 ##  x 变量是连续型的时候
