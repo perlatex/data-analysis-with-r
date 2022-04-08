@@ -1,0 +1,121 @@
+---
+title: "值得玩味的一道题"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+
+# 用 geom_line() 画线图
+
+
+##  x 变量是字符串类型(因子类型)的时候
+
+```{r}
+library(tidyverse)
+
+tba <- crossing(x = letters[1:4], g = c("a", "b")) %>% 
+       mutate(y = rnorm(8) )
+
+
+tba
+```
+
+
+```{r}
+tba %>% 
+  ggplot(aes(x, y, colour = g)) +
+  geom_line() + 
+  geom_point(size = 4)
+```
+
+
+```{r}
+tba %>% 
+  ggplot(aes(x, y, colour = g, group = g)) +
+  geom_line() +
+  geom_point(size = 4)
+```
+
+
+```{r}
+tba %>% 
+  ggplot(aes(x, y, colour = g, group = 1)) +
+  geom_line() +
+  geom_point(size = 4)
+```
+
+
+原因在于:
+
+1. 当 x 是离散变量的时候，有**隐形分组**的味道，那么x坐标轴对应的是4组，这个代码可以说明
+```{r}
+tba %>% 
+  ggplot(aes(x, y)) +
+  geom_line() + 
+  geom_point(size = 4)
+```
+
+2. 颜色分组，color = group + color，这里又分2组
+
+
+所以，这里一共是分了8组，即一个点为一组。事实上，运行第一个代码时，结果已给出了与理解相一致的警告信息。
+```{r, eval=FALSE}
+# geom_path: Each group consists of only one observation. Do you need to adjust the group
+# aesthetic?
+```
+
+
+
+##  x 变量是连续型的时候
+
+如果我们x变量换成是连续型的时候，就没有以上情况了
+
+```{r}
+tbb <- crossing(x = c(1:4), g = c("a", "b")) %>% 
+       mutate(y = rnorm(8) )
+
+tbb
+```
+
+
+
+```{r}
+tbb %>% 
+  ggplot(aes(x, y, colour = g)) +
+  geom_line() + 
+  geom_point(size = 4)
+```
+
+
+```{r}
+tbb %>% 
+  ggplot(aes(x, y, colour = g, group = g)) +
+  geom_line() +
+  geom_point(size = 4)
+```
+
+
+
+```{r}
+tbb %>% 
+  ggplot(aes(x, y, colour = g, group = 1)) +
+  geom_line() +
+  geom_point(size = 4)
+```
+
+
+
+
+
