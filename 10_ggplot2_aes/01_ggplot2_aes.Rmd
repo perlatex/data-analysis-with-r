@@ -512,3 +512,12 @@ ggplot(penguins) +
 ```
 
 
+4. 思考：图中的点有几种颜色？直线有几条？
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, shape = island, color = species)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm")
+```
+
+
