@@ -120,4 +120,14 @@ penguins %>%
 
 
 
+## MetBrewer
 
+```{r}
+library(MetBrewer) # https://github.com/BlakeRMills/MetBrewer
+
+penguins %>% 
+   ggplot(aes(bill_length_mm, fill = species)) +
+   geom_density(alpha = 0.6) +
+   scale_fill_manual(values = met.brewer("Renoir", 3))
+```
+ 
