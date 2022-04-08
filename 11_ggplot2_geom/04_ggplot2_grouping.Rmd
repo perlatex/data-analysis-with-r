@@ -145,6 +145,12 @@ penguins %>%
   facet_wrap(vars(species))
 ```
 
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() +
+  facet_grid(island ~ species)
+```
 
 
 **课堂练习**：用分面画出，不同种类企鹅`bill_length_mm`的密度分布图

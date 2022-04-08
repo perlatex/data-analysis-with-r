@@ -188,6 +188,12 @@ penguins %>%
   geom_histogram()
 ```
 
+```{r}
+penguins %>%
+  ggplot(aes(x = body_mass_g, fill = species)) +
+  geom_histogram(bins = 35, alpha = 0.7, position = "identity")
+```
+
 ### 密度图
 或者密度图
 ```{r}
@@ -201,8 +207,8 @@ penguins %>%
 
 ```{r}
 penguins %>%
-  ggplot(aes(x = bill_length_mm, color = species)) +
-  geom_density()
+  ggplot(aes(x = bill_length_mm, fill = species, colour = species)) +
+  geom_density(alpha = 0.7)
 ```
 
 
@@ -215,7 +221,22 @@ penguins %>%
 
 对于Adelie类而言，是不是也存在类似结构？
 
+### Overlay density and histogram
 
+```{r}
+penguins %>%
+  ggplot(aes(x = body_mass_g)) +
+  geom_histogram(bins = 30) +
+  geom_density(colour = "red")
+```
+
+```{r}
+# scale histogram to density one
+penguins %>%
+  ggplot(aes(x = body_mass_g)) +
+  geom_histogram(bins = 30, aes(y = stat(density))) +
+  geom_density(colour = "red")
+```
 
 ### dot plot
 
@@ -276,6 +297,19 @@ penguins %>%
 
 ### 箱线图
 可以用箱线图（箱线图可以显示分布的中位数、分位数等）
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_boxplot() 
+```
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = species, y = body_mass_g, fill = sex)) +
+  geom_boxplot()
+```
+
 
 ```{r}
 penguins %>%
@@ -293,6 +327,7 @@ penguins %>%
   geom_boxplot() +
   geom_jitter()
 ```
+
 
 
 
@@ -321,6 +356,22 @@ penguins %>%
 
 
 
+```{r}
+penguins %>% 
+  ggplot(aes(x = species, y = body_mass_g, fill = sex, colour = sex)) +       
+  geom_violin(alpha = 0.1, trim = FALSE) +
+  geom_point(position = position_jitterdodge(dodge.width = 0.9),
+             alpha = 0.5,
+             show.legend = FALSE)
+```
+
+### 小蜜蜂图
+```{r}
+library(ggbeeswarm)
+penguins %>% 
+  ggplot(aes(x = species, y = body_mass_g, colour = sex)) +
+  geom_quasirandom(dodge.width = 1)
+```
 
 
 ### 山峦图
@@ -330,5 +381,7 @@ penguins %>%
   ggplot(aes(y = species, x = bill_length_mm, fill = species)) +
   ggridges::geom_density_ridges(alpha = 0.5)
 ```
+
+
 
 

@@ -1,0 +1,54 @@
+---
+title: "ggplot2 customizing"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 查看手册，弄懂代码
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+```{r}
+p1 <- penguins %>% 
+  ggplot(aes(x = species)) +
+  geom_bar() +
+  labs(title = "Species distribution")
+
+
+p2 <- penguins %>% 
+  ggplot(aes(y = island)) +
+  geom_bar() +
+  labs(title = "Island but flipped")
+
+
+p3 <- penguins %>% 
+  ggplot(aes(x = body_mass_g, y = bill_depth_mm, colour = sex)) +
+  geom_point()
+```
+
+
+
+```{r}
+library(patchwork)
+(( p1 | p2 ) / p3) +
+  # add tags and main title
+  plot_annotation(tag_levels = 'A',
+                  title = 'Plots about penguins') &
+  # modify all plots recursively
+  theme_minimal() +
+  theme(text = element_text('Roboto'))
+```
+

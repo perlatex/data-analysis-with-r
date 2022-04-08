@@ -1,0 +1,85 @@
+---
+title: "The beauty of layer()"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+# 练习
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+
+penguins <- penguins %>% 
+  drop_na()
+```
+
+
+
+```{r}
+ggplot(penguins) +
+  geom_bar(aes(y = species))
+
+ggplot(penguins) +
+  stat_count(aes(y = species))
+```
+
+
+
+```{r}
+ggplot(penguins, aes(x = species)) +
+  geom_bar(stat = "count")
+
+# stat_count acts on the mapped var like dplyr::count()
+count(penguins, species)
+```
+
+
+
+```{r}
+penguins %>% 
+  count(species) %>%
+  ggplot(aes(x = species, y = n)) +
+  geom_bar(stat = "identity")
+
+penguins %>% 
+  count(species) %>%
+  ggplot(aes(x = species, y = n)) +
+  geom_col()
+```
+
+
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(y = species)) +
+  geom_bar(aes(x = stat(count)))
+
+
+penguins %>% 
+  ggplot(aes(y = species)) +
+  geom_bar(aes(x = stat(count) / sum(stat(count)))) +
+  scale_x_continuous(labels = scales::percent)
+
+
+penguins %>% 
+  ggplot(aes(y = species)) +
+  geom_bar(aes(x = stat(count) / sum(count))) +
+  scale_x_continuous(labels = scales::percent)
+```
+
+
+
+
+

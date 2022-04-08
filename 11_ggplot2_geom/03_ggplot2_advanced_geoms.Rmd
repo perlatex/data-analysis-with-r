@@ -35,7 +35,41 @@ penguins <- read_csv("./demo_data/penguins.csv")
 penguins
 ```
 
+## Barplot
+```{r}
+penguins %>% 
+  ggplot(aes(y = species, fill = island)) +
+  geom_bar(position = "stack")  # Default
+```
 
+
+```{r}
+penguins %>% 
+  ggplot(aes(y = species, fill = island)) +
+  geom_bar(position = "dodge")    # Dodging island: side by side
+```
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(y = species, fill = island)) +
+  geom_bar(
+    position = position_dodge2(preserve = "single")
+  ) +                               # Preserve single bar (same width)
+  labs(y = NULL)
+```
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(y = species, fill = island)) +
+  geom_bar(position = "fill") +
+  scale_x_continuous(labels = scales::percent,
+                     position = "top",
+                     expand = c(0, 0)) +
+  labs(x = NULL, y = NULL) +
+  theme_classic(16)
+```
 
 ## 嘴峰长度和嘴峰厚度之间的关系
 
