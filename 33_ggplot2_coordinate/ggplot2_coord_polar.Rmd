@@ -1,0 +1,104 @@
+---
+title: "ggplot2之坐标系统"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 极坐标系
+
+## 案例1
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+df <- tibble(x = c(0, 90, 180, 270, 360), y = 3)
+df
+```
+
+
+```{r}
+df %>% 
+  ggplot(aes(x = x, y = y)) + 
+  geom_point()
+```
+
+
+```{r}
+df %>% 
+  ggplot(aes(x = x, y = y)) + 
+  geom_point() +
+  coord_polar(start = 0, theta = "x")
+```
+
+
+## 案例2
+```{r}
+tbl <- tibble(
+  id = 1:20,
+  n = sample(c(10:20), size = 20, replace = TRUE),
+  g = rep(c("a", "b", "c", "d", "e"), each = 4)
+)  
+tbl
+```
+
+
+```{r}
+tbl %>% 
+  ggplot(aes(x = id, y = n, fill = g)) + 
+  geom_bar(stat = "identity") +
+  theme_minimal()
+```
+
+
+```{r}
+tbl %>% 
+  ggplot(aes(x = id, y = n, fill = g)) + 
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  coord_polar(start = 0, theta = "x")
+```
+
+```{r}
+tbl %>% 
+  ggplot(aes(x = id, y = n, fill = g)) + 
+  geom_bar(stat = "identity") +
+  ylim(-10, 20) +
+  theme_minimal() +
+  coord_polar(start = 0, theta = "x")
+```
+
+
+## 案例3
+```{r}
+library(palmerpenguins)
+
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = body_mass_g)) +
+  geom_point() +
+  geom_smooth(method = "lm") 
+```
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = body_mass_g)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  #expand_limits(y = c(0, 60)) +
+  coord_polar(start = 0, theta = "y")
+```
+
+
+
+## 参考
+
+- <https://ggplot2.tidyverse.org/reference/coord_polar.html>
