@@ -55,6 +55,12 @@ broom宏包可以帮助我们**规整**模型输出结果。它将常用的100�
 - `augment()` 模型输出的信息添加到建模用的数据集中，比如`fitted values` 和 `residuals` 
 
 
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/cleanup_using_broom.png")
+```
+
+
+
 ```{r}
 library(broom)
 

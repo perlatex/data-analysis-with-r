@@ -1,0 +1,49 @@
+---
+title: "List-columns 作业"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 作业
+
+- 去掉`penguins` 数据中的缺失值
+- 然后，按照 island 和 species 聚合(Nesting)
+- 最后，找出每组中嘴峰长度和嘴峰厚度均高于所在组的均值的个数
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+
+```{r}
+penguins %>%
+  drop_na() %>% 
+  group_by(island, species) %>% 
+  nest() %>% 
+  rowwise() %>% 
+  mutate(
+    n = sum(data$bill_length_mm > mean(data$bill_length_mm) & data$bill_depth_mm > mean(data$bill_depth_mm))
+  )
+```
+
+
+```{r}
+penguins %>%
+  drop_na() %>% 
+  group_by(island, species) %>% 
+  summarise(
+    n = sum(bill_length_mm > mean(bill_length_mm) & bill_depth_mm > mean(bill_depth_mm))
+  )
+```
+

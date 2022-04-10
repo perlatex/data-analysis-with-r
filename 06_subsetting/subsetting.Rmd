@@ -28,10 +28,11 @@ x <- c(1.1, 2.2, 3.3, 4.4, 5.5)
 ```
 
 
-- 正整数： 指定向量元素中的位置
+- 正整数：位置索引，用于指定向量中元素所在的位置，第一个位置是1
 ```{r}
 x[1]
 ```
+
 
 ```{r}
 x[c(3, 1)]
@@ -109,6 +110,15 @@ l[[1]]
 l[["one"]]
 ```
 
+
+```{r, out.width = '50%', echo = FALSE, fig.cap= "from Advanced R, second Ed. by Hadley Wickham"}
+knitr::include_graphics("images/map_train_single.png")
+knitr::include_graphics("images/map_train_multiple.png")
+```
+
+
+### 更简洁的办法
+
 取出`one`位置上的元素，需要写`[["one"]]`，程序员觉得太麻烦了，所以用`$`来简写
 ```{r}
 l$one
@@ -117,7 +127,9 @@ l$one
 所以请记住
 - `[` 和`[[`的区别
 -`x$y` 是 `x[["y"]]`的简写
- 
+
+
+
  
 ## 矩阵
 

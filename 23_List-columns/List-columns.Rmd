@@ -47,23 +47,44 @@ knitr::include_graphics("images/dcl/tibble-atomic.png")
 一般情况下，data.frame的一列都是向量，即**向量列**（vector columns）；
 而tibble还可以允许某一列为列表(list)，那么列表构成的列，称之为**列表列**（list columns）
 
-```{r, out.width = '75%', echo = FALSE}
+```{r, out.width = '75%', echo = FALSE, fig.cap = "Functional Programming by S. Altman, B. Behrman, H. Wickham (CC4 Licence)"}
 knitr::include_graphics("images/dcl/tibble-list-col.png")
 ```
 
 这样一来，**列表列**非常灵活，因为列表元素可以是原子型向量、列表、矩阵或者小的tibble
 
 
-```{r, out.width = '75%', echo = FALSE}
+```{r, out.width = '75%', echo = FALSE, fig.cap = "Functional Programming by S. Altman, B. Behrman, H. Wickham (CC4 Licence)"}
 knitr::include_graphics("images/dcl/tibble-list-col-vectors.png")
 ```
 
+举个好记的例子
 
+```{r, out.width = '75%', echo = FALSE, fig.cap = "Picture by Jennifer Bryan"}
+knitr::include_graphics("images/map_lego_tibble.jpg")
+```
+
+
+```{r}
+tibble(
+  numbers = 1:8,
+  my_list = list(
+    a = c("a", "b"),
+    b = 2.56,
+    c = c("a", "b", "c"),
+    d = rep(TRUE, 4),
+    d = 2:3,
+    e = 4:6,
+    f = FALSE,
+    g = c(1, 4, 5, 6)
+  )
+)
+```
 
 
 ## nested tibble
 
-tibble的列表列装载数据的能力很强大，也很灵活。下面，我们将介绍如何创建和操控有列表列的tibble。
+tibble的列表列装载数据的能力很强大，也很灵活。除了上面这种方法外，还有其它方法创建和操控有列表列的tibble。
 
 ### creating 
 假定我们这里有一个tibble， 我们有三种方法可以创建列表列
@@ -76,7 +97,7 @@ tibble的列表列装载数据的能力很强大，也很灵活。下面，我�
 #### tidyr::nest()
 使用`tidyr::nest()`函数，创建有列表列的tibble。 
 
-```{r, out.width = '75%', echo = FALSE}
+```{r, out.width = '75%', echo = FALSE, fig.cap = "Functional Programming by S. Altman, B. Behrman, H. Wickham (CC4 Licence)"}
 knitr::include_graphics("images/dcl/tibble-list-col-tibbles.png")
 ```
 
