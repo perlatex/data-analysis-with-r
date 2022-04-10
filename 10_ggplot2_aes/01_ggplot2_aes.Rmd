@@ -324,6 +324,15 @@ ggplot(penguins) +
 
 ```{r}
 ggplot(penguins) +
+  geom_point(aes(x = bill_length_mm, y = body_mass_g), size = 9, alpha = 0.3) +
+  geom_point(aes(x = bill_length_mm, y = body_mass_g), size = 6, alpha = 0.3) +
+  geom_point(aes(x = bill_length_mm, y = body_mass_g), size = 2, alpha = 0.3) 
+```
+
+
+
+```{r}
+ggplot(penguins) +
   geom_point(aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_smooth(aes(x = bill_length_mm, y = bill_depth_mm))
 ```
