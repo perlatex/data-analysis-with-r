@@ -460,6 +460,21 @@ penguins %>%
 ```
 
 ## 极坐标系
+```{r}
+df <- penguins %>% 
+  count(species, island) %>% 
+  mutate(id = row_number()) 
+
+df %>% 
+  ggplot(aes(x = id, y = n, fill = species)) + 
+  geom_bar(stat = "identity") +
+  ylim(-30, 125) +
+  theme_minimal() +
+  coord_polar(start = 0, theta = "x")
+```
+
+
+
 
 ```{r}
 penguins %>% 
