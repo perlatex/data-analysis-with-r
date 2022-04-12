@@ -148,13 +148,19 @@ penguins %>%
 ```
 
 
-
+```{r}
+tibble(x = 1, y = 2) %>% 
+  ggplot() +
+  geom_point(aes(x = x, y = y), size = 100, alpha = 0.3, color = "red") +
+  geom_point(aes(x = x, y = y), size = 60, alpha = 0.3, color = "red") +
+  geom_point(aes(x = x, y = y), size = 20, alpha = 0.3, color = "red") 
+```
 
 ## 映射关系的继承
 
 - 每个图层会继承`ggplot()`里数据和映射关系，**除非**图层自己的数据和映射关系已经存在。
-- 换个方式理解，图层会共享相同的映射关系。
-- 图层与图层之间不会继承关系。
+- 换个方式理解，所有的图层可以共享相同的映射关系。
+- 图层与图层之间没有继承关系。
 
 ```{r}
 # ggplot(data = <DATA>,
@@ -169,9 +175,10 @@ ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
 ```
 
 
-思考：
+思考，图中的点有几种颜色？直线有几条？
 ```{r}
-ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_point(aes(color = species)) +
   geom_smooth(aes(y = flipper_length_mm, group = sex), method = "lm")
 ```
