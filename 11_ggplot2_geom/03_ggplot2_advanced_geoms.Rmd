@@ -20,7 +20,8 @@ output:
 install.packages( 
  c("ggridges", "see", "palmerpenguins", "datapasta", "colorspace", "sf",
    "cowplot",  "gganimate", "ggrepel", "ggforce", "janitor", "patchwork", 
-   "gapminder",  "ragg", "styler", "remotes", "rnaturalearth", "geomtextpath") 
+   "gapminder",  "ragg", "styler", "remotes", "rnaturalearth", "geomtextpath",
+   "ggbeeswarm") 
 )
 ```
 
@@ -325,9 +326,15 @@ penguins %>%
   geom_point(data = m, aes(y = mean), color = "red", size = 5)
 ```
 
+课堂练习：
+
+- 添加小蜜蜂图
+- 蓝色的圆点不同性别体重中位数的位置
 
 
-如何在点的位置添加具体数值文本？
+
+
+在点的位置添加具体文本
 
 ```{r}
 penguins %>%

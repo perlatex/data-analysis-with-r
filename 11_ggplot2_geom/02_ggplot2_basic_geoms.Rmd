@@ -191,7 +191,7 @@ penguins %>%
 ```{r}
 penguins %>%
   ggplot(aes(x = body_mass_g, fill = species)) +
-  geom_histogram(bins = 35, alpha = 0.7, position = "identity")
+  geom_histogram(bins = 35, alpha = 0.7, position = "identity", color = "white")
 ```
 
 ### 密度图
