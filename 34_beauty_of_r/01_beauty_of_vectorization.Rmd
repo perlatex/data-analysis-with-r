@@ -1,0 +1,50 @@
+---
+title: "The beauty of vectorization"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+R语言中绝大部分函数都支持向量化，即，函数会直接对向量中的每个元素进行操作，并不需要从头到尾循环然后每次操作一个元素。这是R语言非常优秀的特质，可能R最大的特质就是偷懒吧。
+
+
+比如，对向量的每个元素乘以2
+
+```{r}
+x <- 1:4
+```
+
+循环迭代的写法
+```{r}
+output_vector <- c()
+
+for (i in 1:4) {
+  output_vector[i] <- x[i] * 2
+}
+
+output_vector
+```
+
+向量化操作
+```{r}
+x * 2
+```
+
+
+```{r}
+x > 2
+```
+
+
+```{r}
+log(x)
+```
+

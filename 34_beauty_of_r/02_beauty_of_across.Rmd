@@ -1,0 +1,482 @@
+---
+title: "tidyverse中的across()之美"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+dplyr 1.0 版本增加了`across()`函数，这个函数集中体现了dplyr宏包的强大和简约，今天我用企鹅数据，来领略它的美。
+
+
+
+## across()函数形式
+
+`across()`, `if_any()` 和 `if_all()`函数，
+
+```{r, eval = FALSE}
+across(.cols = everything(), .fns = NULL, ..., .names = NULL)
+
+if_any(.cols, .fns = NULL, ..., .names = NULL)
+
+if_all(.cols, .fns = NULL, ..., .names = NULL)
+```
+
+- `across()` 对**多列**执行相同的函数操作， 返回**数据框**
+- `if_any()` / `if_all()` 对**多列**执行相同的判断性函数，返回一个**逻辑值**
+
+
+
+## 应用举例
+
+下面通过一些需求案例，呈现`across()`，`if_any()` / `if_all()`函数的功能
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+penguins
+```
+
+
+### 统计每一列的缺失值数量
+
+```{r, eval=FALSE}
+penguins %>%
+  summarise(
+    na_in_species = sum(is.na(species)),
+    na_in_island  = sum(is.na(island)),
+    na_in_length  = sum(is.na(bill_length_mm)),
+    na_in_depth   = sum(is.na(bill_depth_mm)),
+    na_in_flipper = sum(is.na(flipper_length_mm)),
+    na_in_body    = sum(is.na(body_mass_g)),
+    na_in_sex     = sum(is.na(sex)),
+    na_in_year    = sum(is.na(year))
+  )
+```
+
+
+```{r}
+# using across()
+penguins %>%
+  summarise(
+    across(everything(), function(x) sum(is.na(x)))
+  )
+
+
+# or
+penguins %>%
+  summarise(
+    across(everything(), ~ sum(is.na(.)))
+  )
+```
+
+
+
+
+
+### 变量下有多少个分组？
+
+```{r}
+penguins %>%
+  summarise(
+    across(c(species, island, sex), n_distinct)
+  )
+
+# or
+penguins %>%
+  summarise(
+    across(where(is.factor), n_distinct)
+  )
+```
+
+
+
+
+
+### 多列多个统计函数
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    across(ends_with("_mm"), list(mean = mean, sd = sd), na.rm = TRUE)
+  )
+```
+
+
+**随堂练习**：
+- 以sex分组，对"bill_"开头的列，求出每列的最大值
+
+```{r}
+penguins %>%
+  group_by(sex) %>%
+  summarise(
+    across(starts_with("bill_"), max, na.rm = TRUE)
+  )
+```
+
+- 求出每列的和除以最大值
+```{r}
+myfun <- function(x) {
+  sum(x, na.rm = T) / max(x, na.rm = T)
+}
+
+penguins %>%
+  group_by(sex) %>%
+  summarise(
+    across(starts_with("bill_"), myfun)
+  )
+```
+
+
+
+### 数据标准化处理
+
+```{r}
+std <- function(x) {
+  (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+}
+
+penguins %>%
+  summarise(
+    across(where(is.numeric), std)
+  )
+
+
+# using across() and purrr style
+penguins %>%
+  drop_na() %>% 
+  summarise(
+    across(starts_with("bill_"), ~ (.x - mean(.x)) / sd(.x))
+  )
+```
+
+
+
+
+
+### 数据对数化处理
+
+```{r}
+penguins %>%
+  drop_na() %>%
+  mutate(
+    across(where(is.numeric), log)
+  )
+```
+
+
+```{r}
+penguins %>%
+  drop_na() %>%
+  select(species, bill_length_mm) %>% 
+  mutate(
+    across(bill_length_mm, .fns = list(std = std, log = log), .names = "{.fn}_{.col}")
+  )
+```
+
+
+
+
+
+### 不同分组下更复杂的统计
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    n = n(),
+    across(starts_with("bill_"), mean, na.rm = TRUE),
+    Area = mean(bill_length_mm * bill_depth_mm, na.rm = TRUE),
+    across(ends_with("_g"), mean, na.rm = TRUE),
+  )
+```
+
+
+
+
+
+
+
+
+### 筛选数据框有缺失值的行
+
+```{r}
+penguins %>% 
+  filter(
+    if_any(everything(), is.na)
+  )
+```
+
+
+### 筛选全部是缺失值的行
+
+```{r}
+penguins %>% 
+  filter(if_all(everything(), is.na))
+```
+
+
+
+### 筛选嘴峰(长度和厚度)全部大于21mm的企鹅
+
+```{r}
+penguins %>% 
+  filter(
+    if_all(contains("bill"), ~ . > 21)
+  )
+```
+
+
+```{r}
+penguins %>% 
+  filter(if_all(contains("bill"), `>`, 21))
+```
+
+
+### 选出胖嘴企鹅
+
+嘴峰长度和嘴峰厚度都大于各自所在列的均值
+
+```{r}
+bigger_than_mean <- function(x) {
+  x > mean(x, na.rm = TRUE)
+}
+
+penguins %>% 
+  filter(if_all(contains("bill"), bigger_than_mean))
+```
+
+
+这样会不会更好理解点
+```{r}
+bigger_than_mean <- function(x) {
+  x > mean(x, na.rm = TRUE)
+}
+
+penguins %>% 
+  mutate(
+    across(contains("bill"), bigger_than_mean)
+  ) %>% 
+  filter(if_all(contains("bill"), ~ . == TRUE))
+```
+
+### 是单胖还是双胖？
+
+```{r}
+penguins %>% 
+  filter(!is.na(bill_length_mm)) %>% 
+  mutate(
+    category = case_when(
+      if_all(contains("bill"), bigger_than_mean) ~ "both big", 
+      if_any(contains("bill"), bigger_than_mean) ~ "one big", 
+                                            TRUE ~ "small"
+    ))
+```
+
+
+
+
+### 计算行方向的均值
+
+我们想计算每只企鹅 `bill_length_mm` 和 `bill_depth_mm` 的均值
+
+```{r}
+penguins %>%
+  mutate(avg_bill = mean(c(bill_length_mm, bill_depth_mm), na.rm = TRUE)) %>%
+  select(species, bill_length_mm, bill_depth_mm, avg_bill)
+```
+
+这可能不是你要的答案。那是因为R语言认为 `c(bill_length_mm, bill_depth_mm)` 是这两列的所有值，然后求出这两列所有数的均值，因此新增的avg_bill列是都是一个数。
+
+要实现我们想要的，可以配合 `rowwise() + c_across() `使用，可以把`c_across()` 看做特定场合下`c()`函数的一种新产品，更tidy、更安全。
+
+
+```{r}
+penguins %>%
+  rowwise() %>%
+  mutate(avg_bill = mean(c_across(contains("bill")), na.rm = TRUE)) %>%
+  select(species, bill_length_mm, bill_depth_mm, avg_bill)
+```
+
+
+
+
+
+
+
+
+### 计算每天水分和食物各自所占比例
+
+假定下面的`df`是企鹅宝宝每天喝水和吃的东西重量，我们想计算每天水份和食物比例，
+比如第一天water和food都是10.0，那么各自比例都是50%.
+
+```{r}
+df <- tibble::tribble(
+  ~water, ~food,
+  10.0,   10.0,
+  12.1,   10.3,
+  13.5,   19.1,
+  17.4,   16.0,
+  25.8,   15.6,
+  27.4,   19.8
+)
+df
+```
+
+```{r}
+df %>%
+  mutate(
+    sum = food + water
+  ) %>%
+  mutate(
+    across(c(water, food), ~ . / sum, .names = "{col}_%")
+  )
+```
+
+
+
+列比较多的情况，用`rowwise() + c_across()`更好
+
+```{r}
+df %>%
+  rowwise() %>%
+  mutate(total = sum(c_across(water:food))) %>%
+  ungroup() %>%
+  mutate(across(water:food, ~ . / total))
+```
+
+当然可以写的更简练些
+
+```{r}
+df %>%
+  rowwise() %>%
+  mutate(across(.names = "%{.col}") / sum(c_across())) %>%
+  ungroup()
+```
+
+或者
+
+```{r}
+scale <- function(x) {
+  x / sum(x, na.rm = TRUE)
+}
+
+df %>%
+  rowwise() %>%
+  mutate(
+    scale(across(.names = "%{.col}"))
+  )
+```
+
+
+
+
+## 总结
+
+```{r, eval=FALSE}
+df %>% 
+  summarise/mutate(
+    across(.cols = , .fns = NULL, ..., .names = NULL)
+  )
+
+
+df %>% 
+  group_by() + 
+  summarise/mutate(
+    across(.cols = , .fns = NULL, ..., .names = NULL)
+  )
+
+
+
+df %>%
+  filter(
+    if_any /if_all(.cols, .fns = NULL, ..., .names = NULL)
+  )
+
+
+
+df %>%
+  mutate( new = case_when(
+    if_any /if_all(.cols, .fns = NULL, ..., .names = NULL) ~ ,
+    if_any /if_all(.cols, .fns = NULL, ..., .names = NULL) ~ 
+  )
+)
+
+
+
+df %>%
+  rowwise() %>%
+  summarise/mutate(
+    new = mean(c_across())
+  )
+```
+
+
+
+## 作业
+
+- 计算不同种类的企鹅宝宝，其各体征数据的均值（注意缺失值）
+
+- 统计在不同岛屿，观察到企鹅的数量(n())以及有多少种类(n_distinct)
+
+- 统计每位同学，成绩高于各科均值的个数
+
+```{r}
+dt <- tibble::tribble(
+  ~name, ~chinese, ~engish, ~physics, ~sport, ~music,
+  "Aice", 85, 56, 56, 54, 78,
+  "Bob", 75, 78, 77, 56, 69,
+  "Cake", 69, 41, 88, 89, 59,
+  "Dave", 90, 66, 74, 82, 60,
+  "Eve", 68, 85, 75, 69, 21,
+  "Fod", 77, 74, 62, 74, 88,
+  "Gimme", 56, 88, 75, 69, 34
+)
+dt
+```
+
+
+
+
+- 找出`db`数据框中，含有H66的记录行
+```{r}
+db <- tibble::tribble(
+  ~id, ~enc_dx1, ~enc_dx1_name, ~enc_dx2, ~enc_dx2_name, ~enc_dx3, ~enc_dx3_name,
+   1L,    "H66",     "example",    "E55",     "example",       NA,            NA,
+   2L,    "J95",        "text",    "K55",        "text",       NA,            NA,
+   3L,    "M00",        "here",    "H66",        "here",       NA,            NA,
+   4L,    "H66",    "and here",    "K75",    "and here",    "H66",    "and here",
+   5L,    "R00",   "also here",    "K67",   "also here",       NA,            NA
+  )
+db
+```
+
+- 将`tb`一行中最大的数变为1，其余的变为0 (提示，参考计算每天水分和食物各自所占比例的代码）
+
+```{r}
+tb <- tibble::tribble(
+   ~a,  ~b,  ~c,
+   2,  4,  3,
+  13,  9,  4,
+   1,  7,  9,
+  11, 13, 13
+  )
+tb
+```
+
+```{r}
+pick_max <- function(x) {
+  x %/% max(x)
+}
+```
+

@@ -1,0 +1,148 @@
+---
+title: "The beauty of purrr"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+
+## 案例1
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(gapminder)
+library(broom)
+
+gapminder %>% 
+  filter(continent != "Oceania") %>% 
+  group_by(continent) %>% 
+  nest() %>% 
+  mutate(dumb_model = map(data, ~lm(lifeExp ~ gdpPercap + year, data = .x))) %>% 
+  mutate(results = map(dumb_model, ~ tidy(.x, conf.int = TRUE))) %>% 
+  unnest(results) %>% 
+  filter(term == "gdpPercap") %>% 
+  mutate(across(c(estimate, conf.low, conf.high), ~.x * 1000)) %>% 
+  ggplot(aes(x = estimate, y = continent, color = continent)) +
+  geom_pointrange(aes(xmin = conf.low, xmax = conf.high)) +
+  guides(color = "none")
+```
+
+
+
+## 案例2
+```{r}
+mtcars %>% 
+  ggplot(aes(hp, mpg)) +
+  geom_point(size = 8, alpha = 0.5) +
+  geom_point(size = 4, alpha = 0.5) +
+  geom_point(size = 2, alpha = 0.5)
+```
+
+
+```{r}
+reduce(
+  c(8, 4, 2),
+  ~ .x + geom_point(size = .y, alpha = 0.5),
+  .init = ggplot(aes(hp, mpg))
+)
+```
+
+
+
+## 案例3
+```{r}
+(mtcars %>% 
+  ggplot(aes(hp, mpg)) +
+  scale_x_discrete(expand = expansion(.2)) +
+  scale_y_continuous(expand = expansion(.2)) +
+  theme_void() +
+  theme(panel.background = element_rect(fill = "grey20"))) %>% 
+  reduce(
+    10L:1L,
+    ~ .x + geom_point(size = .y ^ 1.5, color = viridis_colors[.y]),  # exponential!
+    .init = .
+  )
+```
+
+
+
+
+
+
+## 案例4
+```{r}
+library(ggstatsplot)
+library(patchwork)
+library(gtsummary)
+
+mod_names <- paste("model", 1:3)
+
+f <- list(
+  mpg ~ wt,
+  mpg ~ wt + cyl,
+  mpg ~ wt + cyl +hp
+) %>% 
+  set_names(mod_names)
+
+
+models <- map(f, ~ lm(.x, data = mtcars))
+
+models_df <- map_dfr(models, tidy, .id = "model")
+
+map(models, tbl_regression) %>% 
+  tbl_merge(tab_spanner = mod_names)
+
+map(models, ~ggcoefstats(.x) + xlim(-10, 45)) %>% 
+  reduce(`/`) +
+  plot_annotation(tag_levels = "1")
+```
+
+
+
+## 案例5
+```{r}
+mtcars$name <- rownames(mtcars)
+
+labeller <- partial(geom_text, aes(label = name), vjust = 0, nudge_y = 1, nudge_x = 0.05)
+
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  labeller(data = filter(mtcars, wt > 5)) +
+  labeller(data = filter(mtcars, mpg > 30), color = "forestgreen") +
+  labeller(data = filter(mtcars, name == "Merc 2400"), size = 6)
+```
+
+
+
+
+## 案例6
+```{r}
+df <- data.frame(
+  date = rep(c("20-01", "20-02", "20-03"), 2),
+  type = rep(c("supp", "scvs"), each = 3),
+  cost = c(5, 10, 5, 2, 4, 8)
+)
+
+
+df %>% 
+  mutate(
+    map_dfc(set_names(unique(type)), ~ ifelse(.x == type, cost, 0))
+  )
+
+df %>%
+  mutate(
+    index = row_number(),
+    type2 = type
+  ) %>%
+  pivot_wider(names_from = type2, values_from = cost, values_fill = 0) %>%
+  select(-index)
+```
