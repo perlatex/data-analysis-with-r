@@ -90,7 +90,7 @@ penguins %>%
   geom_boxplot()
 ```
 
-
+方法1
 ```{r}
 m <- penguins %>%
   group_by(island) %>%
@@ -106,10 +106,25 @@ penguins %>%
 ```
 
 
+方法2
+```{r}
+penguins %>%
+  ggplot(aes(x = island, y = body_mass_g)) +
+  geom_boxplot() +
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    color = "red",
+    size = 5,
+    position = "identity"
+  )
+```
 
--  下图是不同岛屿和性别企鹅体重的箱线图，
- - 在此图的基础上，用圆点标出每组均值的位置，提示`position = position_dodge()`
- - 在每组箱线图的位置上，画出原始数据点的抖散图，提示`position = position_jitterdodge()`
+
+
+
+-  下图是不同岛屿和性别企鹅体重的箱线图，在此图的基础上，用圆点标出每组均值的位置，提示`position = position_dodge()`
+
 
 ```{r}
 penguins %>%
@@ -117,7 +132,7 @@ penguins %>%
   geom_boxplot()
 ```
 
-
+方法1
 ```{r}
 ms <- penguins %>%
   group_by(island, sex) %>%
@@ -131,14 +146,49 @@ penguins %>%
   ggplot(aes(x = island, y = body_mass_g, color = sex)) +
   geom_boxplot() +
   geom_point(data = ms, aes(y = mean), size = 5, position = position_dodge(width = 0.75))
-  
+```
+
+方法2
+```{r}
+penguins %>%
+  ggplot(aes(x = island, y = body_mass_g, color = sex)) +
+  geom_boxplot() +
+  stat_summary(
+    mapping = aes(color = sex),
+    fun.data = ~mean_se(.x), # fun = mean
+    size = 5,
+    geom = "point",
+    position = position_dodge(width = 0.75)
+  )
+```
 
 
+- 继续上一题，在每组箱线图的位置上，添加原始数据点的抖散图，提示`position = position_jitterdodge()`
+
+
+方法1
+```{r}
 penguins %>%
   ggplot(aes(x = island, y = body_mass_g, color = sex)) +
   geom_boxplot() +
   geom_jitter(position = position_jitterdodge(dodge.width = 0.75)) +
   geom_point(data = ms, aes(y = mean), size = 5, position = position_dodge(width = 0.75))
-
 ```
+
+
+方法2
+```{r}
+penguins %>%
+  ggplot(aes(x = island, y = body_mass_g, color = sex)) +
+  geom_boxplot() +
+  geom_jitter(position = position_jitterdodge(dodge.width = 0.75)) +
+  stat_summary(
+    mapping = aes(color = sex),
+    fun.data = ~mean_se(.x), # fun = mean
+    size = 5,
+    geom = "point",
+    position = position_dodge(width = 0.75)
+  )
+```
+
 
