@@ -144,7 +144,7 @@ ms
 
 penguins %>%
   ggplot(aes(x = island, y = body_mass_g, color = sex)) +
-  geom_boxplot() +
+  geom_boxplot(position = position_dodge(width = 0.75)) +
   geom_point(data = ms, aes(y = mean), size = 5, position = position_dodge(width = 0.75))
 ```
 
@@ -152,7 +152,7 @@ penguins %>%
 ```{r}
 penguins %>%
   ggplot(aes(x = island, y = body_mass_g, color = sex)) +
-  geom_boxplot() +
+  geom_boxplot(position = position_dodge(width = 0.75)) +
   stat_summary(
     mapping = aes(color = sex),
     fun.data = ~mean_se(.x), # fun = mean
@@ -170,7 +170,7 @@ penguins %>%
 ```{r}
 penguins %>%
   ggplot(aes(x = island, y = body_mass_g, color = sex)) +
-  geom_boxplot() +
+  geom_boxplot(position = position_dodge(width = 0.75)) +
   geom_jitter(position = position_jitterdodge(dodge.width = 0.75)) +
   geom_point(data = ms, aes(y = mean), size = 5, position = position_dodge(width = 0.75))
 ```
@@ -180,7 +180,7 @@ penguins %>%
 ```{r}
 penguins %>%
   ggplot(aes(x = island, y = body_mass_g, color = sex)) +
-  geom_boxplot() +
+  geom_boxplot(position = position_dodge(width = 0.75)) +
   geom_jitter(position = position_jitterdodge(dodge.width = 0.75)) +
   stat_summary(
     mapping = aes(color = sex),
