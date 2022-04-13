@@ -214,7 +214,7 @@ penguins %>%
 
 ```{r}
 penguins %>%
-  filter(species == "Gentoo") %>%
+  filter(species == "Chinstrap") %>%
   ggplot(aes(x = bill_length_mm, color = sex)) +
   geom_density()
 ```
@@ -247,6 +247,26 @@ penguins %>%
   geom_dotplot(binwidth = .5)
 ```
 
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm, fill = species)) +
+  geom_dotplot(binaxis = 'y', stackdir = 'center')
+```
+
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm, fill = species)) +
+  geom_dotplot(
+    binaxis = 'y', 
+    stackdir = 'up',
+    stackratio = .7,
+    dotsize = 0.6
+  ) +
+  coord_flip()
+```
 
 ```{r}
 penguins %>%

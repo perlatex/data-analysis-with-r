@@ -39,24 +39,22 @@ penguins
 ## Barplot
 ```{r}
 penguins %>% 
-  ggplot(aes(y = species, fill = island)) +
+  ggplot(aes(x = species, fill = island)) +
   geom_bar(position = "stack")  # Default
 ```
 
 
 ```{r}
 penguins %>% 
-  ggplot(aes(y = species, fill = island)) +
+  ggplot(aes(x = species, fill = island)) +
   geom_bar(position = "dodge")    # Dodging island: side by side
 ```
 
 
 ```{r}
 penguins %>% 
-  ggplot(aes(y = species, fill = island)) +
-  geom_bar(
-    position = position_dodge2(preserve = "single")
-  ) +                               # Preserve single bar (same width)
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = position_dodge2(preserve = "single")) + # Preserve single bar (same width)
   labs(y = NULL)
 ```
 
@@ -93,6 +91,17 @@ penguins %>%
   )
 ```
 
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(
+    aes(color = sex, fill = species),
+    shape = 21,
+    alpha = .5,
+    size = 4
+  )
+```
 
 
 ## 点线图
@@ -163,6 +172,15 @@ penguins %>%
   geom_smooth(method = loess, method.args = list(degree = 1))
 ```
 
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() +
+  geom_smooth(method = "gam", 
+              formula = y ~ s(x, bs = "cs", fx = TRUE, k = 20))
+```
 
 
 ### 线性回归
