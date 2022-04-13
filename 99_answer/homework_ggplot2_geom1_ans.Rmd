@@ -75,3 +75,70 @@ p6 <- penguins %>%
 (p1 + p2 + p3) / (p4 + p5 + p6)
 
 ```
+
+
+
+- 下图是不同岛屿企鹅体重的箱线图，在此图的基础上，用圆点标出每组均值的位置
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+
+penguins <- penguins %>% drop_na()
+
+penguins %>%
+  ggplot(aes(x = island, y = body_mass_g, color = island)) +
+  geom_boxplot()
+```
+
+
+```{r}
+m <- penguins %>%
+  group_by(island) %>%
+  summarise(
+    mean = mean(body_mass_g)
+  )
+m
+
+penguins %>%
+  ggplot(aes(x = island, y = body_mass_g)) +
+  geom_boxplot() +
+  geom_point(data = m, aes(y = mean), color = "red", size = 5)
+```
+
+
+
+-  下图是不同岛屿和性别企鹅体重的箱线图，
+ - 在此图的基础上，用圆点标出每组均值的位置，提示`position = position_dodge()`
+ - 在每组箱线图的位置上，画出原始数据点的抖散图，提示`position = position_jitterdodge()`
+
+```{r}
+penguins %>%
+  ggplot(aes(x = island, y = body_mass_g, color = sex)) +
+  geom_boxplot()
+```
+
+
+```{r}
+ms <- penguins %>%
+  group_by(island, sex) %>%
+  summarise(
+    mean = mean(body_mass_g)
+  )
+ms
+
+
+penguins %>%
+  ggplot(aes(x = island, y = body_mass_g, color = sex)) +
+  geom_boxplot() +
+  geom_point(data = ms, aes(y = mean), size = 5, position = position_dodge(width = 0.75))
+  
+
+
+penguins %>%
+  ggplot(aes(x = island, y = body_mass_g, color = sex)) +
+  geom_boxplot() +
+  geom_jitter(position = position_jitterdodge(dodge.width = 0.75)) +
+  geom_point(data = ms, aes(y = mean), size = 5, position = position_dodge(width = 0.75))
+
+```
+
