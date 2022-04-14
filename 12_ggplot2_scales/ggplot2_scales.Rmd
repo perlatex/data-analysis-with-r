@@ -207,7 +207,7 @@ penguins %>%
   )
 ```
 
-
+强烈推荐使用scales宏包的各种函数
 ```{r}
 penguins %>% 
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
@@ -299,7 +299,10 @@ penguins %>%
 ```
 
 
+当然最贴心的还是`scales::label_number()`
+
 ```{r}
+# label_number() handles all numbering formatting
 penguins %>% 
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_point(aes(colour = species)) +
@@ -308,29 +311,6 @@ penguins %>%
     limits = c(30, 60),
     breaks = scales::breaks_width(width = 5),
     labels = scales::label_number(accuracy = 1, suffix = "mm")
-  )
-```
-
-
-
-```{r}
-penguins %>% 
-  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
-  geom_point(aes(colour = species)) +
-  scale_x_continuous(
-    limits = c(30, 60),
-    labels = scales::unit_format(unit = "mm", sep = "")
-  )
-```
-
-
-```{r}
-penguins %>% 
-  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
-  geom_point() +
-  scale_x_continuous(
-    limits = c(30, 60),
-    labels = scales::dollar
   )
 ```
 
@@ -346,11 +326,38 @@ penguins %>%
 ```
 
 
+```{r}
+# label_comma() and label_dollar() are special version of label_number()
+
+scales::label_comma()(20^(1:3))
+scales::label_dollar()(c(-1000, -100, 100, 1000))
+scales::label_percent()(c(0.4, 0.6))
+```
+
 
 ```{r}
-scales::label_percent()(c(0.4, 0.6))
-scales::label_comma()(20^(1:3))
+penguins %>% 
+  ggplot(aes(x = body_mass_g, y = bill_depth_mm)) +
+  geom_point(aes(colour = species)) +
+  scale_x_continuous(
+    name = "这是我的横坐标",
+    labels = scales::label_comma()
+  )
 ```
+
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() +
+  scale_x_continuous(
+    limits = c(30, 60),
+    labels = scales::label_dollar()
+  )
+```
+
+
 
 ```{r}
 penguins %>% 
@@ -428,6 +435,29 @@ penguins %>%
 ```
 
 
+```{r}
+library(gapminder)
+
+gapminder %>% 
+  ggplot(aes(x = log10(gdpPercap), y = lifeExp, color = continent)) +
+  geom_point() +
+  guides(color = "none")
+
+
+gapminder %>% 
+  ggplot(aes(gdpPercap, y = lifeExp, color = continent)) +
+  geom_point() +
+  guides(color = "none") +
+  scale_x_log10()
+
+gapminder %>% 
+  ggplot(aes(gdpPercap, y = lifeExp, color = continent)) +
+  geom_point() +
+  guides(color = "none") +
+  scale_x_log10(labels = label_log())
+```
+
+
 
 - 坐标轴取开方 $x$ -> $x^{1/2}$
 ```{r}
@@ -445,6 +475,13 @@ penguins %>%
   scale_x_reverse()
 ```
 
+```{r}
+gapminder %>% 
+  ggplot(aes(gdpPercap, y = lifeExp, color = continent)) +
+  geom_point() +
+  guides(color = "none") +
+  scale_x_continuous(trans = c("log10", "reverse"))
+```
 
 
 ```{r}
