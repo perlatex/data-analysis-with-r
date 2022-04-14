@@ -154,7 +154,6 @@ penguins %>%
   ggplot(aes(x = island, y = body_mass_g, color = sex)) +
   geom_boxplot(position = position_dodge(width = 0.75)) +
   stat_summary(
-    mapping = aes(color = sex),
     fun.data = ~mean_se(.x), # fun = mean
     size = 5,
     geom = "point",
@@ -183,7 +182,6 @@ penguins %>%
   geom_boxplot(position = position_dodge(width = 0.75)) +
   geom_jitter(position = position_jitterdodge(dodge.width = 0.75)) +
   stat_summary(
-    mapping = aes(color = sex),
     fun.data = ~mean_se(.x), # fun = mean
     size = 5,
     geom = "point",

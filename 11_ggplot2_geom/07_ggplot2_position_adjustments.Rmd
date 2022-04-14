@@ -1,0 +1,192 @@
+---
+title: "ggplot2之位置调整"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+penguins <- penguins %>% drop_na()
+```
+
+
+## position_identity()
+
+identity是等值变换的意思，表示不调整位置.
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = "identity") 
+
+
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = position_identity())
+```
+
+
+## position_stack()  
+
+stack是堆栈的意思
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = "stack")  # Default
+
+
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = position_stack())
+```
+
+
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  count(species, island) %>% 
+  ggplot(aes(x = species, y = n, fill = island)) +
+  geom_col(position = position_stack()) +
+  geom_text(aes(label = n), position = position_stack())
+```
+
+
+`position = position_stack()`比起 `position = "stack"`有更多的参数`vjust = `，它的范围是从0（对应底部）到1（对应顶部），这里设置为0.5，即对应中间位置
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  count(species, island) %>% 
+  ggplot(aes(x = species, y = n, fill = island)) +
+  geom_col(position = position_stack()) +
+  geom_text(aes(label = n), position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Set1")
+```
+
+
+
+## position_dodge()
+
+dodge是借过错开位置的意思，形成并列(side by side)的效果，常用于柱状图或者散点图或者箱线图中
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = "dodge")    # Dodging island: side by side
+
+
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = position_dodge(width = 0.75))
+```
+
+## position_dodge2()
+
+与`position_dodge()`一样，主要用于分组的柱状图，当每组的柱子个数不相等的时候，我们可以选择是让单子柱子的宽度相等，还是一组中所有柱子的宽度之和相等
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = "dodge2")   
+
+
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = position_dodge2())    
+
+
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = position_dodge2(preserve = "total"))  # Preserve total bar (same width)
+
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar(position = position_dodge2(preserve = "single"))  # Preserve single bar (same width)
+```
+
+
+
+## position_jitter()
+
+主要用于抖散图中散点位置控制
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_point(position = "identity") 
+
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_point(position = position_identity()) 
+
+
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_point(position = "jitter") 
+
+
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_point(position = position_jitter(width = 0.1)) 
+
+
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_jitter()
+```
+
+## position_jitterdodge()
+顾名思义jitterdodge = jitter +  dodge. 有时候我们除了生成多个错开的箱线图外，还想产生与箱线图位置一致的抖散图，所以就有了`position_jitterdodge()`。
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm, color = sex)) +
+  geom_boxplot(position = position_dodge(width = 0.9)) +
+  geom_point(position = position_jitterdodge(jitter.width = 0.9))
+```
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm, color = sex)) +
+  geom_boxplot(position = position_dodge(width = 0.9)) +
+  geom_jitter(position = position_jitterdodge(jitter.width = 0.9))
+```
+
+
+
+## position_nudge()
+
+一般用在`geom_text()`中，用于移动文本一个很小的距离
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  count(species) %>% 
+  ggplot(aes(x = species, y = n)) +
+  geom_point() +
+  geom_text(aes(label = species))
+
+penguins %>% 
+  count(species) %>% 
+  ggplot(aes(x = species, y = n)) +
+  geom_point() +
+  geom_text(aes(label = species), position = position_nudge(y = -2))
+
+
+# 上面的写法，可以偷懒的写成常见的形式
+penguins %>% 
+  count(species) %>% 
+  ggplot(aes(x = species, y = n)) +
+  geom_point() +
+  geom_text(aes(label = species), nudge_y = -2)
+```
