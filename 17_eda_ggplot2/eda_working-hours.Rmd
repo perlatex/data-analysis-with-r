@@ -1,0 +1,143 @@
+---
+title: "Do workers in richer countries work longer hours?"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+本周三下午14:00 的任务是重复
+<https://ourworldindata.org/time-use#do-workers-in-richer-countries-work-longer-hours>
+这张图。欢迎大家先尝试。
+
+
+
+# 数据来源
+
+可以点击图中DOWNLOAD按钮，可以获取相应的数据。我这里已经下载，放在data文件夹里
+
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+df_raw <- read_csv("./data/annual-working-hours-vs-gdp-per-capita-pwt.csv")
+df_raw
+```
+
+
+```{r}
+glimpse(df_raw)
+```
+
+
+插播一个好用的宏包
+```{r}
+library(countrycode)
+
+# 输入国家名，得到国家名的简写代码
+countrycode(c('United States', 'Algeria'), origin = 'country.name', destination = 'iso3c')
+
+# 与上相反，从简写代码到国家名
+countrycode(c('USA', 'DZA'), origin = 'iso3c', destination = 'country.name')
+
+# 输入国家名的简写，得到所在洲
+countrycode(c('USA', 'CHN'), origin = "iso3c", destination = "continent")
+```
+
+
+```{r}
+df <- df_raw %>% 
+  janitor::clean_names() %>% 
+  rename(country = entity, working_hours = 4, gdp_per_cap = 5, population = 6) %>% 
+  select(-continent) %>% 
+  mutate(continent = countrycode::countrycode(code, origin = "iso3c", destination = "continent")) %>% 
+  drop_na() %>% 
+  slice_max(year)
+
+df
+```
+
+
+## 简单探索
+
+工作时间最长的国家
+```{r}
+df %>% 
+  arrange(desc(working_hours))
+```
+
+每年平均工作时间和人均GDP的相关系数
+```{r}
+corr_log <- cor(df$working_hours, log10(df$gdp_per_cap))
+```
+
+
+## 可视化
+```{r}
+highlight_countries <- c("Cambodia", "Germany", "United States", "South Africa",
+                         "Singapore", "Mexico", "Argentina", "Brazil", "India",
+                         "China", "Nigeria")
+```
+
+```{r}
+df %>% 
+  ggplot(aes(x = gdp_per_cap, y = working_hours)) +
+  geom_point(aes(size = population, fill = continent, color = continent), shape = 21, alpha = 0.7) +
+  ggrepel::geom_text_repel(
+    #data = df %>% filter(country %in% highlight_countries),
+    aes(label = country), 
+    size = 2.5, 
+    min.segment.length = 0,
+    segment.size = 0.2
+  ) +
+  # geom_smooth(method = lm, color = "#141F52", fill = "grey72", size = 1.5,
+  #             fullrange = TRUE) +
+  scale_x_continuous(
+   name = "GDP per capita (int.-$)",
+   limits = c(10000, 70000),
+   breaks = 10000 * seq(1, 7, by = 1),
+   labels = scales::label_dollar()
+  ) +
+  scale_y_continuous(
+    name = "Annual working hours per worker",
+    limits = c(1400, 2400),
+    breaks = seq(1400, 2400, by = 200),
+    labels = scales::label_number(suffix = " h", big.mark = ",")
+  ) +
+  scale_size_continuous(range = c(1, 18)) +
+  scale_fill_manual(values = c(
+    "Africa" = "#F9C31F", "Americas" = "#F97A1F", "Asia" = "#E2365B",
+    "Europe" = "#36E2BD", "Oceania" = "#2E45B8")
+  ) + 
+  guides(
+   # size = "none",
+    fill = guide_legend(override.aes = list(size = 4, shape = 22))
+    ) +
+  labs(
+    title = "Annual working hours vs. GDP per capita",
+    subtitle = "Workers in poorer countries tend to work more...",
+    caption = "Source: Our World in Data, Feenstra et al. (2015). "
+  ) +
+  theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major = element_line(linetype = "dotted", color = "gray"),
+    plot.caption = element_text(hjust = 0, size = 7)
+  )
+```
+
+
+
+
+
+```{r}
+ggsave("myplot.png", width = 12, height = 7, device = ragg::agg_png, dpi = 300)
+```
+
+
