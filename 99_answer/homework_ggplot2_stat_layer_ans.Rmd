@@ -28,6 +28,9 @@ penguins <- penguins %>% drop_na()
 ```{r}
 ggplot(penguins, aes(x = species)) +
   geom_bar()
+
+ggplot(penguins, aes(x = species)) +
+  stat_count()
 ```
 
 
@@ -90,5 +93,23 @@ ggplot() +
 ```
 
 
+```{r}
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm, color = fct_rev(sex))) +
+  stat_summary(
+    geom       = "point",
+    fun        = mean,
+    position   = position_dodge(width = 0.5)
+  )
+
+
+penguins %>% 
+  ggplot(aes(x = species, y = bill_length_mm, color = fct_rev(sex))) +
+  geom_point(
+    stat       = "summary",
+    fun        = mean,
+    position   = position_dodge(width = 0.5)
+  )
+```
 
 
