@@ -118,7 +118,7 @@ df %>%
   ) + 
   guides(
    # size = "none",
-    fill = guide_legend(override.aes = list(size = 4, shape = 22))
+    fill = guide_legend(override.aes = list(size = 4, shape = 22), keywidth = 1.5)
     ) +
   labs(
     title = "Annual working hours vs. GDP per capita",

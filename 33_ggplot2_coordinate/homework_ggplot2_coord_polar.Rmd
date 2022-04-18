@@ -1,0 +1,53 @@
+---
+title: "ggplot2之坐标系统"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+## 请说出以下四张图形所想表达的意思
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+df <- tibble(
+  work = c("research", "teaching", "admin"),
+  perc = c(40, 40, 20)
+)
+
+
+p1 <- df %>% 
+  ggplot(aes(x = "dummy", y = perc, fill = work)) +
+  geom_col()
+
+
+p2 <- df %>% 
+  ggplot(aes(x = work, y = perc, fill = work)) +
+  geom_col()
+
+
+
+p3 <- df %>% 
+  ggplot(aes(x = "dummy", y = perc, fill = work)) +
+  geom_col() +
+  coord_polar(theta = "y")
+
+
+
+p4 <- df %>% 
+  ggplot(aes(x = work, y = perc, fill = work)) +
+  geom_col() +
+  coord_polar(theta = "x")
+```
+

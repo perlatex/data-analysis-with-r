@@ -1,0 +1,28 @@
+---
+title: "Do workers in richer countries work longer hours?"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+## 课后作业
+
+重复这张图
+
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/eda_working-hours.jpg")
+```
+
+
+数据来源<https://ourworldindata.org/time-use#do-workers-in-richer-countries-work-longer-hours>
+
+可以点击图中DOWNLOAD按钮，可以获取相应的数据。

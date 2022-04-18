@@ -166,6 +166,11 @@ knitr::include_graphics("images/tidyverse.png")
 \centering{https://www.tidyverse.org/}
 
 
+## tidyverse套餐
+
+```{r out.width = '90%', echo = FALSE}
+knitr::include_graphics("images/tidyverse_packages.png")
+```
 
 
 ## 以最快的速度获得一次成功的经验

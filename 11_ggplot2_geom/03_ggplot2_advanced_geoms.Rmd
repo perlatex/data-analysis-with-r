@@ -164,6 +164,15 @@ df %>%
 
 ## 增加拟合回归线
 
+### 线性回归
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE)
+```
+
+
 ### 多项式回归
 ```{r}
 penguins %>%
@@ -183,14 +192,26 @@ penguins %>%
 ```
 
 
-### 线性回归
+
 ```{r}
 penguins %>%
-  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_point() +
-  geom_smooth(method = lm, se = FALSE)
+  geom_smooth(method = "lm", se = FALSE, aes(color = "black")) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = FALSE, aes(color = "red")) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 3), se = FALSE, aes(color = "blue")) +
+  geom_smooth(
+    method = "gam", formula = y ~ s(x, bs = "cs", fx = TRUE, k = 20), 
+    se = FALSE, 
+    aes( color = "orange")
+  ) +
+  scale_color_identity(
+    name = "model fit",
+    breaks = c("black", "red", "blue", "orange"),
+    labels = c("linear", "quadratic", "cubic", "gam"),
+    guide = "legend"
+    )
 ```
-
 
 
 ### 逻辑回归 
