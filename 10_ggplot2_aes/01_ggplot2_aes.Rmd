@@ -290,6 +290,20 @@ ggplot(penguins) +
 ```
 
 
+> 第一次接触，感觉有点不友好？不急，我们慢慢来，因为它们都是可爱的小企鹅
+
+```{r}
+penguins %>% 
+  mutate(cute = "yes") %>% 
+  ggplot() +
+  geom_point(aes(x = bill_length_mm, y = bill_depth_mm, color = cute))
+
+
+penguins %>% 
+  ggplot() +
+  geom_point(aes(x = bill_length_mm, y = bill_depth_mm, color = "yes"))
+```
+
 
 
 # 几何形状
