@@ -20,7 +20,7 @@ output:
 
 
 
-# 数据来源
+## 数据来源
 
 可以点击图中DOWNLOAD按钮，可以获取相应的数据。我这里已经下载，放在data文件夹里
 
@@ -36,29 +36,42 @@ df_raw
 glimpse(df_raw)
 ```
 
+## 观察图片
 
-插播一个好用的宏包
-```{r}
+可能要解决的问题：
+
+- 列名的整理
+- 缺失值处理
+- 只选取最近的年份
+- 由国家名到所在的洲（可能会用到宏包`countrycode`）
+
+```{r, eval=FALSE}
 library(countrycode)
 
 # 输入国家名，得到国家名的简写代码
-countrycode(c('United States', 'Algeria'), origin = 'country.name', destination = 'iso3c')
+countrycode(c("United States", "Algeria"), origin = "country.name", destination = "iso3c")
 
 # 与上相反，从简写代码到国家名
-countrycode(c('USA', 'DZA'), origin = 'iso3c', destination = 'country.name')
+countrycode(c("USA", "DZA"), origin = "iso3c", destination = "country.name")
 
 # 输入国家名的简写，得到所在洲
-countrycode(c('USA', 'CHN'), origin = "iso3c", destination = "continent")
+countrycode(c("USA", "CHN"), origin = "iso3c", destination = "continent")
 ```
 
+- 坐标断点和标签的设置
+- 配色，可以使用工具<https://color.adobe.com/zh/create/color-wheel>提前原图的色彩
+- 图例用的是方形的点
+
+
+## 数据整理
 
 ```{r}
-df <- df_raw %>% 
-  janitor::clean_names() %>% 
-  rename(country = entity, working_hours = 4, gdp_per_cap = 5, population = 6) %>% 
-  select(-continent) %>% 
-  mutate(continent = countrycode::countrycode(code, origin = "iso3c", destination = "continent")) %>% 
-  drop_na() %>% 
+df <- df_raw %>%
+  janitor::clean_names() %>%
+  rename(country = entity, working_hours = 4, gdp_per_cap = 5, population = 6) %>%
+  # select(-continent) %>%
+  # mutate(continent = countrycode::countrycode(code, origin = "iso3c", destination = "continent")) %>%
+  drop_na() %>%
   slice_max(year)
 
 df
@@ -69,7 +82,7 @@ df
 
 工作时间最长的国家
 ```{r}
-df %>% 
+df %>%
   arrange(desc(working_hours))
 ```
 
@@ -81,45 +94,55 @@ corr_log <- cor(df$working_hours, log10(df$gdp_per_cap))
 
 ## 可视化
 ```{r}
-highlight_countries <- c("Cambodia", "Germany", "United States", "South Africa",
-                         "Singapore", "Mexico", "Argentina", "Brazil", "India",
-                         "China", "Nigeria")
+highlight_countries <- c(
+  "Cambodia", "Germany", "United States", "South Africa",
+  "Singapore", "Mexico", "Argentina", "Brazil", "India",
+  "China", "Nigeria"
+)
 ```
 
+
+
 ```{r}
-df %>% 
+df %>%
   ggplot(aes(x = gdp_per_cap, y = working_hours)) +
-  geom_point(aes(size = population, fill = continent, color = continent), shape = 21, alpha = 0.7) +
+  geom_point(aes(size = population, fill = continent), shape = 21, alpha = 0.7) +
   ggrepel::geom_text_repel(
-    #data = df %>% filter(country %in% highlight_countries),
-    aes(label = country), 
-    size = 2.5, 
+    # data = df %>% filter(country %in% highlight_countries),
+    aes(label = country, color = continent),
+    size = 2.5,
     min.segment.length = 0,
     segment.size = 0.2
   ) +
-  # geom_smooth(method = lm, color = "#141F52", fill = "grey72", size = 1.5,
-  #             fullrange = TRUE) +
+  geom_smooth(method = lm, color = "#141F52", fill = "grey72", size = 1, fullrange = TRUE) +
   scale_x_continuous(
-   name = "GDP per capita (int.-$)",
-   limits = c(10000, 70000),
-   breaks = 10000 * seq(1, 7, by = 1),
-   labels = scales::label_dollar()
+    name   = "GDP per capita (int.-$)",
+    limits = c(10000, 70000),
+    breaks = 10000 * seq(1, 7, by = 1),
+    labels = scales::label_dollar()
   ) +
   scale_y_continuous(
-    name = "Annual working hours per worker",
+    name   = "Annual working hours per worker",
     limits = c(1400, 2400),
     breaks = seq(1400, 2400, by = 200),
     labels = scales::label_number(suffix = " h", big.mark = ",")
   ) +
   scale_size_continuous(range = c(1, 18)) +
-  scale_fill_manual(values = c(
-    "Africa" = "#F9C31F", "Americas" = "#F97A1F", "Asia" = "#E2365B",
-    "Europe" = "#36E2BD", "Oceania" = "#2E45B8")
-  ) + 
+  scale_fill_manual(
+    values = c(
+      "Africa"        = "#923E8B",
+      "Asia"          = "#2D8587",
+      "Europe"        = "#4C5C78",
+      "North America" = "#F7D3D2",
+      "Oceania"       = "#A8633C",
+      "South America" = "#932834"
+    ),
+    aesthetics = c("colour", "fill")
+  ) +
   guides(
-   # size = "none",
+    color = guide_none(),
     fill = guide_legend(override.aes = list(size = 4, shape = 22), keywidth = 1.5)
-    ) +
+  ) +
   labs(
     title = "Annual working hours vs. GDP per capita",
     subtitle = "Workers in poorer countries tend to work more...",
@@ -137,7 +160,5 @@ df %>%
 
 
 ```{r}
-ggsave("myplot.png", width = 12, height = 7, device = ragg::agg_png, dpi = 300)
+ggsave("myplot.png", width = 10, height = 6, device = ragg::agg_png, dpi = 300)
 ```
-
-
