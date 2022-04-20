@@ -58,8 +58,8 @@ countrycode(c("USA", "DZA"), origin = "iso3c", destination = "country.name")
 countrycode(c("USA", "CHN"), origin = "iso3c", destination = "continent")
 ```
 
-- 坐标断点和标签的设置
-- 配色，可以使用工具<https://color.adobe.com/zh/create/color-wheel>提前原图的色彩
+- 坐标轴断点和标签的设置
+- 配色，可使用工具<https://color.adobe.com/zh/create/color-wheel>提取原图的色彩
 - 图例用的是方形的点
 
 
