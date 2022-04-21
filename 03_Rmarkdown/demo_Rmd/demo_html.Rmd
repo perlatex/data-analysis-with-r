@@ -71,6 +71,19 @@ penguins %>%
   theme_minimal() 
 ```
 
+
+# 再看看
+
+```{r, fig.asp= 0.4, out.width= "95%", echo=FALSE}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(data = penguins %>% select(-species), color = "gray80") +
+  geom_point(aes(color = species)) +
+  facet_wrap(vars(species), ncol = 3) +
+  guides(color = guide_none())
+```
+
+
 # 结语
 
 我是一只快乐的小企鹅！
