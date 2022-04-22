@@ -5,13 +5,13 @@ date: "`r Sys.Date()`"
 output:
   xaringan::moon_reader:
     lib_dir: libs
+    css: [default, xaringan-themer.css]
     nature:
       ratio: 16:9
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -65,7 +65,7 @@ penguins %>%
 
 ## 看一看
 
-```{r, fig.asp = 0.6}
+```{r, fig.asp = 0.6, out.width= "50%", dpi=300}
 penguins %>%
   ggplot(aes(flipper_length_mm, body_mass_g, group = species)) +
   geom_point(aes(colour = species, shape = species), alpha = 0.7) +
@@ -78,7 +78,7 @@ penguins %>%
 
 ## 再看看
 
-```{r, fig.asp= 0.4, out.width= "95%", echo=FALSE}
+```{r, fig.asp= 0.4, out.width= "95%", dpi=300, echo=FALSE}
 penguins %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_point(data = penguins %>% select(-species), color = "gray80") +
@@ -92,4 +92,18 @@ penguins %>%
 
 ## 结语
 
-我是一只快乐的小企鹅！
+```{r echo=FALSE, out.width = '75%', fig.cap="一对企鹅互相依偎，欣赏著远方跳跃的灯光"}
+knitr::include_graphics("images/penguins-comfort.png")
+```
+
+<https://nypost.com/2020/12/23/ocean-photograph-awards-prize-goes-to-photo-of-embracing-penguins/>
+
+
+---
+class: center, middle
+
+# 感谢 R 语言的美!
+
+本幻灯片由 R 包 [**xaringan**](https://github.com/yihui/xaringan) 和 [**flipbookr**](https://github.com/EvaMaeRey/flipbookr) 生成
+
+
