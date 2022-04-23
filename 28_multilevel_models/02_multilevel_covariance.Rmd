@@ -1,0 +1,219 @@
+---
+title: "理解多层模型的一些补充说明"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+## Multivariate normal distribution
+
+理解多层模型，首先需要先了解**多元正态分布**。
+
+假定我们要模拟大一新生同学们的身高，基于常识可认为身高服从正态分布
+
+$$
+\begin{aligned}[t]
+\operatorname{height}_i &\sim \operatorname{normal}(\mu, \sigma) \\
+\end{aligned}
+$$
+
+
+```{r}
+rnorm(n = 50, mean = 170, sd = 4)
+```
+
+
+类似地，如果我们只模拟体重，也可以假定体重服从正态分布
+$$
+\begin{aligned}[t]
+\operatorname{weight}_i &\sim \operatorname{normal}(\mu, \sigma) \\
+\end{aligned}
+$$
+
+
+```{r}
+rnorm(n = 50, mean = 65, sd = 5)
+```
+
+
+但问题来了，我们把身高和体重放在一起，来看两者之间的关系
+```{r}
+library(tidyverse)
+
+df <- tibble(
+  height = rnorm(n = 50, mean = 170, sd = 4),
+  weight = rnorm(n = 50, mean = 65, sd = 5)
+)
+df
+```
+
+
+
+```{r}
+df %>% 
+  ggplot(aes(height, weight)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+反复运行几次，你会发现身高和体重两者的关联时正时负，没有发现身高和体重有什么关联。
+
+按照我们常识，身高和体重或多或少存在某种关联， 也就说我们这种模拟方法不科学。
+
+
+## 那该怎么模拟有关联的多个变量？
+
+我们需要同时模拟同学们的身高和体重。这两个变量，各自都有自己的均值和方差，但彼此又存在关联，这里有个非常有用的函数`MASS::mvrnorm()`，但`MASS::mvrnorm()`也很挑剔和讲究。
+
+$$
+\begin{aligned}[t]
+\begin{bmatrix} \text{height} \\ \text{weight} \end{bmatrix} & \sim \text{MVNormal} \left (\begin{bmatrix} 170 \\ 68 \end{bmatrix}, \mathbf{S}  \right ) 
+\end{aligned}
+$$
+
+`S`是协方差矩阵，它应该包含(每个变量各自的方差)以及(与其他变量的相关系数)的信息。后面给出具体写法。
+
+
+先上代码吧
+```{r}
+# 均值和方差要排排坐
+mu     <- c(170, 68)
+sigmas <- c(4,   5)  
+```
+ 
+
+```{r}
+# 假定相关系数为 0.8
+# 相关系数矩阵
+rho  <- matrix(c(1, 0.8, 0.8, 1), nrow = 2)
+```
+
+
+```{r}
+# 不仅仅要相关系数矩阵，小姐姐要的是协方差矩阵
+Msigma <- diag(sigmas) %*% rho %*% diag(sigmas)
+```
+
+
+```{r}
+# 前戏做足了，最后放入
+tb <- 
+  MASS::mvrnorm(n = 50, mu = mu, Sigma = Msigma) %>% 
+  data.frame() %>% 
+  rename_with(~ c("height", "weight")) %>% 
+  as_tibble()
+
+tb
+```
+
+```{r}
+tb %>% 
+  ggplot(aes(height, weight)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+
+$$
+\begin{aligned}[t]
+\begin{bmatrix} \text{height} \\ \text{weight} \end{bmatrix} & \sim \text{MVNormal} \left (\begin{bmatrix} 170 \\ 68 \end{bmatrix}, \mathbf{S}  \right ) 
+\end{aligned}
+$$
+
+这里协方差矩阵的计算
+$$
+\begin{aligned}[t]
+\mathbf S     & = \begin{bmatrix} \sigma_\alpha & 0 \\ 0 & \sigma_\beta \end{bmatrix} \mathbf R \begin{bmatrix} \sigma_\alpha & 0 \\ 0 & \sigma_\beta \end{bmatrix} \\
+& = \begin{bmatrix} 4 & 0 \\ 0 & 5 \end{bmatrix} \begin{bmatrix} 1 & 0.8 \\ 0.8 & 1 \end{bmatrix} \begin{bmatrix} 4 & 0 \\ 0 & 5 \end{bmatrix} \\
+\end{aligned}
+$$
+
+
+以上只是故事的开始。
+
+
+## 来到案例
+
+```{r}
+create_data <- function() {
+  df <- tibble(
+    ids = 1:100,
+    department = rep(c("sociology", "biology", "english", "informatics", "statistics"), 20),
+    bases = rep(c(40000, 50000, 60000, 70000, 80000), 20) * runif(100, .9, 1.1),
+    experience = floor(runif(100, 0, 10)),
+    raises = rep(c(2000, 500, 500, 1700, 500), 20) * runif(100, .9, 1.1)
+  )
+
+
+  df <- df %>% mutate(
+    salary = bases + experience * raises
+  )
+  df
+}
+```
+
+```{r}
+rnorm(100, 0, 1) # random + norm
+runif(100, 0, 1) # random + uniform
+```
+
+
+```{r}
+library(tidyverse)
+library(lme4)
+library(modelr)
+library(broom)
+library(broom.mixed)
+
+df <- create_data()
+df
+```
+
+
+```{r}
+m4 <- lmer(salary ~ 1 + experience + (1 + experience | department), data = df)
+m4 
+```
+
+
+
+上一节中的height和weight 说的是 1 + experience 的故事，具体来说
+
+-         1  对应着 department个截距，（有多少个department，就有多少个截距）
+- experience 对应着 department个斜率
+
+
+
+$$
+\begin{align*}
+\text{salary}_i & \sim \operatorname{Normal}(\mu_i, \sigma) \\
+\mu_i         & = \alpha + \alpha_{\text{department}_i} + (\beta + \beta_{\text{department}_i}) \text{experience}_i \\
+\begin{bmatrix} \alpha_\text{department} \\ \beta_\text{department} \end{bmatrix} & \sim \text{MVNormal} \left (\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \mathbf{S}  \right ) \\
+\mathbf S     & = \begin{bmatrix} \sigma_\alpha & 0 \\ 0 & \sigma_\beta \end{bmatrix} \mathbf R \begin{bmatrix} \sigma_\alpha & 0 \\ 0 & \sigma_\beta \end{bmatrix} \\
+\end{align*}
+$$
+
+
+```{r}
+broom.mixed::tidy(m4, effects = "fixed")
+broom.mixed::tidy(m4, effects = "ran_vals")
+```
+
+
+
+## 验证我们的想法
+
+```{r}
+equatiomatic::extract_eq(m4)
+```
+
+
