@@ -180,7 +180,7 @@ knitr::include_graphics("images/markdown_text.png")
 knitr::include_graphics("images/rmarkdown.png")
 ```
 
-<https://quarto.org>
+[Quarto, the next generation of RMarkdown](https://quarto.org)
 
 ---
 ## 伟大的工匠，谢益辉
