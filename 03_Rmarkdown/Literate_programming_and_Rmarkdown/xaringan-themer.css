@@ -1,0 +1,27 @@
+.inverse {
+  background-color: #43418A;
+  color: #FFFFFF;
+}
+
+/* Two-column layout */
+.left-column {
+  width: 33%;
+  height: 50%;
+  padding-top: 1em;
+}
+.right-column {
+  width: 65%;
+  float: left;
+  padding-top: 0em;
+}
+.pull-left {
+  width: 47%;
+}
+.pull-right {
+  width: 47%;
+}
+
+.remark-slide-content {
+  font-size: .7cm;
+  padding: 1em 4em 1em 4em;
+}

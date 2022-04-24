@@ -51,6 +51,20 @@ x
 mtcars
 ```
 
+
+## data.frame
+```{r}
+df <- data.frame(
+  name      = c("Alice", "Bob", "Carl", "Dave"),
+  age       = c(23, 34, 23, 25),
+  marriage  = c(TRUE, FALSE, TRUE, FALSE),
+  color     = c("red", "blue", "orange", "purple")
+)
+df
+```
+
+
+
 # 生成图片
 
 ```{r out.width = '100%'}
@@ -82,4 +96,5 @@ knitr::include_graphics("./images/my_girl.jpg")
 
 # 参考资料
 
+- <https://r4ds.had.co.nz/>
 - <https://bookdown.org/yihui/rmarkdown/html-document.html>

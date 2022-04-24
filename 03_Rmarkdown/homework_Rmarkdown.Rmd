@@ -1,0 +1,26 @@
+---
+title: "Rmarkdown文档"
+subtitle: "这是我的副标题"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    #code_folding: hide
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+# 作业
+
+- 写下此时的心情
+- 构建一个数据框，包含4个学生的姓名、性别、成绩
+- 插入一张你的女神的照片
+- 最后渲染生成html格式文档

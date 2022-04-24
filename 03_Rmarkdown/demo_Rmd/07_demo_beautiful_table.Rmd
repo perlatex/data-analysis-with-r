@@ -23,34 +23,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-大家好，我是你们的新朋友 Rmarkdown，有时候简写为Rmd。 你看到\*.Rmd，不要惊慌。现在我就来说说，我有什么不一样的功能吧...
 
-# 运行代码
-
-## object
-```{r}
-x <- 5
-x
-```
-
-
-## vector
-```{r}
-y <- 1:10
-y
-```
-
-
-## data.frame
-```{r}
-df <- data.frame(
-  name      = c("Alice", "Bob", "Carl", "Dave"),
-  age       = c(23, 34, 23, 25),
-  marriage  = c(TRUE, FALSE, TRUE, FALSE),
-  color     = c("red", "blue", "orange", "purple")
-)
-df
-```
+这里展示画漂亮表格的一种方法
 
 
 # 读入数据
@@ -114,7 +88,7 @@ rule10_wide %>%
 
 ```
 
-# 生成图片
+# 漂亮图片
 
 ```{r, echo = FALSE}
 #| fig.align: "center"
@@ -136,18 +110,3 @@ lincoln_weather %>%
   theme(axis.title.y = element_blank())
 
 ```
-
-# 插入图片
-
-```{r, echo = FALSE}
-#| fig.align: "center"
-#| out.width: "45%"
-#| fig.cap: "我的第一女神"
-
-knitr::include_graphics("./images/my_girl.jpg")
-```
-
-# 参考资料
-
-- <https://r4ds.had.co.nz/>
-- <https://bookdown.org/yihui/rmarkdown/html-document.html>
