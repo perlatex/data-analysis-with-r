@@ -23,11 +23,9 @@ knitr::opts_chunk$set(
 )
 ```
 
+这里展示更多高级的功能
 
-这里展示画漂亮表格的一种方法
-
-
-# 读入数据
+# 漂亮表格
 
 ```{r}
 library(tidyverse)
@@ -35,9 +33,6 @@ library(tidyverse)
 rule10_wide  <- read_rds("./data/rule10_wide.rds")
 rule10_wide 
 ```
-
-
-# 漂亮表格
 
 ```{r, echo = FALSE}
 library(gt)
@@ -110,3 +105,43 @@ lincoln_weather %>%
   theme(axis.title.y = element_blank())
 
 ```
+
+# 面板显示 {.tabset}
+
+## Data
+
+```{r}
+#| echo: false
+#| 
+library(palmerpenguins)
+penguins <- penguins %>% drop_na() 
+penguins
+```
+
+## Code
+
+```{r}
+#| label: levittown1
+#| cache: true
+#| echo: true
+#| fig.show: hide
+
+penguins %>%
+  ggplot(aes(flipper_length_mm, body_mass_g, group = species)) +
+  geom_point(aes(colour = species, shape = species), alpha = 0.7) +
+  scale_color_manual(values = c("darkorange", "purple", "cyan4")) +
+  theme_minimal() 
+```
+
+## Plot
+
+```{r}
+#| ref.label: levittown1
+#| out.width: "100%"
+#| fig.width: 6
+#| echo: false
+```
+
+
+# 参考
+- <https://bookdown.org/yihui/rmarkdown/>
