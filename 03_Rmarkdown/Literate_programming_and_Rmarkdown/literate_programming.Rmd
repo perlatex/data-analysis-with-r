@@ -103,7 +103,9 @@ R语言是用于统计分析，图形表示和报告的编程语言:
 knitr::include_graphics("images/tidyverse_packages.png")
 ```
 
-.center[<https://www.tidyverse.org/>]
+[Tidyverse](https://www.tidyverse.org/)是一系
+列 R 包的集合，包含了dplyr、ggplot2、tidyr、stringr等，从数据导入预处理，再到高级转化、可视化、
+建模和展示统统覆盖。
 
 
 ---
