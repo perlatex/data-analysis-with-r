@@ -234,7 +234,7 @@ knitr::include_graphics("images/markdown_hedgehog.png")
 
 
 ---
-## R markdown⽂档构成的核心元素
+## Rmarkdown⽂档构成的核心元素
 
 .left-column[
 
