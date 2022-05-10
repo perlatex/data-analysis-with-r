@@ -160,7 +160,7 @@ wide
 
 
 
-# 案例
+## 案例
 
 下面是企鹅宝宝嘴峰长度的密度分布
 
@@ -217,7 +217,6 @@ penguins %>%
   ggplot(aes(x = value, color = index)) +
   geom_density() +
   facet_wrap(vars(index), scales = "free")
-  
 ```
 
 
@@ -240,7 +239,6 @@ penguins %>%
 
 可以调整为山峦图，也方便
 
-
 ```{r}
 penguins %>%
   select(species, bill_length_mm:body_mass_g) %>%
@@ -253,6 +251,48 @@ penguins %>%
   ggridges::geom_density_ridges() +
   facet_wrap(vars(index), scales = "free")
 ```
+
+## 有用的参数
+
+假定这个四个小朋友跳绳进步的记录
+
+```{r}
+skipping <- tibble::tribble(
+    ~name, ~`week-1`, ~`week-2`, ~`week-3`,
+  "Alice",       40,       60,       98,
+    "Bob",       50,       70,      120,
+  "Carol",       55,       81,      116,
+   "Dave",       4L,       83,      119
+  )
+
+skipping
+```
+
+
+```{r}
+skipping_longer <- skipping %>% 
+  pivot_longer(
+    cols         = `week-1`:`week-3`,
+    names_to     = "week",
+    names_prefix = "week-",   # 去掉前缀
+    values_to    = "value"
+  )
+
+skipping_longer
+```
+
+
+
+```{r}
+skipping_longer %>% 
+  pivot_wider(
+   names_from   = week,
+   names_prefix = "week-",    # 增加前缀
+   values_from  = value
+)
+```
+
+
 
 
 # 课堂练习
