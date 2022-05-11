@@ -1,5 +1,5 @@
 ---
-title: "数据规整"
+title: "数据规整与高级转换"
 author: "王小二"
 date: "`r Sys.Date()`"
 output: 
@@ -107,7 +107,7 @@ long
 ```{r, eval=FALSE}
 plant_height %>% 
   pivot_longer(
-    cols = -Day,     # A:D 或者 c(A, B, C, D) 或者 c("A", "B", "C", "D"), 或者-1, 或者2:5
+    cols = -Day,  # A:D 或者 c(A, B, C, D) 或者 c("A", "B", "C", "D"), 或者-1, 或者2:5
     names_to = "plant",
     values_to = "height"
 )
@@ -143,7 +143,7 @@ knitr::include_graphics("images/sandwich_pivot.jpg")
 
 ## 长表格变成宽表格
 
-如果，长表格变回宽表格呢？需要用到`pivot_wider()`
+如果，长表格想变回宽表格呢？需要用到函数`pivot_wider()`
 
 ```{r}
 wide <- long %>% 
@@ -215,7 +215,7 @@ penguins %>%
   ) %>% 
   
   ggplot(aes(x = value, color = index)) +
-  geom_density() +
+  geom_density(show.legend = FALSE) +
   facet_wrap(vars(index), scales = "free")
 ```
 
@@ -309,9 +309,10 @@ penguins %>%
   ) %>%
   
   ggplot(aes(x = sex, y = value, color = sex)) +
-  geom_boxplot() +
+  geom_boxplot(aes(fill = sex), alpha = 0.2) +
   geom_jitter() +
-  facet_wrap(vars(index), ncol = 4, scales = "free")
+  facet_wrap(vars(index), ncol = 4, scales = "free") +
+  theme(legend.position = "none")
 ```
 
 
