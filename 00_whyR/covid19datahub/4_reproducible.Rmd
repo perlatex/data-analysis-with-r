@@ -38,14 +38,14 @@ slider用于计算滚动平均。
 ```{r}
 library(tidyverse)
 library(slider)
-library(COVID19)
+library(COVID19)  # 宏包可以获取全球数据
 ```
 
 
-我们选取美国在2020-10-01到2022-12-31这个期间的数据
+我们选取美国在2020-10-01到2022-05-05这个期间的数据
 
 ```{r}
-df <- covid19("US", start = "2020-10-01", end = "2022-01-04", verbose = FALSE)
+df <- covid19("US", start = "2020-10-01", end = "2022-05-05", verbose = FALSE)
 ```
 
 
@@ -100,10 +100,10 @@ df %>%
   ) +
   geom_path() +
   geom_path(aes(y = `7_day_avg`), color = "red") +
-  scale_x_date(name = NULL, breaks = "2 month") +
+  scale_x_date(name = NULL, breaks = "3 month") +
   labs(
     title = "美国新冠肺炎每日确诊病例",
-    subtitle = "数据来源https://github.com/covid19datahub/R"
+    subtitle = "数据来源 https://github.com/covid19datahub/R"
   ) +
   theme_classic()
 ```
