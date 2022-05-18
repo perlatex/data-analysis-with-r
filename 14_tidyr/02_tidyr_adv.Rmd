@@ -91,7 +91,7 @@ long %>%
 df %>%
   pivot_longer(
     cols = rt_word:acc_nonword,
-    names_to = c(".value", "condition"),
+    names_to = c(".value", "condition"), # .value 代替了 values_to 
     names_sep = "_"
   )
 ```
