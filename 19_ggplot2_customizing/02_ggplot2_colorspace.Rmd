@@ -14,10 +14,9 @@ output:
     df_print: paged
 ---
 
-## 配色
+# 配色
 
-
-先对比下
+先对比下，以下两种配色，哪个舒服些？
 ```{r}
 colorspace::swatchplot(c("red", "green", "blue", "cyan", "magenta", "yellow"))
 ```
@@ -34,8 +33,9 @@ colorspace::swatchplot(c("firebrick", "springgreen4", "blue3", "turquoise3", "da
 - 使用相对柔和的颜色`"firebrick"`, `"springgreen4"`, `"blue3"`, `"turquoise3"`, `"darkorchid2"`, `"gold2"`，会让人觉得舒服
 
 
+我缺乏艺术细胞，所以用{colorspace}，{MetBrewer}，{paletteer}以及{ggthemr} 宏包偷懒。
 
-## colorspace
+# colorspace
 
 我个人比较喜欢[colorspace](http://colorspace.r-forge.r-project.org/articles/color_spaces.html)中的配色，今天我们就讲讲如何使用这个宏包！
 
@@ -53,19 +53,19 @@ colorspace::swatchplot(c("firebrick", "springgreen4", "blue3", "turquoise3", "da
 
 
 ```{r}
-colorspace::qualitative_hcl(n = 4, palette = "Dark 2") %>% 
+colorspace::qualitative_hcl(n = 4, palette = "Dark 2") %>%
   colorspace::swatchplot()
 ```
 
 
 ```{r}
-colorspace::sequential_hcl(n = 7, palette = "Peach") %>% 
+colorspace::sequential_hcl(n = 7, palette = "Peach") %>%
   colorspace::swatchplot()
 ```
 
 
 ```{r}
-colorspace::diverging_hcl(n = 7, palette = "Tropic") %>% 
+colorspace::diverging_hcl(n = 7, palette = "Tropic") %>%
   colorspace::swatchplot()
 ```
 
@@ -83,51 +83,222 @@ hcl_palettes(plot = TRUE)
 ```{r}
 library(tidyverse)
 library(palmerpenguins)
-library(colorspace)    
+library(colorspace)
 ```
 
 
 ```{r}
-penguins %>% 
-   ggplot(aes(bill_length_mm, fill = species)) +
-   geom_density(alpha = 0.6)
+penguins %>%
+  ggplot(aes(bill_length_mm, fill = species)) +
+  geom_density(alpha = 0.6)
 ```
 
 
 ```{r}
-penguins %>% 
-   ggplot(aes(bill_length_mm, fill = species)) +
-   geom_density(alpha = 0.6) +
-   scale_fill_discrete_qualitative(palette = "cold")
+penguins %>%
+  ggplot(aes(bill_length_mm, fill = species)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_discrete_qualitative(palette = "cold")
 ```
 
 
 
 ```{r}
-penguins %>% 
-   ggplot(aes(bill_length_mm, fill = species)) +
-   geom_density(alpha = 0.6) +
-   scale_fill_discrete_sequential(palette = "Peach")
+penguins %>%
+  ggplot(aes(bill_length_mm, fill = species)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_discrete_sequential(palette = "Peach")
 ```
 
 
 ```{r}
-penguins %>% 
-   ggplot(aes(bill_length_mm, fill = species)) +
-   geom_density(alpha = 0.6) +
-   scale_fill_discrete_diverging(palette = "Tropic")
+penguins %>%
+  ggplot(aes(bill_length_mm, fill = species)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_discrete_diverging(palette = "Tropic")
 ```
 
 
 
-## MetBrewer
+# MetBrewer
 
 ```{r}
 library(MetBrewer) # https://github.com/BlakeRMills/MetBrewer
-
-penguins %>% 
-   ggplot(aes(bill_length_mm, fill = species)) +
-   geom_density(alpha = 0.6) +
-   scale_fill_manual(values = met.brewer("Renoir", 3))
 ```
- 
+
+MetBrewer调色板灵感来自纽约大都会艺术博物馆的作品。
+
+```{r, out.width = '80%', fig.align='center', echo = FALSE}
+knitr::include_graphics(path = "images/VanGogh2.png")
+```
+
+用如下代码获取颜色
+```{r}
+met.brewer("VanGogh2")
+```
+
+## 在ggplot2中的应用
+```{r}
+penguins %>%
+  ggplot(aes(bill_length_mm, fill = species)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_manual(values = met.brewer("VanGogh2", 3))
+```
+
+```{r}
+penguins %>%
+  ggplot(aes(bill_length_mm, fill = species)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_manual(values = met.brewer("Renoir", 3))
+```
+
+
+我比较得意的一张图
+```{r}
+df <- tibble(
+  x = rnorm(1000),
+  y = rnorm(1000),
+  g = seq(1, 10, length.out = 1000)
+)
+
+df %>%
+  ggplot(aes(x = x, y = y, color = g)) +
+  geom_point() +
+  scale_colour_gradientn(colors = met.brewer("Signac")) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    plot.background = element_rect(color = "grey20", fill = "grey20"),
+    legend.position = "none"
+  )
+```
+
+# paletteer
+
+paletteer宏包是一个大合集，共用2392个调色盘
+
+```{r}
+library(paletteer) # https://github.com/EmilHvitfeldt/paletteer
+```
+
+paletteer 中的调色盘，可以分成两类：discrete and continuous
+
+1. discrete palettes
+
+- fixed width palettes 调色盘内的颜色和数量都是固定的
+
+```{r echo=FALSE}
+library(paletteer)
+pals::pal.bands(
+  paletteer_d("nord::frost"),
+  paletteer_d("dutchmasters::milkmaid"),
+  paletteer_d("LaCroixColoR::Lime"),
+  main = "Fixed width palettes",
+  labels = c("nord\n frost", "dutchmasters\n milkmaid", "LaCroixColoR\n Lime")
+)
+```
+
+可以通过代码，查看一下这类调色盘有哪些：
+
+```{r}
+palettes_d_names
+```
+
+还可以使用代码，将调色盘在结果中展示出来。例如，前面图片中的第二个调色盘{dutchmasters}中"milkmaid"：
+
+```{r}
+paletteer_d("dutchmasters::milkmaid")
+```
+
+
+
+- dynamic palettes， 
+
+该类调色盘内的颜色是动态变化的，但是颜色个数不能超过该调色盘的最大个数
+
+```{r echo=FALSE}
+pals::pal.bands(
+  paletteer_dynamic("cartography::green.pal", 2),
+  paletteer_dynamic("cartography::green.pal", 5),
+  paletteer_dynamic("cartography::green.pal", 8),
+  main = "Dynamic palettes",
+  labels = c(
+    "cartography\n green.pal\n n = 2",
+    "cartography\n green.pal\n n = 5",
+    "cartography\n green.pal\n n = 6"
+  )
+)
+```
+
+```{r}
+palettes_dynamic_names
+```
+
+第一个{cartography}中的blue.pal，最大长度为20个。假设我们想要5种颜色，可以这么做：
+
+```{r}
+paletteer_dynamic("cartography::blue.pal", 5)
+```
+假设我们想要12种颜色，可以这么做：
+
+
+```{r}
+paletteer_dynamic("cartography::blue.pal", 12)
+```
+
+2. continuous palettes
+
+调色盘中颜色是连续的，如下图
+
+```{r}
+pals::pal.bands(
+  paletteer_c("viridis::inferno", 256),
+  paletteer_c("grDevices::terrain.colors", 256),
+  paletteer_c("scico::berlin", 256),
+  main = "continuous palettes",
+  labels = c("viridis\n inferno", "grDevices\n terrain.colors", "scico\n berlin")
+)
+```
+
+看下其中调色盘的信息：
+```{r}
+palettes_c_names
+```
+
+
+## 在ggplot2中使用调色盘作图
+
+- 离散的色彩用函数`scale_fill_paletteer_d()`
+```{r}
+penguins %>%
+  ggplot(aes(bill_length_mm, fill = species)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_paletteer_d("awtools::ppalette")
+```
+
+
+- 连续的色彩用函数`scale_fill_paletteer_c()`
+```{r}
+penguins %>%
+  ggplot(aes(bill_length_mm, bill_depth_mm, color = body_mass_g)) +
+  geom_point() +
+  scale_colour_paletteer_c("gameofthrones::tully")
+```
+
+# ggthemr
+
+```{r}
+library(ggthemr) # https://github.com/Mikata-Project/ggthemr
+ggthemr("dust")
+
+penguins %>%
+  ggplot(aes(x = species, fill = species)) +
+  geom_bar(width = 0.6)
+
+ggthemr_reset()
+```
+
+# 取色器
+
+- 取色器https://color.adobe.com/zh/create/color-wheel
+- 把图片拉进去，可以得到图片中颜色hex值，是不是很神奇？
