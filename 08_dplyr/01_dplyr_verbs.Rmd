@@ -266,6 +266,15 @@ df %>% select(starts_with("s") | ends_with("e"))
 df %>% select(!starts_with("s"))
 ```
 
+选取所有列
+```{r}
+df %>% select(everything())
+```
+
+选取最后一列
+```{r}
+df %>% select(last_col())
+```
 
 ## 修改列名 `rename()`
 

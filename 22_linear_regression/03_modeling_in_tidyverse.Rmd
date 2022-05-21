@@ -95,6 +95,12 @@ mod1 %>%
 ```
 
 
+### 弄成发表质量的表格
+```{r}
+library(gtsummary)
+mod1 %>% 
+  tbl_regression()
+```
 
 
 

@@ -1,0 +1,43 @@
+---
+title: "批量读取文件"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+read_plus <- function(flnm) {
+  
+  readxl::read_excel(flnm) %>% 
+    dplyr::mutate(
+      file = basename(flnm) %>% str_remove(pattern = ".xls"),
+      .before = 1
+    )
+  
+}
+```
+
+
+```{r}
+df <- 
+  here::here("data") %>% 
+  fs::dir_ls(regexp = "*.xls", recurse = TRUE) %>%  
+  purrr::map_dfr(~read_plus(.)) 
+
+```
+

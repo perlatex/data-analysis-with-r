@@ -144,12 +144,28 @@ wages <- read_csv("./data/wages.csv")
 head(wages, 6)
 ```
 
+## 数据探索
+```{r}
+glimpse(wages)
+```
+
+## 变量类型
+
+```{r, out.width='85%', fig.align='center', echo=FALSE}
+knitr::include_graphics("./images/variable_types.png")
+```
 
 ## 范例 
 ```{r}
 library(readxl)
 d <- read_excel("../demo_data/olympics.xlsx")
 tail(d, 6)
+```
+
+## 数据探索
+```{r}
+library(visdat)
+vis_miss(d)
 ```
 
 

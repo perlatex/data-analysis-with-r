@@ -190,10 +190,15 @@ penguins %>%
 ```
 
 
-
 ```{r}
 penguins %>% 
   slice(1)
+```
+
+
+```{r}
+penguins %>% 
+  slice(1:5)
 ```
 
 
@@ -203,6 +208,29 @@ penguins %>%
   slice(1)
 ```
 
+
+```{r}
+penguins %>% 
+  slice_head(n = 5)
+```
+
+
+```{r}
+penguins %>% 
+  slice_tail(n = 5)
+```
+
+
+```{r}
+penguins %>% 
+  slice_sample(n = 5)
+```
+
+
+```{r}
+penguins %>% 
+  slice_sample(prop = 0.1)
+```
 
 
 ## 嘴峰长度最大那一行
@@ -227,11 +255,29 @@ penguins %>%
   slice_max(bill_length_mm)
 ```
 
+
+```{r}
+penguins %>% 
+  slice_max(bill_length_mm, n = 3)
+```
+
+
+```{r}
+penguins %>% 
+  slice_max(bill_length_mm, prop = 0.01)
+```
+
+
+
 ```{r}
 penguins %>% 
   group_by(species) %>% 
   slice_max(bill_length_mm)
 ```
+
+
+
+
 
 ## separate
 ```{r}

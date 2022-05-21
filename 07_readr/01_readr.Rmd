@@ -15,7 +15,35 @@ output:
 ---
 
 
-## 习题
+## 读取csv数据
+
+```{r}
+library(readr)
+
+wages <- read_csv("./demo_data/wages.csv")
+
+head(wages, 6)
+```
+
+
+
+```{r}
+glimpse(wages)
+```
+
+
+
+## 读取excel数据
+
+```{r}
+library(readxl)
+d <- read_excel("../demo_data/olympics.xlsx")
+
+tail(d, 6)
+```
+
+
+## 读取rds数据
 
 读取demo_data文件夹下`kidiq.RDS`文件
 
@@ -30,4 +58,14 @@ output:
 | mom_iq     	| 母亲IQ值         	|
 | mom_age    	| 母亲年龄         	|
 
+
+
+
+## read_tsv() for tab-separated values (*.tsv) files
+
+## read_delim() 
+
+## read_fwf() for fixed width files
+
+## read_table() for tabular files where columns are separated by white-space.
 
