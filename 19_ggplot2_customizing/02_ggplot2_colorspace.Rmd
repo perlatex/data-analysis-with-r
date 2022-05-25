@@ -14,6 +14,10 @@ output:
     df_print: paged
 ---
 
+```{r}
+library(tidyverse)
+```
+
 # 配色
 
 先对比下，以下两种配色，哪个舒服些？
@@ -74,7 +78,7 @@ colorspace::diverging_hcl(n = 7, palette = "Tropic") %>%
 
 根据你需要颜色的三大种类，先找适合的模板palettes
 ```{r}
-hcl_palettes(plot = TRUE)
+colorspace::hcl_palettes(plot = TRUE)
 ```
 
 
@@ -287,8 +291,10 @@ penguins %>%
 
 # ggthemr
 
+[ggthemr](https://github.com/Mikata-Project/ggthemr) 从整体上修改图片的配色
+
 ```{r}
-library(ggthemr) # https://github.com/Mikata-Project/ggthemr
+library(ggthemr)  # devtools::install_github('Mikata-Project/ggthemr')
 ggthemr("dust")
 
 penguins %>%
