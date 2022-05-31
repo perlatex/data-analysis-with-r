@@ -157,7 +157,7 @@ ToothGrowth %>%
 ## 简单统计
 ```{r}
 ToothGrowth %>%
-  group_by(supp) %>%
+  group_by(dose) %>%
   summarise(
     mean_length = mean(length)
   )
