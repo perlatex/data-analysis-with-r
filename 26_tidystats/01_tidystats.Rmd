@@ -1,0 +1,280 @@
+---
+title: "维生素摄入方法和剂量对豚鼠牙齿生长的影响"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+```{r, include = F}
+knitr::opts_chunk$set(
+  fig.asp = 0.618,
+  fig.align = "center",
+  out.width = "100%",
+  dpi = 300,
+  message = FALSE, 
+  warning = FALSE
+  )
+```
+
+
+# 从一个案例开始
+
+这个数据集记录着 60 只豚鼠在不同的摄入方法和不同维生素剂量下，牙齿的生长情况
+
+- length : 牙齿长度
+- supp   : 两种摄入方法 (橙汁和维生素片)
+- dose   : 维生素剂量 (0.5, 1, and 2 mg/day) 
+
+
+首先，我们要读入数据并做简单预处理
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+
+ToothGrowth <-
+  read_csv("./data/ToothGrowth.csv") %>%
+  mutate(
+    across(c(dose, supp), as.factor)
+  )
+
+ToothGrowth
+```
+
+
+
+
+
+# 问题一：喝橙汁 vs 吃药片，谁的牙齿长？
+
+
+## 可视化探索
+
+- 散点图
+```{r}
+ToothGrowth %>%
+  ggplot(aes(x = supp, y = length)) +
+  geom_point()
+```
+
+- 密度图
+```{r}
+ToothGrowth %>%
+  ggplot(aes(x = length)) +
+  geom_density(aes(color = supp))
+```
+
+
+- 箱线图
+```{r}
+ToothGrowth %>%
+  ggplot(aes(x = supp, y = length)) +
+  geom_boxplot(alpha = 0.3)
+```
+
+
+- 抖散图
+```{r}
+ToothGrowth %>%
+  ggplot(aes(x = supp, y = length)) +
+  geom_boxplot(alpha = 0.3) +
+  geom_jitter()
+```
+
+
+
+## 计算两种摄入方法下，牙齿长度的均值
+
+分组统计
+
+```{r}
+ToothGrowth %>%
+  group_by(supp) %>%
+  summarise(
+    mean_length = mean(length)
+  )
+```
+
+
+
+
+## 喝橙汁的豚鼠比吃维生素片的牙齿要长？
+
+从统计学角度回答，`双样本T检验`(这里supp的层级只有2层)或者`单因素方差分析`都是可以的
+
+```{r}
+t.test(length ~ supp, data = ToothGrowth)
+```
+
+虽然喝橙子的均值要高于吃药片的，但这里p值0.06 > 0.05，而且95%置信区间包含了0，所以**从上述假设模型来看**，不能说明喝橙汁的豚鼠一定比吃维生素片的牙齿要长。
+
+
+## 看专家怎么说
+```{r}
+library(report)
+
+mod1 <- t.test(length ~ supp, data = ToothGrowth)
+
+report(mod1)
+```
+
+
+## 统计加绘图，不得不服
+
+将数据可视化和统计建模作是数据分析的两个不同阶段，`ggstatsplot`宏包将他们融为一体，生成的图片可以直接用于发表。
+我认为，它更多的价值在与，检验我们对统计结果的认识。
+
+```{r}
+library(ggstatsplot)
+ggbetweenstats(
+  data = ToothGrowth,
+  x = supp,
+  y = length
+)
+```
+
+
+
+
+# 问题二：维生素摄入剂量对豚鼠牙齿生长是否存在显著影响？
+
+## 先画个图
+```{r}
+ToothGrowth %>%
+  ggplot(aes(x = dose, y = length)) +
+  geom_boxplot(alpha = 0.3) +
+  geom_jitter()
+```
+
+
+## 简单统计
+```{r}
+ToothGrowth %>%
+  group_by(supp) %>%
+  summarise(
+    mean_length = mean(length)
+  )
+```
+
+
+## 单因素方差分析
+```{r}
+aov(length ~ dose, data = ToothGrowth) %>%
+  summary()
+```
+
+## 组间比较
+```{r}
+library(ggstatsplot)
+ggbetweenstats(
+  data = ToothGrowth,
+  x = dose,
+  y = length
+)
+```
+
+
+# 问题三：维生素摄入方法和剂量对豚鼠牙齿生长是否存在显著影响？
+
+摄入方法和摄入剂量，两个因素都要考虑进来
+
+
+## 分组画图看看
+```{r}
+ToothGrowth %>%
+  ggplot(aes(x = supp, y = length, fill = supp)) +
+  geom_boxplot() +
+  facet_wrap(vars(dose)) +
+  labs(title = "维生素摄入方法和剂量对豚鼠牙齿长度的影响")
+```
+
+
+## 不同摄入方法和不同摄入剂量下，牙齿长度的均值
+
+分组统计
+
+```{r}
+ToothGrowth %>%
+  group_by(supp, dose) %>%
+  summarise(
+    mean_length = mean(length)
+  )
+```
+
+
+
+
+## 摄入方法和摄入剂量，对豚鼠牙齿长度是否存在显著影响？
+
+这里是两个解释变量，所以需要双因素方差分析 (ANOVA)
+
+```{r}
+aov(length ~ supp + dose, data = ToothGrowth) %>%
+  summary()
+```
+
+表明摄入方法、摄入剂量对牙齿生长的影响都是显著的。
+
+
+## 看专家怎么说
+
+```{r}
+library(report)
+mod2 <- aov(length ~ supp + dose, data = ToothGrowth)
+report(mod2)
+```
+
+
+
+# 问题四：在不同剂量下，两种摄入方法对结果是否存在显著影响？
+
+## 还是画图看看
+```{r}
+ToothGrowth %>%
+  ggplot(aes(x = dose, y = length, color = supp)) +
+  geom_boxplot(alpha = 0.3, position = position_dodge(0.8)) +
+  geom_jitter(position = position_jitterdodge(dodge.width = 0.8)) +
+  theme_classic()
+```
+
+## 分组统计
+```{r}
+ToothGrowth %>%
+  group_by(dose) %>%
+  group_modify(
+    ~ t.test(length ~ supp, data = .x) %>%
+      broom::tidy()
+  )
+```
+
+
+## 用 rstatix 统计
+
+```{r}
+library(rstatix)
+ToothGrowth %>%
+  group_by(dose) %>%
+  rstatix::t_test(length ~ supp)
+```
+
+
+
+## 不同剂量之间是否也存在差异？
+使用 `ggstatsplot()` 宏包
+
+```{r, fig.width = 10}
+ToothGrowth %>%
+  ggstatsplot::grouped_ggbetweenstats(
+    x = supp,
+    y = length,
+    grouping.var = dose,
+    pairwise.display = "all"
+  )
+```
