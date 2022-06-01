@@ -413,7 +413,7 @@ library(ggplot2)
 
 ---
 layout: true
-# ggbetweenstats()  组间比较
+# ggbetweenstats() 组间比较
 ---
 
 --
@@ -494,7 +494,7 @@ layout: true
 
 ```{r}
 ToothGrowth %>% 
-  group_by(supp) %>% 
+  group_by(dose) %>% 
   summarise(
     mean_length = mean(length)
   ) %>% 

@@ -1,0 +1,35 @@
+---
+title: "two sample t-tests"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+# 提问
+
+我们以企鹅体征数据作为案例，假定企鹅就是我们的被试
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+penguins <- palmerpenguins::penguins %>%
+  drop_na()
+```
+
+提出问题：
+
+- 企鹅有男女两种性别(`female, male`)，不同性别的`bill_length_mm`的均值是否相同？
+
+- 企鹅种类有三种(`Adelie, Chinstrap, Gentoo`)，比较在每个种类下男企鹅和女企鹅`bill_length_mm`的均值是否相同？
+
+
