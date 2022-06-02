@@ -311,7 +311,22 @@ t.test(length ~ supp, data = ToothGrowth)
 
 ---
 layout: true
-# 本质上就是线性回归
+# T检验本质上是线性回归
+---
+
+```{r, fig.asp= 0.8, out.width= "40%", dpi = 300}
+ToothGrowth %>%
+  mutate(supp = if_else(supp == "VC", 1, 2)) %>%
+  ggplot(aes(x = supp, y = length)) +
+  geom_point() +
+  geom_smooth(method = "lm") #<<
+```
+
+
+
+---
+layout: true
+# T检验本质上是线性回归
 ---
 
 .pull-left[
@@ -328,7 +343,9 @@ t.test(length ~ supp, data = ToothGrowth) #<<
 
 使用 `lm()`
 ```{r}
-tbl <- ToothGrowth %>% mutate(supp = fct_rev(supp))
+tbl <- ToothGrowth %>% 
+  mutate(supp = fct_rev(supp))
+
 
 model <- lm(length ~ supp, data = tbl) #<<
 
@@ -336,11 +353,9 @@ confint(model)
 ```
 
 <br>
-<br>
 可以看到，95%的置信区间与用`t.test()`的结果一致。
 
 ]
-
 
 
 
