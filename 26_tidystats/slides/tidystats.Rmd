@@ -319,6 +319,12 @@ ToothGrowth %>%
   mutate(supp = if_else(supp == "VC", 1, 2)) %>%
   ggplot(aes(x = supp, y = length)) +
   geom_point() +
+  stat_summary(
+   fun = mean,
+   geom = "point",
+   color = "red",
+   size = 3
+  ) +
   geom_smooth(method = "lm") #<<
 ```
 
