@@ -1,7 +1,7 @@
 ---
 title: "第一章：配置R语言环境"
-author: "王敏杰"
-institute: "四川师范大学"
+author: "杰希"
+institute: "丁香园"
 date: "\\today"
 fontsize: 12pt
 output: binb::metropolis
@@ -43,10 +43,10 @@ knitr::opts_chunk$set(
 
 ## 第一步安装R
 
--   下载并安装R，官方网站<http://cran.r-project.org>
+-   下载并安装R，官方网站<https://cloud.r-project.org/>
 
 ```{r echo=FALSE, out.width = '85%'}
-knitr::include_graphics("images/Rinstall.png")
+knitr::include_graphics("images/R_download.png")
 ```
 
 ## 第二步安装RStudio
@@ -55,58 +55,77 @@ knitr::include_graphics("images/Rinstall.png")
 -   选择`RStudio Desktop`
 
 ```{r out.width = '85%', echo = FALSE}
-knitr::include_graphics("images/Rstudio_install.png")
+knitr::include_graphics("images/Rstudio_download.png")
 ```
 
 ## 注意事项
 
-这里有个小小的提示：
+- 先安装 R，然后安装 Rstudio
+- 安装在相同的盘符，比如，都安装在 D 盘
+- 安装路径\textcolor{red}{不要}有\textcolor{red}{中文}和\textcolor{red}{空格}。比如，这样就比较好
 
--   电脑用户名\textcolor{red}{不要}有\textcolor{red}{中文}和\textcolor{red}{空格}
+```{r out.width = '85%', echo = FALSE}
+knitr::include_graphics("images/install_path.png")
+```
 
--   尽量安装在非系统盘，比如，可以选择安装在D盘
+- 安装之后，不能修改两个文件夹里面的内容
 
--   安装路径\textcolor{red}{不要}有\textcolor{red}{中文}和\textcolor{red}{空格}。比如，这样就比较好
-
-    -   `D:/R`
-    -   `D:/Rstudio`
+<!-- \small -->
+<!-- 可观看视频[https://www.bilibili.com/video/BV1hA411e7k3](https://www.bilibili.com/video/BV1hA411e7k3)后安装 -->
 
 
-\small
-可观看视频[https://www.bilibili.com/video/BV1hA411e7k3](https://www.bilibili.com/video/BV1hA411e7k3)后安装
+# 初见Rstudio
+
+
+## 打开Rstudio
+```{r out.width = '55%', echo = FALSE}
+knitr::include_graphics("images/open_rstudio.png")
+```
+
+
+## 初见Rstudio
+```{r out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/first_rstudio.png")
+```
+
 
 
 ## RStudio很友好
 
 ```{r out.width = '85%', echo = FALSE}
-knitr::include_graphics("images/rstudio-editor1.png")
+knitr::include_graphics("images/rstudio-editor.png")
 ```
 
 
 ## RStudio很友好
 
-- 左上角是`Editor`窗口，负责编写代码
-- 左下角是`Console`窗口，可以键入命令
-- 右上角是`Environment`和`History`窗口，保存当前存储的数据和历史命令记录等
-- 右下角是`Plot`和`Help`窗口，用于显示绘制图片和帮助文档
+<!-- - 左上角是`Editor`窗口，负责编写代码 -->
+<!-- - 左下角是`Console`窗口，可以键入命令 -->
+<!-- - 右上角是`Environment`和`History`窗口，保存当前存储的数据和历史命令记录等 -->
+<!-- - 右下角是`Plot`和`Help`窗口，用于显示绘制图片和帮助文档 -->
 
-
-## R 与 RStudio 是什么关系呢
-
-\qquad \qquad \qquad R \hspace{4cm} RStudio
-
-```{r out.width = '45%', echo = FALSE}
-knitr::include_graphics(c("images/engine.jpg", "images/dashboard.jpg"))
+```{r out.width = '85%', echo = FALSE}
+knitr::include_graphics("images/rstudio-editor2.png")
 ```
 
-<!-- ## 使用 -->
 
-<!--  **Not this**: \hspace{2cm} **Open this**:  -->
+## Hello, R
 
-<!-- ```{r out.width = '45%', echo = FALSE, fig.align = "left"} -->
-<!-- knitr::include_graphics(c("images/Rlogo.png", "images/rstudio_ball.png")) -->
-<!-- ``` -->
+```{r out.width = '60%', echo = FALSE}
+knitr::include_graphics("images/test.png")
+```
 
+在Console内键入 `1 + 1` 并按回车后，将显示如下结果
+```{r}
+1 + 1
+```
+
+
+## R 与 RStudio 是什么关系呢？
+
+```{r out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/engine_dashboard.png")
+```
 
 
 
@@ -139,7 +158,7 @@ knitr::include_graphics("images/dont-load-data.png")
 
 
 
-## 第三步安装宏包
+## 安装宏包
 
 ```{r out.width = '65%', echo = FALSE}
 knitr::include_graphics("images/RStudio-Screenshot.png")
@@ -150,37 +169,38 @@ knitr::include_graphics("images/RStudio-Screenshot.png")
    - `install.packages("tidyverse")`
 
 
-## 使用宏包
+## 宏包是什么东东？(就是买回来的家电)
 
 ```{r out.width = '100%', echo = FALSE}
 knitr::include_graphics("images/loading_packages.png")
 ```
 
-# 测试
-
-## 测试
-
-```{r out.width = '65%', echo = FALSE}
-knitr::include_graphics("images/test.png")
-```
-
-在Console内键入 `1 + 1` 并按回车后，将显示如下结果
-```{r}
-1 + 1
-```
 
 
+# 脚本
 
-## 脚本
 
-通过Rstudio菜单栏依此点击`File > New File > R Script` 来创建一个新的脚本。**脚本**文件通常以`.R`作为文件的后缀名。
+## 创建脚本
+
+在Rstudio菜单栏
+
+- 依此点击`File > New File > R Script` 
+- 脚本文件通常以`.R`(或者`.Rmd`)作为文件的后缀名。
 
 ```{r intro-R-39, out.width = '75%', echo = FALSE}
-knitr::include_graphics("images/script1.png")
+knitr::include_graphics("images/New_R_Script2.png")
 ```
 
 
-## 脚本
+
+## 键入代码
+
+```{r intro-R-391, out.width = '80%', echo = FALSE}
+knitr::include_graphics("images/code.png")
+```
+
+
+## 运行脚本
 
 如何运行脚本呢？方法有很多
 
@@ -189,10 +209,18 @@ knitr::include_graphics("images/script1.png")
 knitr::include_graphics("images/script2.png")
 ```
 
-- 按住 `Ctrl` 键，然后按回车键`Enter`，可以运行**光标所在行**的代码
-- 点击 `Run`, 运行**光标所在行**的代码
-- 点击 `Source`，从头到尾运行当前脚本**全部**代码
-- 鼠标选中多行代码，然后点击 `Run`或者`Ctrl + Enter`
+1. 按住 `Ctrl` 键，然后按回车键`Enter`，可以运行**光标所在行**的代码
+2. 点击 `Run`, 运行**光标所在行**的代码
+3. 点击 `Source`，从头到尾运行当前脚本**全部**代码
+4. 鼠标选中多行代码，然后点击 `Run`或者`Ctrl + Enter`
+
+## 运行脚本
+
+这样会显得很专业
+
+```{r intro-R-401, out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/keyboard_Run.png")
+```
 
 
 ## 测试
@@ -267,7 +295,7 @@ ggplot(midwest, aes(x = area, y = poptotal)) +
 本文介绍\color{red}{免安装}的方法！
 
 
-## 云平台 
+## 云平台
 
 浏览器打开 https://rstudio.cloud/
 
@@ -275,8 +303,8 @@ ggplot(midwest, aes(x = area, y = poptotal)) +
 knitr::include_graphics("images/cloud/fig01.png")
 ```
 
-  
-## 注册 
+
+## 注册
 
 注册一个账号
 
@@ -284,8 +312,8 @@ knitr::include_graphics("images/cloud/fig01.png")
 knitr::include_graphics("images/cloud/fig02.png")
 ```
 
-  
-## 填入信息 
+
+## 填入信息
 
 ```{r, out.width = '100%', echo = FALSE}
 knitr::include_graphics("images/cloud/fig03.png")
@@ -305,7 +333,7 @@ knitr::include_graphics("images/cloud/fig04.png")
 knitr::include_graphics("images/cloud/fig05.png")
 ```
 \small
-复制 https://github.com/perlatex/data-analysis-with-r 
+复制 https://github.com/perlatex/data-analysis-with-r
 
 
 ## 开始界面

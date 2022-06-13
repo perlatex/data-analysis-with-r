@@ -1,7 +1,7 @@
 ---
 title: "R语言基础"
-author: "王敏杰"
-institute: "四川师范大学"
+author: "杰希"
+institute: "丁香园"
 date: "\\today"
 fontsize: 12pt
 output: binb::metropolis
