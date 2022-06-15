@@ -276,7 +276,12 @@ ggplot(midwest, aes(x = area, y = poptotal)) +
 -   安装宏包太慢，怎么解决？
 
 -   安装宏包，遇到报错信息"unable to access index for repository..."？
+ 
+可能需要选择国内镜像
 
+-   提示`C://users/???/documents`，文件名、目录名和卷标语法不正确，怎么回事
+
+这是你电脑开机用户名是中文导致的，建议使用英文注册一个新用户，在新用户名下，重新安装R和Rstudio
 
 # 如何使用Rstudio Cloud
 
