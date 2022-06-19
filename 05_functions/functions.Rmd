@@ -156,8 +156,8 @@ z <- c(4, 7, 7, 8, 9, 3, 9, 6)
 ## 自定义函数
 
 ```{r}
-my_std <- function(x) {
-   (x - mean(x)) / sd(x)
+my_std <- function(v) {
+   (v - mean(v)) / sd(v)
  }
 ```
 
@@ -169,29 +169,37 @@ my_std(z)
 
 现在`my_std` 是一个糖葫芦**瘦身机器**了（放进一个胖瘦不匀称的糖葫芦，出来一个身材匀称的糖葫芦）。
 
+```{r, echo = FALSE}
+knitr::include_graphics("./images/functions.png")
+```
+
+
+## 自定义函数的部件
+
 自己定义函数，需要四个关键部件：
 
-```{r, eval=FALSE}
-my_std <- function(x) {
-   ...
-}
+```{r, echo = FALSE}
+knitr::include_graphics("./images/r-function-syntax.png")
 ```
 
 
 - 创建，由`function()`创建一个函数
-- 参数，由`function()`括号里指定函数的参数，比如`function(x)`中的参数为 `x` 
-- 函数主体，一般情况下，在`function()`后跟随一对大括号`{ }`，在大括号里声明具体函数功能，在代码最后一行，可以用`return`返回计算后的值。当然，如果函数的目的只是返回最后一行代码计算的值，这个`return`可以省略。
-- 函数名，`function() { }` 赋值给新对象，比如这里的`my_std`，相当于给函数取一名字，方便以后使用。
-- 函数调用，外部的向量值传递给函数的参数，参数代入函数内部运算后，返回结果
+- 参数，由`function()`括号里指定函数的参数，比如`function(args)`中的参数为 `args` 
+- 函数主体，一般情况下，在`function()`后跟随一对大括号`{ }`，在大括号里声明具体函数功能，在代码最后一行，可以用`return()`返回计算后的值。当然，如果函数的目的只是返回最后一行代码计算的值，这个`return`可以省略。
+- 函数名，`function() { }` 赋值给新对象，比如这里的`name`，相当于给函数取一名字，方便以后使用。
+- 函数调用，外部的向量值**传递**给函数的参数，参数代入函数内部运算后，返回结果
+
 ```{r, eval=FALSE}
-my_std(x = z) # 或者
+my_std(v = z) 
+
+# 或者
 my_std(z)
 ```
 
 
-```{r, echo = FALSE}
-knitr::include_graphics("./images/functions.png")
-```
+
+
+
 
 ## 案例
 
