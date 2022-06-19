@@ -162,9 +162,9 @@ my_std <- function(v) {
 ```
 
 ```{r}
-my_std(x)
-my_std(y)
-my_std(z)
+my_std(v = x)
+my_std(v = y)
+my_std(v = z)
 ```
 
 现在`my_std` 是一个糖葫芦**瘦身机器**了（放进一个胖瘦不匀称的糖葫芦，出来一个身材匀称的糖葫芦）。
@@ -190,10 +190,10 @@ knitr::include_graphics("./images/r-function-syntax.png")
 - 函数调用，外部的向量值**传递**给函数的参数，参数代入函数内部运算后，返回结果
 
 ```{r, eval=FALSE}
-my_std(v = z) 
+my_std(v = c(1, 3, 5, 7, 9)) 
 
-# 或者
-my_std(z)
+# 如果函数只有一个参数，可以偷懒
+my_std(c(1, 3, 5, 7, 9))
 ```
 
 
