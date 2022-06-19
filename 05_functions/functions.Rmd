@@ -252,7 +252,7 @@ select(starwars, height)
 knitr::include_graphics("./images/what-is-install.jpg")
 ```
 
-**课堂练习**：
+**课堂练习**：生活中，买买买；R中就是，装装装。
 
 - 有一个宏包的名字叫 `palmerpenguins`，请大家安装。
 - 这个宏包，包含了数据集penguins，请问如何使用该数据集？
