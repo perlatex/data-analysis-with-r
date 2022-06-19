@@ -20,27 +20,6 @@ output:
 
 - 可以使用`readr::read_rds()`或者`readRDS()`
 
-```{r}
-library(readr)
-kidiq <- read_rds("./demo_data/kidiq.RDS")
-kidiq
-```
-
-
 - 请说出数据框中每一列的变量类型
 
-| 变量       	| 含义             	|
-|------------	|------------------	|
-| kid_score  	| 小孩考试分数     	|
-| mom_hs     	| 母亲是否完成高中 	|
-| mom_iq     	| 母亲IQ值         	|
-| mom_age    	| 母亲年龄         	|
-
-
 - 保存为`xlsx`文件
-
-```{r}
-kidiq %>% 
-  openxlsx::write.xlsx("kidiq.xlsx")
-```
-

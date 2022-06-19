@@ -1,0 +1,40 @@
+---
+title: "函数"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+## 作业
+
+- 根据方差的数学表达式，写出**方差**计算函数，并与基础函数`var()`的结果对比
+
+$$
+\mathrm{Var}(x) = \frac{1}{n - 1} \sum_{i=1}^n (x_i - \bar{x}) ^2 
+$$
+```{r}
+my_var <- function(x){
+   sum( (x - mean(x))^2) / (length(x) - 1)
+}
+
+y <- c(2, 7, 8, 9, 3, 6, 8, 12, 6, 9)
+
+my_var(y)
+```
+
+与系统自带的函数计算结果对比
+```{r}
+var(y)
+```
+
+
+

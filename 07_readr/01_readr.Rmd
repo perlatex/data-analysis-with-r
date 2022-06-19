@@ -1,5 +1,5 @@
 ---
-title: "读取数据"
+title: "读写数据"
 author: "王小二"
 date: "`r Sys.Date()`"
 output: 
@@ -15,57 +15,83 @@ output:
 ---
 
 
-## 读取csv数据
+## 读写csv数据
 
 ```{r}
 library(readr)
 
 wages <- read_csv("./demo_data/wages.csv")
-
-head(wages, 6)
+wages
 ```
-
 
 
 ```{r}
-glimpse(wages)
+write_csv(wages, "wages_new.csv")
 ```
 
 
 
-## 读取excel数据
+## 读写excel数据
 
 ```{r}
 library(readxl)
-d <- read_excel("../demo_data/olympics.xlsx")
-
-tail(d, 6)
+olympics <- read_excel("./demo_data/olympics.xlsx")
+olympics
 ```
+
+
+
+```{r}
+library(openxlsx)
+write.xlsx(olympics, "olympics_new.xlsx")
+```
+
 
 
 ## 读取rds数据
 
-读取demo_data文件夹下`kidiq.RDS`文件
+使用`readr::read_rds()`或者`readRDS()`
 
-- 可以使用`readr::read_rds()`或者`readRDS()`
-
-- 请说出数据框中每一列的变量类型
-
-| 变量       	| 含义             	|
-|------------	|------------------	|
-| kid_score  	| 小孩考试分数     	|
-| mom_hs     	| 母亲是否完成高中 	|
-| mom_iq     	| 母亲IQ值         	|
-| mom_age    	| 母亲年龄         	|
+```{r}
+kidiq <- readRDS("./demo_data/kidiq.RDS")
+kidiq
+```
 
 
+```{r}
+kidiq <- readr::read_rds("./demo_data/kidiq.RDS")
+kidiq
+```
 
 
-## read_tsv() for tab-separated values (*.tsv) files
+```{r}
+readr::write_rds(kidiq, "kidiq_new.rds")
+```
 
-## read_delim() 
 
-## read_fwf() for fixed width files
 
-## read_table() for tabular files where columns are separated by white-space.
+
+## 读取 SPSS 数据
+
+```{r}
+library(haven)
+
+survey <- read_sav("./demo_data/survey.sav")
+survey
+```
+
+
+
+```{r}
+write_sav(survey, "survey_new.sav")
+```
+
+
+
+## 更多格式
+
+- `readr::read_tsv()`   制表符分隔的文件
+- `readr::read_delim()` 指定分割符的文件
+- `readr::read_fwf()`   固定宽度的文件
+- `readr::read_table()` 空格分割的文件
 
