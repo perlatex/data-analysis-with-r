@@ -37,7 +37,7 @@ read_plus <- function(flnm) {
 df <- 
   here::here("data") %>% 
   fs::dir_ls(regexp = "*.xls", recurse = TRUE) %>%  
-  purrr::map_dfr(~read_plus(.)) 
+  purrr::map_dfr(~read_plus(.x)) 
 
 ```
 

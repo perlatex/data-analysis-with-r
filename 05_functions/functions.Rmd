@@ -246,7 +246,7 @@ select(starwars, height)
 
 ## 安装宏包、加载宏包和调用函数
 
-这些宏包（packages）好比您买回家的电视机 、洗衣机、冰箱 ，每个宏包都有自己的功能
+这些宏包（packages）好比您买回家的电视机 、洗衣机、冰箱，每个宏包都有自己的功能
 
 ```{r, echo = FALSE}
 knitr::include_graphics("./images/what-is-install.jpg")
