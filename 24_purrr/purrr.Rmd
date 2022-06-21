@@ -455,7 +455,7 @@ tibble(
 
 
 
-用于建模
+## 用在建模中
 
 ```{r}
 palmerpenguins::penguins %>% 
@@ -479,5 +479,22 @@ palmerpenguins::penguins %>%
 ```
 
 
+## 可视化中使用
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+
+myplot <- function(x) {
+  penguins %>%
+    ggplot(aes(x = {{ x }})) +
+    geom_density(show.legend = FALSE)
+}
+
+
+penguins %>%
+  select(bill_length_mm:body_mass_g) %>%
+  map(myplot)
+```
 
 
