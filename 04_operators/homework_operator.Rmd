@@ -1,0 +1,22 @@
+---
+title: "向量化"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 结果和你想的一样？
+```{r}
+paste0(c(1, 2, 3, 4), c("a", "b"))
+```
+
+
