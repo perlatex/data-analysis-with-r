@@ -1,12 +1,12 @@
 ---
-title: "关于交叉引用"
-author: "王小二"
+title: "图形和表格的交叉引用"
+author: "王小胖"
+date: "`r Sys.Date()`"
 output: 
   bookdown::html_document2:
     theme: flatly
     highlight: pygments
     code_download: true
-    #code_folding: hide
     toc: true
     toc_float: true
     number_sections: true
@@ -15,17 +15,100 @@ output:
 
 
 
-# 图片
-See Figure \@ref(fig:cars-plot).
 
-```{r cars-plot, fig.cap="The cars data.", echo=FALSE}
-par(mar = c(4, 4, .2, .1))
-plot(cars)  # a scatterplot
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center"
+)
 ```
 
 
 
+# 引言
+
+我们是一群快乐的小企鹅！
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+
+
+# 图形
+
+我们身材好不好？请看图 \@ref(fig:fig-1)
+
+```{r fig-1, fig.asp = 0.6, fig.cap = "这是我们的好身材!"}
+penguins %>%
+  ggplot(aes(flipper_length_mm, body_mass_g, group = species)) +
+  geom_point(aes(colour = species, shape = species), alpha = 0.7) +
+  scale_color_manual(values = c("darkorange", "purple", "cyan4")) +
+  theme_minimal() 
+```
+
+
+
+再看看图 \@ref(fig:fig-2)
+
+
+```{r fig-2, fig.asp= 0.4, out.width= "95%", echo=FALSE, fig.cap = "中国好身材"}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(data = penguins %>% select(-species), color = "gray80") +
+  geom_point(aes(color = species)) +
+  facet_wrap(vars(species), ncol = 3) +
+  guides(color = guide_none())
+```
+
+
+
+
+# 表格
+
+请看表格\@ref(tab:table1)
+
+```{r table1}
+penguins %>%
+  group_by(species) %>%
+  summarize(across(contains("_"), mean, na.rm = TRUE)) %>% 
+  knitr::kable(
+    caption = "这是我们的数据真实可靠喔", #<< 图注在这里
+    booktabs = TRUE,
+    digits = 2
+  )
+```
+
+
+gtsummary表格的交叉引用也是一样一样的。
+请看我炫酷的表格\@ref(tab:gtsummary-tab)。是不是很爽？
+
+```{r, gtsummary-tab}
+library(gtsummary)
+
+trial2 <- trial %>% select(trt, age, grade)
+
+trial2 %>%
+  tbl_summary(
+    by = trt,
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{n} / {N} ({p}%)"),
+    digits = all_continuous() ~ 2,
+    label = grade ~ "Tumor Grade",
+    missing_text = "(Missing)"
+  ) %>% 
+  modify_caption(
+    caption = "this is my caption, very good",  #<< 图注在这里
+    text_interpret = "html"
+  )
+```
+
+
 # 公式
+
 Also see Equation \@ref(eq:mean).
 
 \begin{equation}
@@ -34,12 +117,11 @@ Also see Equation \@ref(eq:mean).
 
 
 
-# 表格
-And see Table \@ref(tab:mtcars).
+# 总结
 
-```{r mtcars, echo=FALSE}
-knitr::kable(mtcars[1:5, 1:5], caption = "The mtcars data.")
-```
+可爱的 R 大神们，向你们致敬！
+
+
 
 # 参考
 
