@@ -256,18 +256,43 @@ my_scale(y)
 
 
 
+## 安装宏包、加载宏包和调用函数
+
+宏包（packages）好比您买回家的电视机、洗衣机、冰箱，每个家电都有自己的功能
+
+```{r, echo = FALSE}
+knitr::include_graphics("./images/what-is-install.jpg")
+```
+
+
+安装宏包有以下常见两种方式：
+
+1. 宏包已是稳定版本，并已经提交到CRAN的（这是一个专门存放宏包的网络平台），方法为 `install.packages("dplyr")`
+2. 宏包处于开发状态，我们尝鲜的，方法为 `devtools::install_github("hadley/emo")`
+
+
+
+
 ## 使用宏包的函数
 
-各种宏包也为我们准备了不同的函数，我们在**使用前要先加载该宏包**，比如后面章节我们会用的`dplyr`宏包中的`select()`函数，它用于选取数据框的某列
+各种宏包为我们准备了不同的函数，我们在使用前**一般要先加载该宏包**，比如后面章节我们会用的`dplyr`宏包中的`select()`函数，它用于选取数据框的某列。
+
+使用宏包函数的第一种方法
 ```{r, eval=FALSE}
 library(dplyr)
 select(starwars, height)
 ```
 
-但是，其它宏包可能也有`select()`函数，比如`MASS`和`skimr`，如果同时加载了`dplyr`，`MASS`和`skimr`三个宏包，在程序中使用`select()`函数，就会造成混淆和报错。这个时候就需要给每个函数指定是来源哪个宏包，具体方法就是在宏包和函数之间添加`::`，比如`dplyr::select()`，`skimr::select()` 或者`MASS::select()`。
+但是，其它宏包可能也有`select()`函数，比如`MASS`和`skimr`，如果同时加载了`dplyr`，`MASS`和`skimr`三个宏包，若在程序中使用`select()`函数，就会造成混淆和报错。这个时候就需要给每个函数指定是来源哪个宏包，具体方法就是在宏包和函数之间添加`::`，比如`dplyr::select()`，`skimr::select()` 或者`MASS::select()`。
 
 
 > 一班有个王大宝，二班也有个叫王大宝，他们一起参加活动，点名的时候就需要加上班级，`一班::王大宝`，放在R语言就是 `package::function()`.
+
+
+因此，使用宏包函数的第二种方法
+```{r}
+dplyr::select(starwars, height)
+```
 
 
 
@@ -277,21 +302,6 @@ select(starwars, height)
 - **自定义的函数**
 - **宏包的函数**
 
-
-## 安装宏包、加载宏包和调用函数
-
-这些宏包（packages）好比您买回家的电视机、洗衣机、冰箱，每个宏包都有自己的功能
-
-```{r, echo = FALSE}
-knitr::include_graphics("./images/what-is-install.jpg")
-```
-
-
-
-安装宏包有以下常见两种方式：
-
-1. 宏包已是稳定版本，并已经提交到CRAN的（这是一个专门存放宏包的网络平台），方法为 `install.packages("dplyr")`
-2. 宏包处于开发状态，我们尝鲜的，方法为 `devtools::install_github("hadley/emo")`
 
 
 
