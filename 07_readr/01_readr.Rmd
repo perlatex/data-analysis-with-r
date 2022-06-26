@@ -47,6 +47,9 @@ write.xlsx(olympics, "olympics_new.xlsx")
 ```
 
 
+**课堂练习**，把 `olympics` 保存到demo_data文件夹，并取名为`olympics_new2.xlsx`
+
+
 
 ## 读取rds数据
 
