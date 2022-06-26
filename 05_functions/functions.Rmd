@@ -286,6 +286,15 @@ select(starwars, height)
 knitr::include_graphics("./images/what-is-install.jpg")
 ```
 
+
+
+安装宏包有以下常见两种方式：
+
+1. 宏包已是稳定版本，并已经提交到CRAN的（这是一个专门存放宏包的网络平台），方法为 `install.packages("dplyr")`
+2. 宏包处于开发状态，我们尝鲜的，方法为 `devtools::install_github("hadley/emo")`
+
+
+
 **课堂练习**：生活中，买买买；R中就是，装装装。
 
 - 有一个宏包的名字叫 `palmerpenguins`，请大家安装。
