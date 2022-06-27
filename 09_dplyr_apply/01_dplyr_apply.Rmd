@@ -180,6 +180,15 @@ penguins %>% filter( between(bill_length_mm, 35, 40) )
 ```
 
 
+
+```{r}
+penguins %>% filter(is.na(bill_length_mm))
+
+penguins %>% filter(!is.na(bill_length_mm))
+```
+
+
+
 ## 弱水三千，只取一瓢
 ```{r}
 penguins %>% 
