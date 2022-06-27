@@ -180,12 +180,20 @@ penguins %>% filter( between(bill_length_mm, 35, 40) )
 ```
 
 
-
+找出缺失值所在的行
 ```{r}
-penguins %>% filter(is.na(bill_length_mm))
+df <- tibble(
+  x = c(1, NA, 2, 3),
+  y = c(4, 5, 6, NA)
+)
 
-penguins %>% filter(!is.na(bill_length_mm))
+df %>% filter(is.na(x))
+
+df %>% filter(!is.na(y))
 ```
+
+**课堂练习**，找出没有缺失值的所有记录
+
 
 
 
