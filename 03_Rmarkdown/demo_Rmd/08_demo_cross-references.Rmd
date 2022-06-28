@@ -82,8 +82,20 @@ penguins %>%
   )
 ```
 
+当前`gt`表格也非常方便，你看表格 \@ref(tab:gt-tab)
 
-gtsummary表格的交叉引用也是一样一样的。
+```{r, gt-tab}
+library(gt)
+mtcars %>% 
+  slice(1:2) %>% 
+  gt(caption = "First two rows of mtcars")
+```
+
+
+
+
+
+`gtsummary`表格的交叉引用也是一样一样的。
 请看我炫酷的表格\@ref(tab:gtsummary-tab)。是不是很爽？
 
 ```{r, gtsummary-tab}
@@ -126,3 +138,4 @@ Also see Equation \@ref(eq:mean).
 # 参考
 
 - <https://bookdown.org/yihui/rmarkdown-cookbook/cross-ref.html>
+- <https://gt.rstudio.com/index.html>
