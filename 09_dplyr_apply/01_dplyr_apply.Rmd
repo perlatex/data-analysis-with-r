@@ -188,7 +188,10 @@ df <- tibble(
 )
 
 df %>% filter(is.na(x))
+```
 
+保留完整记录所在的行
+```{r}
 df %>% filter(!is.na(y))
 ```
 
