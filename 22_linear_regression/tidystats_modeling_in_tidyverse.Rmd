@@ -169,7 +169,25 @@ wages %>%
   geom_line(aes(y = pred), color = "red") 
 ```
 
-
+```{r}
+mod1 %>% 
+  broom::augment(
+    data = wages,      
+    interval = "confidence",
+    se_fit = TRUE
+  ) %>%
+  
+  ggplot(aes(x = height, y = earn)) +
+  geom_point() +
+  geom_line(aes(y = .fitted), color = "red") +
+  geom_ribbon(
+    aes(ymin = .lower, ymax = .upper),
+    alpha = 0.5,
+    fill = "orange"
+  ) +
+  #geom_smooth(method = "lm", fill = "red", color = "gray") +
+  theme_minimal()
+```
 
 
 
@@ -183,6 +201,32 @@ newdata %>%
 ```
 
 数据框进、数据框出，非常方便。
+
+
+
+```{r}
+newdata <- wages %>% 
+  modelr::data_grid(height)
+
+mod1 %>% 
+  broom::augment(
+    newdata = newdata,      
+    interval = "prediction",
+    se_fit = TRUE
+  ) %>%
+  
+  ggplot(aes(x = height, y = .fitted)) +
+  geom_point(data = wages, aes(y = earn)) +
+  geom_line(color = "red") +
+  geom_ribbon(
+    aes(ymin = .lower, ymax = .upper),
+    alpha = 0.5,
+    fill = "orange"
+  ) +
+  theme_minimal()
+```
+
+
 
 
 
