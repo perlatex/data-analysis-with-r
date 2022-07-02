@@ -72,6 +72,8 @@ knitr::include_graphics("images/path_R_Rstudio.png")
 
 ## 注意事项
 
+- R 和 Rstudio 是俩兄弟，住隔壁
+
 ```{r out.width = '85%', echo = FALSE}
 knitr::include_graphics("images/install_path.png")
 ```

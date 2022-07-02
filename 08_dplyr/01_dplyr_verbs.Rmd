@@ -91,6 +91,11 @@ c(1:10) %>% sum()
 ```
 
 
+也可以使用它的弟弟 `|>`
+```{r}
+c(1:10) |> sum()
+```
+
 
 通过下图图示可以看到管道操作符就像生产线上的传送带一样，将数据运入函数中。
 ```{r out.width = '45%', echo = FALSE}
@@ -161,6 +166,17 @@ df %>%
   mutate(new_col = calc_square(score))
 ```
 
+**课堂练习**，向量中心化
+
+```{r}
+centralized <- function(x) {
+  x - mean(x)
+}
+
+df %>% 
+  mutate(new_col = centralized(score))
+```
+
 
 计算总分，也很方便
 ```{r}
@@ -194,7 +210,7 @@ knitr::include_graphics("images/Pipe_baking_magrittr_backAssign.gif")
 
 ## 选取列 `select()`
 
-`select() `顾名思义选择，就是选择数据框的某一列，或者某几列。
+`select()` 顾名思义选择，就是选择数据框的某一列，或者某几列。
 
 
 我们以上面学生成绩的数据框为例，这里选择`name`列 
@@ -221,6 +237,7 @@ df %>% select(!type)
 ```{r}
 df %>% select(1, 2, 3)
 df %>% select(2:3)
+df %>% select(-2)
 ```
 
 
@@ -254,7 +271,7 @@ df %>% select(where(is.numeric))
 ```
 
 
-选取所有数值类型的并且以"s"开头的列
+选取所有数值类型的并且以"t"开头的列
 ```{r}
 df %>% select(where(is.numeric) & starts_with("t"))
 ```
@@ -312,7 +329,7 @@ df %>%
 
 ## 筛选 `filter()`
 
-用`filter()`函数筛选出符合特定条件的某些行。比如，
+用`filter()`函数筛选出符合特定条件的某些行(keep的意思)。比如，
 
 
 把**成绩等于90分的**同学筛选出来
@@ -391,10 +408,24 @@ df %>% filter(score == max(score))
 df %>% filter(score > mean(score))
 ```
 
+**课堂练习**，找出考试成绩的平方大于 8000 的那些记录
+
+```{r}
+df %>% 
+  mutate(score_square = score^2) %>% 
+  filter(score_square > 8000)
+```
+
+或者
+```{r}
+df %>% filter(score^2 > 8000)
+```
+
+
 
 ## 统计汇总 `summarise()`
 
-`summarise() `函数非常强大，主要用于统计汇总，往往与其他函数配合使用。比如计算所有同学考试成绩的均值 
+`summarise()`函数非常强大，主要用于统计汇总，往往与其他函数配合使用。比如计算所有同学考试成绩的均值 
 
 ```{r}
 df %>% 
@@ -415,7 +446,7 @@ df %>%
   summarise(
     mean_score   = mean(score),
     median_score = median(score),
-    n            = n(),
+    n            = n(),         # 当前数据框的行数 
     sum          = sum(score)
   )
 ```
@@ -441,7 +472,18 @@ df %>%
   )
 ```
 
+**课堂练习** 统计每个学科的均值和标准差
 
+
+**思考** 以下代码的含义
+```{r}
+df %>%
+  group_by(type, name) %>%
+  summarise(
+    mean_score = mean(total),
+    sd_score   = sd(total)
+  )
+```
 
 ## 排序 `arrange()`
 
@@ -524,11 +566,16 @@ df1 %>% left_join(df2, by = "name")
 
 我们再试试`right_join()`  
 ```{r}
-df1 %>% dplyr::right_join(df2, by = "name")
+df1 %>% right_join(df2, by = "name")
 ```
 
 Carol同学的信息没有显示？ Dave 同学显示了但没有考试成绩？大家想想又为什么呢？
 
+
+**思考**，以下代码是否与上一代码等价？
+```{r}
+df2 %>% left_join(df1, by = "name")
+```
 
 
 ## 满联结 `full_join()`
@@ -540,9 +587,15 @@ df1 %>% full_join(df2, by = "name")
 ```
 
 
+```{r}
+df2 %>% full_join(df1, by = "name")
+```
+
+
+
 ## 内联结 `inner_join()`
 
-只保留name条目相同地记录
+只保留name条目相同地记录，含有筛选功能
 ```{r}
 df1 %>% inner_join(df2, by = "name")
 ```

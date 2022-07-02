@@ -198,6 +198,25 @@ df %>% filter(!is.na(y))
 **课堂练习**，找出没有缺失值的所有记录
 
 
+## summarise() vs mutate()
+
+区分 `group_by() + summarise()` 与 `group_by() + mutate()`
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    normalized_mass = (body_mass_g - mean(body_mass_g))/sd(body_mass_g)
+  )
+```
+
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  mutate(
+    normalized_mass = (body_mass_g - mean(body_mass_g))/sd(body_mass_g)
+  )
+```
 
 
 ## 弱水三千，只取一瓢
