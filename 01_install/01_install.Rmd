@@ -1,7 +1,7 @@
 ---
 title: "第一章：配置R语言环境"
-author: "杰希"
-institute: "丁香园"
+author: "王敏杰"
+institute: "NCU"
 date: "\\today"
 fontsize: 12pt
 output: binb::metropolis
@@ -64,11 +64,19 @@ knitr::include_graphics("images/Rstudio_download.png")
 - 安装在相同的盘符，比如，都安装在 D 盘
 - 安装路径\textcolor{red}{不要}有\textcolor{red}{中文}和\textcolor{red}{空格}。比如，这样就比较好
 
+```{r out.width = '100%', echo = FALSE}
+knitr::include_graphics("images/path_R_Rstudio.png")
+```
+
+
+
+## 注意事项
+
 ```{r out.width = '85%', echo = FALSE}
 knitr::include_graphics("images/install_path.png")
 ```
 
-- 安装之后，不能修改两个文件夹里面的内容
+- 安装之后，\textcolor{red}{不能修改}两个文件夹里面的内容
 
 <!-- \small -->
 <!-- 可观看视频[https://www.bilibili.com/video/BV1hA411e7k3](https://www.bilibili.com/video/BV1hA411e7k3)后安装 -->
@@ -185,7 +193,7 @@ knitr::include_graphics("images/loading_packages.png")
 在Rstudio菜单栏
 
 - 依此点击`File > New File > R Script` 
-- 脚本文件通常以`.R`(或者`.Rmd`)作为文件的后缀名。
+- 脚本文件通常以`.R`作为文件的后缀名。
 
 ```{r intro-R-39, out.width = '75%', echo = FALSE}
 knitr::include_graphics("images/New_R_Script2.png")
@@ -209,14 +217,16 @@ knitr::include_graphics("images/code.png")
 knitr::include_graphics("images/script2.png")
 ```
 
-1. 按住 `Ctrl` 键，然后按回车键`Enter`，可以运行**光标所在行**的代码
-2. 点击 `Run`, 运行**光标所在行**的代码
-3. 点击 `Source`，从头到尾运行当前脚本**全部**代码
-4. 鼠标选中多行代码，然后点击 `Run`或者`Ctrl + Enter`
+\footnotesize
+
+- 方法1. 按下 `Ctrl + Enter`，可以运行**光标所在行**的代码
+- 方法2. 点击 `Run`， 运行**光标所在行**的代码
+- 方法3. 点击 `Source`，从头到尾运行当前脚本**全部**代码
+- 方法4. 选中多行代码，然后点击 `Run` 或者按下 `Ctrl + Enter`
 
 ## 运行脚本
 
-这样会显得很专业
+`Ctrl + Enter`会显得很专业
 
 ```{r intro-R-401, out.width = '100%', echo = FALSE}
 knitr::include_graphics("images/keyboard_Run.png")
@@ -269,19 +279,18 @@ ggplot(midwest, aes(x = area, y = poptotal)) +
 
 -   我的电脑是苹果系统，怎么安装呢？
 
--   我的Rstudio需要哪些设置？
-
--   为什么Rstudio打开是空白呢？
-
--   安装宏包太慢，怎么解决？
+\qquad  \textcolor{red}{和windows下的安装一样，选择mac版本安装就行}
 
 -   安装宏包，遇到报错信息"unable to access index for repository..."？
  
-可能需要选择国内镜像
+\qquad  \textcolor{red}{选择国内镜像试试}
+
 
 -   提示`C://users/???/documents`，文件名、目录名和卷标语法不正确，怎么回事
 
-这是你电脑开机用户名是中文导致的，建议使用英文注册一个新用户，在新用户名下，重新安装R和Rstudio
+\qquad  \textcolor{red}{这是你电脑开机用户名是中文导致的，建议使用英文注册一个新用户，在新用户名下，重新安装R和Rstudio}
+
+
 
 # 如何使用Rstudio Cloud
 
