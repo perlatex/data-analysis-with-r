@@ -125,6 +125,39 @@ penguins %>% select(species, starts_with("bill_"))
 ```
 
 
+## 用字符串向量去选择数据框的列
+
+想选取的列名，我们写在字符串向量里
+```{r}
+vars <- c("species", "bill_length_mm", "flipper_length_mm")
+```
+
+
+- `all_of()` 会严格按照字符串向量进行选取
+```{r}
+penguins %>% select(all_of(vars))
+```
+
+如果字符串向量中有一个不是数据框中的列名，就会报错
+```{r}
+vars <- c("species", "bill_length_mm", "i_am_monster")
+
+penguins %>% select(all_of(vars))
+```
+
+
+- `any_of()` 条件相对宽松，并不要求字符串向量在数据框列名中都一定存在
+```{r}
+vars <- c("species", "bill_length_mm", "i_am_monster")
+
+penguins %>% select(any_of(vars))
+```
+
+`any_of()` 非常有用。比如，我想删除某个变量，但我不知道这个变量是否存在数据框中，使用下面反向选取的方法，“有则改之，无则加勉”的味道。
+```{r}
+penguins %>% select(-any_of(vars))
+```
+
 
 ## 寻找男企鹅
 
@@ -198,9 +231,27 @@ df %>% filter(!is.na(y))
 **课堂练习**，找出没有缺失值的所有记录
 
 
-## summarise() vs mutate()
+## summarise() vs. mutate()
 
-区分 `group_by() + summarise()` 与 `group_by() + mutate()`
+- 区分 `summarise()` 与 `mutate()`
+
+```{r}
+penguins %>%
+  summarise(
+    normalized_mass = (body_mass_g - mean(body_mass_g))/sd(body_mass_g)
+  )
+```
+
+
+```{r}
+penguins %>%
+  mutate(
+    normalized_mass = (body_mass_g - mean(body_mass_g))/sd(body_mass_g)
+  )
+```
+
+
+- 区分 `group_by() + summarise()` 与 `group_by() + mutate()`
 ```{r}
 penguins %>%
   group_by(species) %>%
@@ -429,7 +480,7 @@ penguins %>% mutate(
 
 ## 每种类型企鹅有多少只？
 
-知识点：`n()`函数，统计当前分组数据框的行数
+知识点：`n()`函数，统计**当前分组数据框**的行数
 
 ```{r}
 penguins %>%
