@@ -55,7 +55,7 @@ penguins %>%
 ```{r}
 penguins %>%
   summarize(
-     across(c(bill_depth_mm, bill_length_mm), mean)
+    across(c(bill_depth_mm, bill_length_mm), mean)
  )
 ```
 
@@ -64,7 +64,7 @@ penguins %>%
 ```{r}
 penguins %>%
   summarize(
-     across(c(bill_depth_mm, bill_length_mm, flipper_length_mm), mean)
+    across(c(bill_depth_mm, bill_length_mm, flipper_length_mm), mean)
  )
 ```
 
@@ -216,5 +216,16 @@ penguins %>%
   )
 ```
 
+- 以sex分组，对"bill_"开头的列，中心化和标准化
 
+```{r}
+penguins %>%
+  group_by(sex) %>%
+  mutate(
+    across(
+      starts_with("bill_"),
+      list(mycentralized = ~ .x - mean(.x), mystd = ~ (.x - mean(.x)) / sd(.x))
+    )
+  )
+```
 

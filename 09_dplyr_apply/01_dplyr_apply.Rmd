@@ -198,16 +198,23 @@ penguins %>%
 ```
 
 
-**课堂练习**，说出以下代码的含义
+**课堂练习**，说出以下代码的含义和区别？
 ```{r}
 penguins %>%
   filter(species == "Adelie", bill_length_mm == max(bill_length_mm) )
 ```
 
 
+```{r}
+penguins %>%
+  filter(species == "Adelie") %>% 
+  filter(bill_length_mm == max(bill_length_mm) )
+```
+
+
 `between()`的用法
 ```{r}
-penguins %>% filter(bill_length_mm > 35, bill_length_mm < 40)
+penguins %>% filter(bill_length_mm >= 35, bill_length_mm <= 40)
 
 penguins %>% filter( between(bill_length_mm, 35, 40) )
 ```
@@ -219,16 +226,40 @@ df <- tibble(
   x = c(1, NA, 2, 3),
   y = c(4, 5, 6, NA)
 )
+df
+```
 
+```{r}
+is.na(df$x)
+```
+
+```{r}
 df %>% filter(is.na(x))
 ```
 
 保留完整记录所在的行
 ```{r}
-df %>% filter(!is.na(y))
+df %>% filter(!is.na(x))
 ```
 
 **课堂练习**，找出没有缺失值的所有记录
+```{r}
+df %>% filter(!is.na(x), !is.na(y))
+```
+
+```{r}
+df %>% filter(if_any(everything(), is.na))
+```
+
+```{r}
+df %>% filter(if_all(everything(), ~!is.na(.x)))
+```
+
+
+```{r}
+df %>% 
+  drop_na()
+```
 
 
 ## summarise() vs. mutate()
@@ -462,6 +493,19 @@ penguins %>% mutate(
 )
 ```
 
+最新版的dplyr，可以使用可读性更高的写法
+```{r}
+penguins %>% mutate(
+  body = case_when(
+    body_mass_g < 3500                       ~ "best",
+    body_mass_g >= 3500 & body_mass_g < 4500 ~ "good",
+    body_mass_g >= 4500 & body_mass_g < 5500 ~ "general",
+   .default                                  = "other"
+  )
+)
+```
+
+
 
 **随堂练习**：按嘴峰长度分成A, B, C, D 4个等级
 
@@ -471,7 +515,7 @@ penguins %>% mutate(
     bill_length_mm < 35                        ~ "A",
     bill_length_mm >= 35 & bill_length_mm < 45 ~ "B",
     bill_length_mm >= 45 & bill_length_mm < 55 ~ "C",
-    TRUE                                       ~ "D"
+    .default                                   = "D"
   )
 )
 ```
@@ -508,6 +552,7 @@ penguins %>% count(species)
 
 不同性别的企鹅各有多少
 ```{r}
+penguins %>% count(sex)
 penguins %>% count(sex, sort = TRUE)
 ```
 
@@ -566,12 +611,14 @@ c(TRUE, TRUE, FALSE) %>% sum()
 
 ```{r}
 penguins %>% 
+  select(species, bill_length_mm) %>% 
   mutate(is_bigger40 = bill_length_mm > 40)
 ```
 
 
 ```{r}
 penguins %>% 
+  select(species, bill_length_mm) %>% 
   mutate(is_bigger40 = bill_length_mm > 40) %>% 
   summarise(
     prop = sum(is_bigger40) / n()

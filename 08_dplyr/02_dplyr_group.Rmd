@@ -114,13 +114,14 @@ pollution %>%
   arrange(amount)
 ```
 
+和其他dplyr函数不一样，`arrange()` 会忽略分组信息。因此，想组内排序，需要多写一句`.by_group = TRUE`
 ```{r}
 pollution %>% 
   group_by(city) %>% 
   arrange(amount, .by_group = TRUE) 
 ```
 
-
+事实上，以上代码等价于
 ```{r}
 pollution %>% 
   arrange(city, amount) 
