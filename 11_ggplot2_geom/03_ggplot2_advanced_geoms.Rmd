@@ -512,7 +512,14 @@ penguins %>%
 ```{r}
 ggplot() +
   geom_function(fun = dnorm, args = list(mean = 0, sd = 0.5)) +
-  xlim(-2, 2)
+  xlim(-3, 3)
+```
+
+
+```{r}
+tibble(x = c(-3, 3)) %>% 
+  ggplot(aes(x = x)) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 0.5))
 ```
 
 
@@ -520,13 +527,28 @@ ggplot() +
 ```{r}
 f <- function(x) 0.5 * exp(-abs(x))
 
-
 ggplot() +
   geom_function(fun = f, colour = "red") +
-  xlim(-5, 5)
+  xlim(-3, 3)
 ```
 
-**课堂练习**：自己定义一个函数，然后画出来
+
+```{r}
+tibble(x = c(-3, 3)) %>% 
+  ggplot(aes(x = x)) +
+  stat_function(fun = f)
+```
+
+**课堂练习**：看手相，然后画出函数图
+
+```{r}
+tibble(x = c(-3, 3)) %>%
+  ggplot(aes(x = x)) +
+  stat_function(fun = ~ exp(.x)) +
+  stat_function(fun = ~.x) +
+  stat_function(fun = ~ log(.x))
+```
+
 
 
 ## 让你的数据骚动起来
