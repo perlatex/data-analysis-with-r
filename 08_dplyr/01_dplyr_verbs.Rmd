@@ -76,6 +76,12 @@ mutate(df,
        ) 
 ```
 
+注意到，如果对已有的变量名重新赋值，相当于替换原有的列
+```{r}
+mutate(df, score = 100) 
+```
+
+
 ## 管道 `%>%`
 
 实际运用中，我们经常要使用函数，比如计算向量`c(1:10)`所有元素值的和
@@ -446,7 +452,7 @@ df %>%
   summarise(
     mean_score   = mean(score),
     median_score = median(score),
-    n            = n(),         # 当前数据框的行数 
+    n            = n(),         # 返回当前数据框的行数 
     sum          = sum(score)
   )
 ```
