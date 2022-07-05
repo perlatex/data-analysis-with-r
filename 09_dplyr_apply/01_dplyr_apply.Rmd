@@ -188,6 +188,13 @@ penguins %>% filter(species == "Adelie")
 ```
 
 
+找出嘴峰长度刚好是厚度两倍的企鹅
+```{r}
+penguins %>%
+  filter( bill_length_mm == bill_depth_mm * 2 )
+```
+
+
 ```{r}
 penguins %>%
   filter(species == "Adelie" &  bill_length_mm > 40 )
