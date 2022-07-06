@@ -26,7 +26,8 @@ penguins <- penguins %>% drop_na()
 
 - 写出`stat_***()`版本
 ```{r}
-ggplot(penguins, aes(x = species)) +
+penguins %>% 
+  ggplot(aes(x = species)) +
   geom_bar()
 ```
 
@@ -52,6 +53,24 @@ penguins %>%
   geom_col()
 ```
 
+- 你会选择哪一种方法？
+
+```{r}
+penguins %>% 
+  count(species) %>% 
+  ggplot(aes(x = species, y = n)) +
+  geom_col() +
+  geom_text(aes(label = n), vjust = -0.4)
+
+
+penguins %>%
+  ggplot(aes(species)) +
+  stat_count(geom = "bar") +
+  stat_count(
+    aes(label = after_stat(count)),
+    geom = "text", vjust = -.4
+  )  
+```
 
 
 - 比较下列图形的区别
@@ -86,9 +105,30 @@ ggplot() +
       geom       = "point",
       position   = position_dodge(width = 0.5)
   )
-
 ```
 
 
 
+- 用`stat_summary()`重写下面的代码
+```{r}
+m <- penguins %>%
+  group_by(sex) %>%
+  summarise(
+    mean = mean(body_mass_g)
+  )
+m
+
+
+penguins %>%
+  ggplot(aes(x = sex, y = body_mass_g)) +
+  geom_jitter() +
+  geom_point(
+    data = m, aes(y = mean), size = 5, color = "red"
+  ) +
+  geom_text(
+    data = m,
+    aes(x = sex, y = mean, label = round(mean, 2)), size = 5,
+    color = "red", vjust = -1
+  )
+```
 

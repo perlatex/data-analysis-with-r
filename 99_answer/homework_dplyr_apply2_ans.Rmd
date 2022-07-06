@@ -1,0 +1,46 @@
+---
+title: "dplyr作业"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+# 作业
+
+判断成绩是否高于各科均值，是就1 否则0
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+df <- tibble::tribble(
+    ~name, ~chinese, ~engish, ~physics, ~sport, ~music,
+   "Aice",       85,      56,       56,     54,     78,
+    "Bob",       75,      78,       77,     56,     69,
+   "Cake",       69,      41,       88,     89,     59,
+   "Dave",       90,      66,       74,     82,     60,
+    "Eve",       68,      85,       75,     69,     21,
+    "Fod",       77,      74,       62,     74,     88,
+  "Gimme",       56,      88,       75,     69,     34
+  )
+df
+```
+
+
+```{r}
+df %>%
+  mutate(
+    across(-name, ~ if_else(.x > mean(.x), 1, 0))
+  )
+```
+
