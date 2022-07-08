@@ -19,22 +19,60 @@ library(tidyverse)
 ```
 
 
+## 几个常用的函数
+```{r}
+df <- tibble::tribble(
+  ~x, ~y, ~z,
+   1,  1,  1,
+   1,  1,  2,
+   1,  1,  1,
+   2,  1,  2,
+   2,  2,  3,
+   3,  3,  1
+  )
+
+df
+```
+
+```{r}
+df %>% 
+  mutate( n = n() )               # 当前分组数据框的行数
+
+
+df %>% 
+  group_by(x) %>% 
+  mutate( n = n() )
+```
+
+
+```{r}
+df %>% 
+  mutate( n = row_number()  )     # 当前分组数据框的行号
+
+df %>% 
+  group_by(x) %>% 
+  mutate( n = row_number()  )     
+```
+
+
+
 ## distinct() 与 n_distinct() 的区别
 ```{r}
 df <- tibble::tribble(
   ~x, ~y, ~z,
-  1, 1, 1,
-  1, 1, 2,
-  1, 1, 1,
-  2, 1, 2,
-  2, 2, 3,
-  3, 3, 1
-)
+   1,  1,  1,
+   1,  1,  2,
+   1,  1,  1,
+   2,  1,  2,
+   2,  2,  3,
+   3,  3,  1
+  )
+
 df
 ```
 
 
-- `distinct()`处理对象是data.frame，功能是**保留没有重复的row**，返回是data.frame
+- `distinct()`处理对象是data.frame，功能是**删除重复出现的row，保留没有重复的row**，返回是data.frame
 
 
 ```{r}
@@ -60,10 +98,7 @@ df %>%
 
 ```{r}
 df %>%
-  distinct(
-    across(c(x, y)),
-    .keep_all = TRUE
-  )
+  distinct(across(c(x, y)),  .keep_all = TRUE)
 ```
 
 
@@ -94,17 +129,36 @@ df %>%
   )
 ```
 
+
+**课堂练习**，比较两者的区别
+```{r}
+df %>%
+  group_by(x) %>%
+  summarise( n = n() )
+
+
+df %>%
+  group_by(x) %>%
+  summarise(
+    n = n_distinct(z)
+  )
+
+```
+
+
+
 ## 比distinct()更知我心
 
 ```{r}
-df <- tribble(
-  ~id, ~date, ~store_id, ~sales,
-  1, "2020-03-01", 1, 100,
-  2, "2020-03-01", 2, 100,
-  3, "2020-03-01", 3, 150,
-  4, "2020-03-02", 1, 110,
-  5, "2020-03-02", 3, 101
-)
+df <- tibble::tribble(
+  ~id,        ~date, ~store_id, ~sales,
+    1, "2020-03-01",         1,    100,
+    2, "2020-03-01",         2,    100,
+    3, "2020-03-01",         3,    150,
+    4, "2020-03-02",         1,    110,
+    5, "2020-03-02",         3,    101
+  )
+
 
 df %>%
   janitor::get_dupes(store_id)
@@ -175,9 +229,7 @@ df %>%
 ```
 
 
-
-
-现在有更简便的方法
+当然也有简单粗暴的方法
 ```{r}
 df %>% 
   drop_na()
@@ -196,3 +248,8 @@ df %>%
 df %>% 
   janitor::remove_empty("rows")
 ```
+
+
+## Cheatsheets
+
+- <https://www.rstudio.com/resources/cheatsheets/>

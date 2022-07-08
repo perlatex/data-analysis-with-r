@@ -316,6 +316,13 @@ penguins %>%
 ```
 
 
+## 能说出它想干什么?
+```{r}
+penguins %>% 
+  relocate(where(is.character), .after = last_col())
+```
+
+
 ## 弱水三千，只取一瓢
 ```{r}
 penguins %>% 
