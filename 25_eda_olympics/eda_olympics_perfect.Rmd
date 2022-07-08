@@ -1,0 +1,198 @@
+---
+title: "重复Nature期刊上的一篇文章"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 引言
+
+这是Nature期刊上的一篇文章[Nature. 2004 September 30; 431(7008)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3173856/#SD2)，文章的主要结论在这张图
+
+```{r, out.width = '90%', echo = FALSE}
+knitr::include_graphics(path = "images/tileshop.jpg")
+```
+
+这一篇2004年的文章，作者分析了2004年之前所有奥运会上男子和女子100米短跑冠军成绩，通过线性回归模型预测：
+
+- 2156年奥运会上的重大冲刺
+- 女子短跑运动员正在缩小与男子的差距，也许有一天会超过男子
+
+
+我抱着好奇的心态，在补充材料里找到了文章使用的数据。
+
+
+# 作业要求
+
+- 重复文章的模型和图片
+- 网络搜索，补全这几年的数据，重新建模，看看作者的观点是否依然成立
+
+
+
+# 数据
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(modelr)
+library(readxl)
+
+raw <- read_excel("./demo_data/olympics.xlsx")
+raw
+```
+
+
+
+这个数据包含3个变量，具体含义如下：
+
+| 变量         	| 含义       	|
+|:-------------	|:-----------	|
+| Olympic_year 	| 奥运会年份 	|
+| Men_score    	| 男子成绩   	|
+| Women_score  	| 女子成绩   	|
+
+
+
+
+# 更全面的重复
+
+除了画出回归直线外，还要画出
+
+- the regression line
+- the confidence band in gray
+- the prediction band in red
+
+
+## 分组建模和预测
+```{r}
+model1 <- lm(Men_score ~ Olympic_year, data = raw)
+model2 <- lm(Women_score ~ Olympic_year, data = raw)
+
+df1 <- tibble(
+  Olympic_year = seq(1900, 2252, by = 16)
+  ) %>%
+  predict(model1, newdata = ., interval = "confidence") %>%
+  as_tibble() %>%
+  mutate(
+    Olympic_year = seq(1900, 2252, by = 16),
+    Gender = "Men"
+  )
+
+df2 <- tibble(
+  Olympic_year = seq(1900, 2252, by = 16)
+  ) %>%
+  predict(model2, newdata = ., interval = "confidence") %>%
+  as_tibble() %>%
+  mutate(
+    Olympic_year = seq(1900, 2252, by = 16),
+    Gender = "Female"
+  )
+
+df <- bind_rows(df1, df2)
+```
+
+## 绘图
+
+- 绘制原始数据的散点和拟合直线
+- 绘制拟合的直线和置信区间线
+
+```{r}
+library(ggplot2)
+
+p <- df %>% 
+  ggplot(aes(x = Olympic_year)) +
+  geom_point(data = raw, aes(x = Olympic_year, y = Men_score), color = "#004080") +
+  geom_smooth(
+    data = raw, aes(x = Olympic_year, y = Men_score), method = "lm",
+    color = "#004080", linewidth = 1, se = FALSE
+  ) +
+  geom_point(data = raw, aes(x = Olympic_year, y = Women_score), color = "red") +
+  geom_smooth(
+    data = raw, aes(x = Olympic_year, y = Women_score), method = "lm",
+    color = "red", linewidth = 1, se = F
+  ) +
+  geom_line(aes(y = lwr, fill = Gender), linetype = 3) +
+  geom_line(aes(y = upr, fill = Gender), linetype = 3) +
+  geom_line(aes(y = fit, color = Gender), linewidth = 1, linetype = 2)
+
+p
+```
+
+
+## 添加细节
+- 使用annotate添加文字
+- 使用theme()设置主题
+
+```{r}
+p +
+  scale_colour_manual(values = c("red", "#004080")) +
+  scale_x_continuous(
+    limits = c(1900, 2252),
+    breaks = seq(1900, 2252, by = 16), expand = c(0, 0)
+  ) +
+  labs(x = "Year", y = "Winning time (s)") +
+  annotate(
+    geom = "text", x = c(1948, 2012), y = c(9, 12),
+    label = c("r^2 == 0.882", "r^2 == 0.789"),
+    color = c("#004080", "red"), parse = TRUE
+  ) +
+  theme_classic() +
+  theme(
+    panel.background = element_rect(fill = "#DDE7F1", colour = "black", size = 1.3),
+    plot.background = element_rect(fill = c("#DDE7F1")),
+    axis.text.x = element_text(angle = 90),
+    plot.margin = margin(1, 1, 1, 1, "cm")
+  ) +
+  guides(colour = "none")
+```
+
+
+
+# 补全数据
+
+补全这几年的数据，重新建模，看看作者的观点是否依然成立
+
+```{r}
+update <- read_excel("./demo_data/olympics_update.xlsx")
+
+raw <- update
+```
+
+
+```{r}
+model1 <- lm(Men_score ~ Olympic_year, data = raw)
+model2 <- lm(Women_score ~ Olympic_year, data = raw)
+
+df1 <- tibble(
+  Olympic_year = seq(1900, 2252, by = 16)) %>% 
+  predict(model1, newdata = ., interval = "confidence") %>%
+  as_tibble() %>%
+  mutate(
+    Olympic_year = seq(1900, 2252, by = 16),
+    Gender = "Men"
+  )
+
+df2 <- tibble(
+  Olympic_year = seq(1900, 2252, by = 16)) %>% 
+  predict(model2, newdata = ., interval = "confidence") %>%
+  as_tibble() %>%
+  mutate(
+    Olympic_year = seq(1900, 2252, by = 16),
+    Gender = "Female"
+  )
+
+df <- bind_rows(df1, df2)
+
+df %>% 
+  ggplot(aes(x = Olympic_year)) +
+  geom_line(aes(y = fit, colour = Gender)) 
+```
+
