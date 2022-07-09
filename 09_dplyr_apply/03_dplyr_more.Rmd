@@ -72,7 +72,7 @@ df
 ```
 
 
-- `distinct()`处理对象是data.frame，功能是**删除重复出现的row，保留没有重复的row**，返回是data.frame
+- `distinct()`处理对象是data.frame，功能是**删除重复出现的row，保留没有重复的row**，返回仍然是data.frame
 
 
 ```{r}
@@ -80,7 +80,7 @@ df %>%
   distinct()
 ```
 
-
+也可以指定要去重的列
 ```{r}
 df %>%
   distinct(x)
@@ -112,6 +112,7 @@ df %>%
 
 - `n_distinct()`处理的对象是vector，功能是**统计不同的元素有多少个**，返回数值个数
 ```{r}
+c(1, 1, 1, 2, 2, 1, 3, 3) %>% unique() %>% length()
 c(1, 1, 1, 2, 2, 1, 3, 3) %>% n_distinct()
 ```
 
@@ -142,7 +143,6 @@ df %>%
   summarise(
     n = n_distinct(z)
   )
-
 ```
 
 
@@ -244,12 +244,13 @@ df %>%
 
 
 ```{r}
-# 删除一行全部为"NA"的行
+# 删除一行中全部为"NA"的行
 df %>% 
   janitor::remove_empty("rows")
 ```
 
 
-## Cheatsheets
+## 参考资料
 
 - <https://www.rstudio.com/resources/cheatsheets/>
+- <https://tidydatatutor.com/vis.html>
