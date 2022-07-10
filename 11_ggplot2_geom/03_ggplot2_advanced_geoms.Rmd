@@ -39,6 +39,21 @@ penguins
 ## Barplot
 ```{r}
 penguins %>% 
+  ggplot(aes(x = species)) +
+  geom_bar()  
+```
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar()  
+```
+
+
+
+```{r}
+penguins %>% 
   ggplot(aes(x = species, fill = island)) +
   geom_bar(position = "stack")  # Default
 ```
@@ -159,9 +174,6 @@ df %>%
 
 
 
-
-
-
 ## 增加拟合回归线
 
 ### 线性回归
@@ -262,6 +274,8 @@ penguins %>%
   ggdensity::geom_hdr(xlim = c(160, 240), ylim = c(30, 70)) +
   geom_point(shape = 21)
 ```
+
+
 
 ## 马赛克图
 ```{r}
@@ -365,7 +379,7 @@ penguins %>%
   geom_point(data = m, aes(y = mean), color = "red", size = 5)
 ```
 
-课堂练习：
+**课堂练习**：
 
 - 添加小蜜蜂图
 - 蓝色的圆点不同性别体重中位数的位置
@@ -389,9 +403,32 @@ penguins %>%
   )
 ```
 
+**展示**，有没有更好的方法？
+
+```{r}
+penguins %>%
+  ggplot(aes(x = sex, y = body_mass_g)) +
+  geom_jitter() +
+  stat_summary(
+    fun.data = mean_se,
+    geom = "point",
+    color = "red",
+    size = 5
+  ) +
+  stat_summary(
+    fun.data = mean_se,
+    mapping = aes(label = round(after_stat(y), 2)),
+    geom = "text",
+    color = "red",
+    size = 5,
+    vjust = -1
+  ) 
+```
 
 
-有时候我们需要添加文本注解，
+## 添加注解
+
+有时候我们需要添加文本注解
 ```{r}
 mean_length <- penguins %>%
   summarise(

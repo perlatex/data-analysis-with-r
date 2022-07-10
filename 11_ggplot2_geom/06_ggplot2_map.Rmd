@@ -29,6 +29,25 @@ ggplot(data = world_map_data) +
 ```
 
 
+## 美国地图
+```{r}
+library(maps)
+us_states <- map_data("state")
+
+us_states %>% 
+  ggplot(aes(x = long, y = lat, group = group)) + 
+  geom_polygon(fill = "white", color = "black")
+```
+
+
+```{r}
+us_states %>% 
+  ggplot(aes(x = long, y = lat, group = group, fill = region)) + 
+  geom_polygon(color = "gray90", size = 0.1) + 
+  guides(fill = FALSE)
+```
+
+
 
 ## 四川地图
 
