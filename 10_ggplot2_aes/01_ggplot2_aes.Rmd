@@ -229,7 +229,7 @@ ggplot(penguins) +
 ```
 
 
-可以看到，通过`color`, `size`, `shape`, `alpha`等视觉属性可以实现分组的功能。
+可以看到，通过`color`, `size`, `shape`, `alpha`等视觉属性可以实现**分组**的功能。
 
 
 

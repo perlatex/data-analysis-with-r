@@ -55,6 +55,16 @@ df %>%
 ```
 
 
+```{r}
+df %>% 
+  mutate( n = cur_group_id()  )   # 当前所在组的编号
+
+df %>% 
+  group_by(x) %>% 
+  mutate( n = cur_group_id()  ) 
+```
+
+
 
 ## distinct() 与 n_distinct() 的区别
 ```{r}
@@ -77,31 +87,32 @@ df
 
 ```{r}
 df %>%
-  distinct()
+  distinct()  # 只保留最先出现的row
 ```
 
 也可以指定要去重的列
 ```{r}
 df %>%
-  distinct(x)
+  distinct(x)      
 
 df %>%
-  distinct(x, y)
+  distinct(x, .keep_all = TRUE)
 ```
 
 
 ```{r}
 df %>%
-  distinct(x, y, .keep_all = TRUE) # 只保留最先出现的row
+  distinct(x, y, .keep_all = TRUE) 
 ```
 
-
+也可是使用更紧凑的形式
 ```{r}
 df %>%
   distinct(across(c(x, y)),  .keep_all = TRUE)
 ```
 
 
+组内去重
 ```{r}
 df %>%
   group_by(x) %>%
@@ -110,7 +121,7 @@ df %>%
 
 
 
-- `n_distinct()`处理的对象是vector，功能是**统计不同的元素有多少个**，返回数值个数
+- `n_distinct()`处理的对象是vector，功能是**统计不同的元素有多少个**，返回元素个数
 ```{r}
 c(1, 1, 1, 2, 2, 1, 3, 3) %>% unique() %>% length()
 c(1, 1, 1, 2, 2, 1, 3, 3) %>% n_distinct()
@@ -118,7 +129,7 @@ c(1, 1, 1, 2, 2, 1, 3, 3) %>% n_distinct()
 
 
 ```{r}
-df$z %>% n_distinct()
+df$z %>% n_distinct()  # 类比 length(), mean(), sum() 等汇总性函数
 ```
 
 
@@ -149,6 +160,8 @@ df %>%
 
 ## 比distinct()更知我心
 
+我们有时候需要找出重复的记录，可以使用`janitor::get_dupes()`
+
 ```{r}
 df <- tibble::tribble(
   ~id,        ~date, ~store_id, ~sales,
@@ -161,7 +174,7 @@ df <- tibble::tribble(
 
 
 df %>%
-  janitor::get_dupes(store_id)
+  janitor::get_dupes(store_id)    
 
 df %>%
   janitor::get_dupes(date)
@@ -170,7 +183,7 @@ df %>%
 
 ## bind_rows() 与 bind_cols()
 
-这两个函数用于数据框的合并或者绑定。
+这两个函数，用于数据框的合并或者绑定。
 
 - `bind_cols()`, 列绑定，要求两个数据框的row必须相等
 ```{r}
@@ -188,7 +201,44 @@ tb1 <- tibble(a = 1:4, b = 5:8)
 tb2 <- tibble(a = 1:2, b = 3:4)
 
 bind_rows(tb1, tb2)
+
+bind_rows(tb1, tb2, tb2)
 ```
+
+
+**注意**：
+- `*_join()`等**联接**函数，需要指明按照哪一列进行联接，具体来说， 
+指明参数 `*_join(df1, df2, by = "var")`
+- `bind_*()`等**绑定**函数，要求两个数据框在外形上一致
+
+
+## 数据框更新
+
+```{r}
+df <- tibble(
+  id = c("a", "b", "c", "d", "e"),
+  col1 = 1:5,
+  col2 = c(0.5, 0.3, 1.5, 1.09, 0.87)
+)
+df
+```
+
+
+```{r}
+df_update <- 
+  tibble(  
+    id = c("b", "c"),
+    col1 = c(7, 8),
+    col2 = c(4, 5)
+  )
+df_update
+```
+
+
+```{r}
+df %>% rows_update(df_update, by = "id")
+```
+
 
 
 ## 删除缺失值所在行
@@ -199,8 +249,8 @@ df <- tibble::tribble(
   "Alice",     "math",   NA,       5,
     "Bob",  "english",   NA,       9,
     "Bob",     "math",   69,      NA,
-  "Carol",  "english",   80,      10,
-  "Carol",     "math",   90,       5
+  "Carol",  "english",   80,      12,
+  "Carol",     "math",   NA,       NA
 )
 df
 ```
@@ -219,17 +269,62 @@ df %>%
   )
 ```
 
-
-所有列，如果有缺失值`NA`，就删除所在的row
+多列删除缺失值所在行
 ```{r}
+df %>% 
+  filter(!is.na(score), !is.na(extra))
+```
+
+
+```{r}
+df %>% 
+  filter(
+    across(c(score, extra), ~ !is.na(.x))
+  )
+
+
 df %>% 
   filter(
     across(everything(), ~ !is.na(.x))
   )
+
+
+df %>% 
+  filter(
+    if_all(c(score, extra), ~ !is.na(.x))
+  )
+```
+**课堂练习**：找出score和extra都是缺失值的行。
+
+```{r}
+df %>% 
+  filter(
+    if_all(c(score, extra), is.na)
+  )
 ```
 
 
-当然也有简单粗暴的方法
+
+有时候，我们想查看有缺失值的行（只要有一个缺失值，就找出来）
+
+```{r}
+df %>% 
+   filter(
+     if_any(c(score, extra), is.na)
+   )
+```
+
+
+对于指定的列，只要有一个不是缺失值，就找出来
+```{r}
+df %>% 
+  filter(
+    if_any(c(score, extra), ~ !is.na(.x))
+  )
+```
+
+
+当然，对于缺失值我们往往没有耐心，会采用一个简单粗暴的方法
 ```{r}
 df %>% 
   drop_na()
@@ -243,9 +338,26 @@ df %>%
 
 
 
+
+```{r}
+tb <- tibble(
+  x = c(1, NA, NA),
+  y = c(NA, 1, NA),
+  z = c(NA, NA, NA)
+)
+tb
+```
+
+```{r}
+# 删除一行中全部为"NA"的列
+tb %>% 
+  janitor::remove_empty("cols")
+```
+
+
 ```{r}
 # 删除一行中全部为"NA"的行
-df %>% 
+tb %>% 
   janitor::remove_empty("rows")
 ```
 
