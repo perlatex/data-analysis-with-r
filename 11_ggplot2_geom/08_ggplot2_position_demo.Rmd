@@ -1,0 +1,89 @@
+---
+title: "ggplot2之位置调整"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+penguins <- penguins %>% drop_na()
+penguins
+```
+
+
+直方图
+```{r}
+penguins %>%
+  ggplot(aes(x = body_mass_g)) +
+  geom_histogram(bins = 35, alpha = 0.7, color = "white")
+```
+
+
+关于bins以及落入bins中的点数
+
+```{r}
+penguins %>%
+  mutate(interval = cut(body_mass_g, breaks = 35)) %>% 
+  count(interval)
+```
+
+
+
+不同的物种，用不的颜色
+```{r}
+penguins %>%
+  ggplot(aes(x = body_mass_g, fill = species)) +
+  geom_histogram(bins = 35, alpha = 0.7, color = "white")
+```
+
+
+```{r}
+penguins %>%
+  mutate(interval = cut(body_mass_g, breaks = 35)) %>% 
+  count(interval, species)
+```
+
+
+# 三种位置摆放
+
+同一个bin里，本来是一根柱子，但不同的species，用不同的颜色加以区分。那么同一个bin里就有了多个小柱子，关于这些小柱子的位置摆放，我们有三种可选的方案。列举如下
+
+- `position = "stack"` 意思是一上一下的堆栈，好比蜂窝煤炉子中的蜂窝煤，我压着你、你压着我的感觉。注意看下图从左到右的第二根柱子，红色的 Adelie 是 5，绿色的 Chinstrap 是 1，所以堆栈之后，它们整体高度是6
+
+```{r}
+penguins %>%
+  ggplot(aes(x = body_mass_g, fill = species)) +
+  geom_histogram(bins = 35, alpha = 0.7, position = "stack", color = "white")  # 默认
+```
+
+
+
+
+- `position = "identity"` 是等值变化，不做调整的意思。好比情侣相拥的感觉。下图从左到右的第二根柱子，红色的 Adelie 是 5，绿色的 Chinstrap 是 1，注意他们都是从0开始，而且位于一个bin中，因此有遮盖，最高的高度仍然是5
+```{r}
+penguins %>%
+  ggplot(aes(x = body_mass_g, fill = species)) +
+  geom_histogram(bins = 35, alpha = 0.7, position = "identity", color = "white")
+```
+
+
+
+- `position = "dodge"` 手拉手、肩并肩。下图从左到右的第二根柱子，红色的Adelie是5，绿色的Chinstrap 是1，他们都是从0开始，但他们没有重叠和交叉
+```{r}
+penguins %>%
+  ggplot(aes(x = body_mass_g, fill = species)) +
+  geom_histogram(bins = 35, alpha = 0.7, position = "dodge", color = "white")  
+```
+

@@ -93,7 +93,7 @@ penguins %>%
 
 ## position_dodge2()
 
-与`position_dodge()`一样，主要用于分组的柱状图，当每组的柱子个数不相等的时候，我们可以选择是让单子柱子的宽度相等，还是一组中所有柱子的宽度之和相等
+与`position_dodge()`一样，主要用于分组的柱状图，当每组的柱子个数不相等的时候，我们可以选择是让单个柱子的宽度相等，还是每组中所有柱子的宽度之和相等
 
 ```{r, message=FALSE, warning=FALSE}
 penguins %>% 
@@ -147,7 +147,7 @@ penguins %>%
 ```
 
 ## position_jitterdodge()
-顾名思义jitterdodge = jitter +  dodge. 有时候我们除了生成多个错开的箱线图外，还想产生与箱线图位置一致的抖散图，所以就有了`position_jitterdodge()`。
+顾名思义`jitterdodge = jitter +  dodge`. 有时候我们除了生成多个错开的箱线图外，还想产生与箱线图位置一致的抖散图，所以就有了`position_jitterdodge()`。
 
 ```{r, message=FALSE, warning=FALSE}
 penguins %>% 
