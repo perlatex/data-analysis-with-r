@@ -1,0 +1,61 @@
+---
+title: "ggplot2之标度作业2"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+# 作业
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+penguins <- penguins %>% drop_na()
+
+penguins
+```
+
+
+
+1. 改造以下代码，要求每组高于bill_depth_mm均值的，透明度为1，否则为0.3
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point(size = 5, show.legend = FALSE)
+```
+
+
+
+
+2. 改造以下代码，要求低于每组bill_depth_mm均值的点，用灰色
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point(size = 5, alpha = 0.7, show.legend = FALSE)
+```
+
+
+
+
+
+3. 改造下面代码，要求每组中bill_length_mm最长的那个点是实心点，其它的点是空心点
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point(shape = 21, size = 5, show.legend = FALSE)
+```
+
+
+
+
