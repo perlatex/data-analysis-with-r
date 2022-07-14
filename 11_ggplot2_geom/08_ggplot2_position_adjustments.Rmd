@@ -91,6 +91,17 @@ penguins %>%
   geom_bar(position = position_dodge(width = 0.75))
 ```
 
+
+
+```{r}
+penguins %>% 
+  count(species, sex) %>% 
+  ggplot(aes(x = species, y = n, fill = sex)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+  geom_text(aes(label = n), position = position_dodge(width = 0.9), vjust = -0.5) 
+```
+
+
 ## position_dodge2()
 
 与`position_dodge()`一样，主要用于分组的柱状图，当每组的柱子个数不相等的时候，我们可以选择是让单个柱子的宽度相等，还是每组中所有柱子的宽度之和相等

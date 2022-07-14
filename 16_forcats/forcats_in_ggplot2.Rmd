@@ -1,0 +1,441 @@
+---
+title: "因子型变量以及在可视化中应用"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+这是一个关于企鹅排队的故事
+
+```{r, echo = FALSE}
+knitr::include_graphics("./images/penguins.gif")
+```
+
+
+# forcats宏包
+
+与dplyr、ggplot2等宏包一样，forcats宏包是tidyverse家族重要成员。
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+```
+
+
+forcats宏包主要用于处理分类变量和因子型向量。当我们有分类变量，且不想以字母的顺序排序时，可以使用forcats宏包中的函数，通过改变向量的层级顺序来实现。
+
+forcats宏包中常用的几个函数：
+
+1. `fct_reorder()`: 根据另一个变量的统计结果重新排列因子层级
+
+2. `fct_relevel()`: 手动排序
+
+3. `fct_rev()`    : 逆序
+
+4. `fct_infreq()` : 按照频次的顺序
+
+5. `fct_inorder()`: 按照首次出现的顺序排序因子层级
+
+
+
+
+# 案例
+
+还是用我们熟悉的penguins数据，举例说明这些函数在可视化中的具体应用。
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+penguins <- penguins %>% drop_na()
+```
+
+
+## fct_reorder()
+
+我们想画出每个物种的数量，
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species)) +
+  geom_bar()
+```
+
+可以看到图中物种是按照A-C-G顺序，即字母表的顺序呈现。如果我们想按照柱子的高度，从低往高排列呢？**通俗点说，哪支队伍的人少，就排在前面。**
+
+
+- 传统的方法
+```{r}
+penguins %>%
+  mutate(species = factor(species, levels = c("Chinstrap", "Gentoo", "Adelie"))) %>% 
+  
+  ggplot(aes(x = species)) +
+  geom_bar()
+```
+但这个顺序是，我们知道结果之后，加进去的。
+
+
+- 更方便的方法
+
+可以用`fct_reorder()`偷懒，自动按照每组企鹅数量的多少调整因子顺序。
+
+```{r}
+penguins %>%
+  mutate(species = fct_reorder(species, bill_length_mm, .fun = length)) %>% 
+  
+  ggplot(aes(x = species)) +
+  geom_bar()
+```
+
+也可以直接写在`ggplot()`里
+
+```{r}
+penguins %>%
+  ggplot(aes(x = fct_reorder(species, bill_length_mm, .fun = length))) +
+  geom_bar()
+```
+
+
+验证，看看每支队伍的人数
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    n = length(bill_length_mm)
+  ) %>%
+  arrange(n)
+```
+
+**思考**，有没有更简单的验证方法？
+
+
+
+也可以这样指挥，哪支队伍的人多，就排在前面，即降序排列
+
+```{r}
+penguins %>%
+  ggplot(aes(x = fct_reorder(species, bill_length_mm, .fun = length, .desc = TRUE))) +
+  geom_bar()
+```
+
+
+
+**继续**，画出不同物种企鹅的嘴巴长度的箱线图
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_boxplot()
+```
+
+
+哪支队伍嘴巴长度的中位数小，就排在前面
+
+```{r}
+penguins %>%
+  ggplot(aes(
+    x = fct_reorder(species, bill_length_mm, .fun = median),
+    y = bill_length_mm
+  )) +
+  geom_boxplot()
+```
+
+验证，看看每支队伍嘴巴长度的中位数
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    median = median(bill_length_mm)
+  ) %>%
+  arrange(median)
+```
+
+
+
+
+每支队伍中的最后一个人，出来pk，输了的，他的队伍排在前面
+```{r}
+penguins %>%
+  mutate(species = fct_reorder(species, bill_length_mm, .fun = last)) %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_boxplot()
+```
+
+
+
+验证，看看每支队伍中的最后一个人的嘴长
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    last = last(bill_length_mm)
+  ) %>%
+  arrange(last)
+```
+
+
+
+每支队伍中的最胖一个，出来pk，谁输了，他的队伍就先出场。
+```{r}
+penguins %>%
+  ggplot(aes(x = fct_reorder(species, body_mass_g, .fun = max), y = body_mass_g)) +
+  geom_boxplot()
+```
+
+验证，看看每支队伍中的最胖那个人
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    maximum = max(body_mass_g)
+  ) %>%
+  arrange(maximum)
+```
+
+
+给出每支队伍中最胖与最瘦之差，差值最小，那么他的队伍就先出场。
+
+```{r}
+penguins %>%
+  mutate(species = fct_reorder(species, body_mass_g, function(x) { max(x) - min(x) })) %>%
+  ggplot(aes(x = species, y = body_mass_g)) +
+  geom_boxplot()
+```
+
+验证，每支队伍中最胖与最瘦之差
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    diff = max(body_mass_g) - min(body_mass_g)
+  ) %>%
+  arrange(diff)
+```
+
+
+## fct_reorder2()
+
+按照多个变量的关系来排序。比如，每组企鹅的嘴巴长度和嘴巴厚度乘积的最大值，来排序。
+
+通俗点来说，每支队伍中的嘴巴面积最大的企鹅，出来pk，谁输了，他的队伍就先出场。
+
+```{r}
+penguins %>%
+  mutate(
+    species = fct_reorder2(species, bill_length_mm, bill_depth_mm,
+      .fun = function(.x, .y) max(.x * .y)
+    )
+  ) %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_boxplot()
+```
+
+注意，这里默认的是降序排列，不是之前`fct_reorder()`的升序。也可以验证
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    maximum = max(bill_length_mm * bill_depth_mm)
+  ) %>%
+  arrange(desc(maximum))
+```
+
+
+
+
+再比如，每支队伍中站在最后的那个男性，出来 pk 嘴长
+
+```{r}
+penguins %>%
+  mutate(
+    species = fct_reorder2(species, sex, bill_length_mm, .fun = last2)
+  ) %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_boxplot()
+```
+
+
+验证，找出每支队伍中站在最后的那个男性
+```{r}
+penguins %>%
+  filter(sex == "male") %>% # last2(): 两个last = last(sex) + last(bill_length_mm)
+  group_by(species) %>%
+  summarise(
+    l = last(bill_length_mm)
+  ) %>%
+  arrange(desc(l))
+```
+
+
+## fct_relevel()
+
+移动
+```{r }
+# Move "Chinstrap" in front, rest alphabetic
+penguins %>%
+  ggplot(aes(y = fct_relevel(species, "Chinstrap"))) +
+  geom_bar()
+```
+
+
+直接指定顺序
+
+```{r}
+# Use order "Chinstrap", "Gentoo", "Adelie"
+penguins %>%
+  ggplot(aes(y = fct_relevel(species, "Chinstrap", "Gentoo", "Adelie"))) +
+  geom_bar()
+```
+
+
+```{r}
+penguins %>%
+  mutate(species = fct_relevel(species, "Chinstrap", "Gentoo", "Adelie")) %>%
+  ggplot(aes(y = species)) +
+  geom_bar()
+```
+
+
+当然也可以偷懒，即把G类企鹅放在第二位
+
+```{r}
+penguins %>%
+  mutate(species = fct_relevel(species, "Gentoo", after = 1)) %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_jitter()
+```
+
+还可以这样，让A类企鹅放在最后
+
+```{r}
+penguins %>%
+  ggplot(aes(y = fct_relevel(species, "Adelie", after = Inf))) +
+  geom_bar()
+```
+
+还通过函数实现排序
+
+```{r}
+penguins %>%
+  mutate(species = fct_relevel(species, rev)) %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_jitter()
+```
+
+
+
+```{r}
+penguins %>%
+  mutate(species = fct_relevel(species, sample)) %>% # 每次运行结果都不一样哦
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_jitter()
+```
+
+
+总之，只要是你想要的顺序，`fct_relevel()`都可以帮你实现，真的很暖很贴心~
+
+
+
+## fct_rev()
+
+按照首字母逆向排列，即反序
+
+```{r}
+penguins %>%
+  ggplot(aes(y = fct_rev(species))) +
+  geom_bar()
+```
+
+
+
+## fct_infreq()
+
+按照频次的顺序
+
+```{r}
+# Use the order defined by the number of penguins of different species
+# The order is descending, from most frequent to least frequent
+penguins %>%
+  mutate(species = fct_infreq(species)) %>%
+  ggplot(aes(x = species)) +
+  geom_bar()
+```
+
+
+```{r}
+penguins %>%
+  mutate(species = fct_rev(fct_infreq(species))) %>%
+  ggplot(aes(x = species)) + 
+  geom_bar()
+```
+
+
+## fct_inorder()
+
+按照首次出现的顺序排列
+
+```{r}
+penguins %>%
+  mutate(species = fct_inorder(species)) %>%
+  ggplot(aes(x = species)) +
+  geom_bar()
+```
+
+验证
+```{r}
+penguins %>%
+  distinct(species)
+```
+
+
+## fct_count()
+
+`fct_count()`，有点类似`dplyr::count()`， 用于统计字符串或者因子类型向量中元素出现的次数和占比。因此与其他`fct_*`函数不同，`fct_count()`返回的是数据框tibble.
+
+物种出现多少次，占比多少？
+```{r}
+penguins %>%
+  pull(species) %>%
+  fct_count(sort = FALSE, prop = FALSE)
+```
+
+
+```{r}
+penguins %>%
+  pull(species) %>%
+  fct_count(sort = TRUE, prop = TRUE)
+```
+
+
+```{r}
+penguins %>%
+  pull(species) %>%
+  fct_count(sort = TRUE, prop = TRUE) %>%
+  ggplot(aes(x = f, y = p)) +
+  geom_col()
+```
+
+
+
+# 小结
+
+-  `fct_reorder(.f, .x, .fun = median, ..., .desc = FALSE)`
+- `fct_reorder2(.f, .x, .y, .fun = last2, ..., .desc = TRUE)`
+-  `fct_relevel(.f, ..., after = 0L)`
+-      `fct_rev( f)`
+-   `fct_infreq( f, ordered = NA)`
+-  `fct_inorder( f, ordered = NA)`
+-    `fct_count( f, sort = FALSE, prop = FALSE)`
+
+

@@ -393,6 +393,31 @@ penguins %>%
 ```
 
 
+## 横坐标标签过长的情形
+
+```{r}
+data <- tibble(
+  x = c(
+    "short",
+    "that's a bit longer",
+    "very very very very very very very looooong label"
+  ),
+  y = 1:3
+)
+
+data
+```
+
+
+```{r}
+data %>%
+  ggplot(aes(x, y)) +
+  geom_col() +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 10))
+```
+
+
+
 ## 坐标轴转换
 
 $x$ -> $x^{-1}$
