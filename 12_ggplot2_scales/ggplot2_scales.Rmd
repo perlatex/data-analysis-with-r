@@ -663,7 +663,21 @@ penguins %>%
 ```
 
 
-## 使用模板配色
+## 配色
+
+关于配色，这里有个小小的提示：
+
+- 尽可能避免使用`"red"`, `"green"`, `"blue"`, `"cyan"`, `"magenta"`, `"yellow"`颜色
+- 使用相对柔和的颜色`"firebrick"`, `"springgreen4"`, `"blue3"`, `"turquoise3"`, `"darkorchid2"`, `"gold2"`，会让人觉得舒服
+
+
+
+可以对比下
+```{r ggplot2-colors-18}
+colorspace::swatchplot(c("red", "green", "blue", "cyan", "magenta", "yellow"))
+colorspace::swatchplot(c("firebrick", "springgreen4", "blue3", "turquoise3", "darkorchid2", "gold2"))
+```
+
 
 - 可以使用[ColorBrewer](https://colorbrewer2.org)色彩
 
@@ -764,7 +778,7 @@ penguins %>%
   scale_color_binned(type = "viridis")
 ```
 
-# 其它标度
+# 大小的标度
 
 ## 控制图中点的大小变化范围
 
@@ -783,6 +797,9 @@ penguins %>%
 这里`range = c(1, 10)`的意思，让体重值最小的点，半径为1；让体重值最大的点，半径为10.
 
 
+# 图例的标度
+
+下次课讲
 
 
 ## 更多
