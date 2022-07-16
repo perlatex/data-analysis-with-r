@@ -125,7 +125,6 @@ penguins %>%
 
 
 
-
 ## 修改横坐标标题
 
 ```{r}
@@ -136,6 +135,8 @@ penguins %>%
     name = "这是我的横坐标"
   )
 ```
+
+
 
 ## 修改坐标轴范围
 
@@ -162,7 +163,7 @@ penguins %>%
 penguins %>% 
   ggplot(aes(x = species)) +
   geom_bar() +
-  scale_x_discrete(expand = c(0, 0)) 
+  scale_x_discrete(expand = c(0, 0.5)) 
 ```
 
 - 离散的坐标轴，默认有0.6个单位的扩展
@@ -207,7 +208,7 @@ penguins %>%
   )
 ```
 
-强烈推荐使用scales宏包的各种函数
+强烈推荐使用`scales`宏包的各种函数
 ```{r}
 penguins %>% 
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
@@ -310,7 +311,7 @@ penguins %>%
     name = "这是我的横坐标",
     limits = c(30, 60),
     breaks = scales::breaks_width(width = 5),
-    labels = scales::label_number(accuracy = 1, suffix = "mm")
+    labels = scales::label_number(accuracy = 0.1, suffix = "mm")
   )
 ```
 
@@ -332,6 +333,7 @@ penguins %>%
 scales::label_comma()(20^(1:3))
 scales::label_dollar()(c(-1000, -100, 100, 1000))
 scales::label_percent()(c(0.4, 0.6))
+scales::label_percent(scale = 1)(c(50, 55))
 ```
 
 
@@ -413,7 +415,7 @@ data
 data %>%
   ggplot(aes(x, y)) +
   geom_col() +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 10))
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 ```
 
 
@@ -479,7 +481,7 @@ gapminder %>%
   ggplot(aes(gdpPercap, y = lifeExp, color = continent)) +
   geom_point() +
   guides(color = "none") +
-  scale_x_log10(labels = label_log())
+  scale_x_log10(labels = scales::label_log())
 ```
 
 
@@ -788,9 +790,7 @@ penguins %>%
   geom_point(aes(size = body_mass_g)) +
   scale_size(
      name = "企鹅体重",
-     range = c(1, 10),
-     breaks = c(3000, 4000, 5000, 6000),
-     labels = c("3kg", "4kg", "5kg", "6kg")
+     range = c(1, 10)
    )
 ```
 

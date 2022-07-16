@@ -138,6 +138,9 @@ penguins %>%
 
 
 还有一种分组方法，就是**分面**
+
+- facet_wrap()
+
 ```{r}
 penguins %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
@@ -145,10 +148,40 @@ penguins %>%
   facet_wrap(vars(species))
 ```
 
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_wrap(vars(species))
+```
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_wrap(vars(sex))
+```
+
+
+- facet_grid()
+
 ```{r}
 penguins %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_point() +
+  facet_grid(island ~ species)
+```
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = sex)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
   facet_grid(island ~ species)
 ```
 

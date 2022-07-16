@@ -283,16 +283,26 @@ library(dplyr)
 select(starwars, height)
 ```
 
-但是，其它宏包可能也有`select()`函数，比如`MASS`和`skimr`，如果同时加载了`dplyr`，`MASS`和`skimr`三个宏包，若在程序中使用`select()`函数，就会造成混淆和报错。这个时候就需要给每个函数指定是来源哪个宏包，具体方法就是在宏包和函数之间添加`::`，比如`dplyr::select()`，`skimr::select()` 或者`MASS::select()`。
+但是如果加载多个宏包，也可能遇到其它宏包也有`select()`函数的情形，比如`MASS`和`skimr`。如果同时加载了`dplyr`，`MASS`和`skimr`三个宏包，若在程序中使用`select()`函数，就会造成混淆和报错。
 
+```{r, eval=FALSE}
+library(dplyr)
+library(MASS)
+select(starwars, height)
+```
 
-> 一班有个王大宝，二班也有个叫王大宝，他们一起参加活动，点名的时候就需要加上班级，`一班::王大宝`，放在R语言就是 `package::function()`.
+这个时候就需要给每个函数指定是来源哪个宏包，具体方法就是在宏包和函数之间添加`::`，比如`dplyr::select()`，`skimr::select()` 或者`MASS::select()`。
 
 
 因此，使用宏包函数的第二种方法
 ```{r}
 dplyr::select(starwars, height)
 ```
+
+
+
+> 一班有个王大宝，二班也有个叫王大宝，他们一起参加活动，点名的时候就需要加上班级，`一班::王大宝`，放在R语言就是 `package::function()`.
+
 
 
 
