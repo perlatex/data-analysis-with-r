@@ -1,0 +1,75 @@
+---
+title: "Do workers in richer countries work longer hours?"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 作业
+
+复现下面链接中的图
+<https://ourworldindata.org/time-use#do-workers-in-richer-countries-work-longer-hours>
+
+此图挺有意思，纵坐标是年均工作时间，横坐标是经生活成本差异调整后的人均GDP，越往左上角，干得越多拿的越少（又忙又穷），最极端的是孟加拉国，越往右下角，干得越少拿的反而越多（又闲又富），最极端的是卢森堡，可以近似的看做一个全球内卷化差异图。
+
+
+## 数据来源
+
+可以点击图中DOWNLOAD按钮，可以获取相应的数据。我这里已经下载，放在data文件夹里
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+df_raw <- read_csv("./demo_data/annual-working-hours-vs-gdp-per-capita-pwt.csv")
+df_raw
+```
+
+
+## 数据整理
+
+已解决的问题：
+
+- 列名的整理
+- 由国家名到所在的洲（用到宏包`countrycode`）
+- 缺失值处理
+- 只选取最近的年份
+
+```{r}
+df <- df_raw %>%
+  janitor::clean_names() %>%
+  rename(country = entity, working_hours = 4, gdp_per_cap = 5, population = 6) %>%
+  select(-continent) %>%
+  mutate(continent = countrycode::countrycode(code, origin = "iso3c", destination = "continent")) %>%
+  drop_na() %>%
+  slice_max(year)
+
+df
+```
+
+
+## 简单探索
+
+- 工作时间最长的国家
+- 每年平均工作时间和人均GDP的相关系数
+
+
+
+
+## 观察图片
+
+要解决的问题和提示：
+
+- 坐标轴断点和标签的设置
+- 配色，可使用工具<https://color.adobe.com/zh/create/color-wheel>提取原图的色彩
+- 标签重叠的解决方案(`ggrepel::geom_text_repel()`)
+- 图例用的是方形的点(`ggpubr::show_point_shapes()`)
+
+
