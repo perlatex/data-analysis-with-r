@@ -46,7 +46,11 @@ penguins %>%
 
 使用方法
 ```{r, eval=FALSE}
-theme(element_name = element_function())
+theme(
+  
+  element_name = element_function()
+  
+  )
 ```
 
 这里`element_function()`有四个
@@ -85,6 +89,7 @@ element_blank()
 penguins %>% 
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_point(aes(colour = species)) +
+  ggtitle("this is my title") +
   
   theme(
     plot.background = element_rect(fill = "orange", color = "black", size = 10),
@@ -251,7 +256,11 @@ penguins %>%
   geom_bar() + 
   scale_fill_manual(values = c("#74656E", "#E2D9C1", "#608690")) +
   theme_minimal() +
-  theme(plot.background = element_rect(fill = "#FBCE74"))
+  theme(
+    panel.grid = element_blank(),
+    plot.background = element_rect(fill = "#FBCE74"),
+    legend.position = "none"
+  )
 ```
 
 

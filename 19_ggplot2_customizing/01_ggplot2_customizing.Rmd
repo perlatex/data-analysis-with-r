@@ -32,18 +32,21 @@ g1 <- penguins %>%
   geom_point() + 
   theme_bw(base_size = 14) +
   labs(tag = "(A)", x = "Bill length (mm)", y = "Body mass (g)")
-       
+g1
+```
 
+
+```{r}
 g2 <- penguins %>% 
   ggplot(aes(bill_length_mm, bill_depth_mm, color = species)) +
   geom_point() + 
   theme_bw(base_size = 14) +
   labs(tag = "(B)", x = "Bill length (mm)", y = "Bill depth (mm)")
+g2
 ```
 
 
-
-
+把两张图组合起来
 ```{r, fig.width = 12, fig.asp= 0.318}
 library(patchwork)
 

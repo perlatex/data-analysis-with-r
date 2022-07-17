@@ -78,6 +78,7 @@ penguins %>%
   ggplot(aes(x = species)) +
   geom_bar()
 ```
+
 但这个顺序是，我们知道结果之后，加进去的。
 
 
@@ -161,7 +162,7 @@ penguins %>%
 
 
 
-每支队伍中的最后一个人，出来pk，输了的，他的队伍排在前面
+每支队伍中的最后一个人，出来pk嘴长，输了的，他的队伍排在前面
 ```{r}
 penguins %>%
   mutate(species = fct_reorder(species, bill_length_mm, .fun = last)) %>%
@@ -184,7 +185,7 @@ penguins %>%
 
 
 
-每支队伍中的最胖一个，出来pk，谁输了，他的队伍就先出场。
+每支队伍中的最胖一个，出来pk体重，谁输了，他的队伍就先出场。
 ```{r}
 penguins %>%
   ggplot(aes(x = fct_reorder(species, body_mass_g, .fun = max), y = body_mass_g)) +
@@ -291,7 +292,7 @@ penguins %>%
 ```{r }
 # Move "Chinstrap" in front, rest alphabetic
 penguins %>%
-  ggplot(aes(y = fct_relevel(species, "Chinstrap"))) +
+  ggplot(aes(x = fct_relevel(species, "Chinstrap"))) +
   geom_bar()
 ```
 
@@ -301,7 +302,14 @@ penguins %>%
 ```{r}
 # Use order "Chinstrap", "Gentoo", "Adelie"
 penguins %>%
-  ggplot(aes(y = fct_relevel(species, "Chinstrap", "Gentoo", "Adelie"))) +
+  ggplot(aes(x = fct_relevel(species, "Chinstrap", "Gentoo", "Adelie"))) +
+  geom_bar()
+```
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = fct_relevel(species, c("Chinstrap", "Gentoo", "Adelie")))) +
   geom_bar()
 ```
 
@@ -309,7 +317,7 @@ penguins %>%
 ```{r}
 penguins %>%
   mutate(species = fct_relevel(species, "Chinstrap", "Gentoo", "Adelie")) %>%
-  ggplot(aes(y = species)) +
+  ggplot(aes(x = species)) +
   geom_bar()
 ```
 
@@ -327,7 +335,7 @@ penguins %>%
 
 ```{r}
 penguins %>%
-  ggplot(aes(y = fct_relevel(species, "Adelie", after = Inf))) +
+  ggplot(aes(x = fct_relevel(species, "Adelie", after = Inf))) +
   geom_bar()
 ```
 
@@ -360,7 +368,7 @@ penguins %>%
 
 ```{r}
 penguins %>%
-  ggplot(aes(y = fct_rev(species))) +
+  ggplot(aes(x = fct_rev(species))) +
   geom_bar()
 ```
 
