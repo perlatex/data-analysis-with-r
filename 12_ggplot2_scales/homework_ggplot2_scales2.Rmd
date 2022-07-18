@@ -27,6 +27,55 @@ penguins
 ```
 
 
+0. 改造以下代码，让bill_depth_mm值高于整体均值的点用红色，否则用灰色
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(size = 3)
+```
+
+
+对于这种需求，我们一般采用**（分组、映射、标度）**三步走
+
+- 分组。新增一列，对每只企鹅给一个标记，类似于sex这种分组变量
+
+```{r}
+penguins %>% 
+  mutate(g = if_else(bill_length_mm > mean(bill_length_mm), "a", "b"))
+```
+
+
+
+- 映射。将新增的变量，映射给颜色，即"a"对应一种颜色，"b"对应另一种颜色
+
+```{r}
+penguins %>% 
+  mutate(g = if_else(bill_length_mm > mean(bill_length_mm), "a", "b")) %>% 
+
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = g)) +
+  geom_point(size = 3)
+```
+
+
+
+- 标度。修改颜色，让 "a" 对应红色， "b" 对应灰色 
+
+```{r}
+penguins %>% 
+  mutate(g = if_else(bill_length_mm > mean(bill_length_mm), "a", "b")) %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = g)) +
+  geom_point(size = 3) +
+  
+  scale_color_manual(
+    values = c("a" = "red", "b" = "gray80")
+  )
+```
+
+
+
+## 开始吧
+
 
 1. 改造以下代码，要求每组高于bill_depth_mm均值的，透明度为1，否则为0.3
 ```{r, message=FALSE, warning=FALSE}

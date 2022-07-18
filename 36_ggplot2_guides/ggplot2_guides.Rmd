@@ -144,8 +144,8 @@ penguins %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = body_mass_g)) +
   geom_point() +
   scale_color_continuous(
-    guide = guide_colourbar(),
-    name = "weight",
+    guide  = guide_colourbar(),
+    name   = "weight",
     limits = c(3000, 7000),
     breaks = c(3000, 4000, 4500, 5000, 7000)
   )
@@ -201,7 +201,19 @@ penguins %>%
 ```
 
 
-  
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(size = body_mass_g)) +
+  scale_size(
+     name   = "企鹅体重",
+     range  = c(1, 10),
+     breaks = c(3000, 4000, 5000, 6000),
+     labels = c("3kg", "4kg", "5kg", "6kg")
+   )
+```
+
+
 # 参考
 
-- https://ggplot2.tidyverse.org/reference/guide_colourbar.html
+- <https://ggplot2.tidyverse.org/reference/guide_colourbar.html>

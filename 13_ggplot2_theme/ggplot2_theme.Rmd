@@ -285,6 +285,21 @@ penguins %>%
   scale_fill_economist()
 ```
 
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = species, fill = species)) +
+  geom_bar(width = 0.8) + 
+  ggthemes::theme_solarized() +
+  theme(
+     panel.grid.major.x = element_blank(),
+     panel.grid.major.y = element_blank(),
+     panel.grid.minor.y = element_blank()
+   ) 
+
+```
+
+
 - `ggthemr`宏包
 
 ```{r}
