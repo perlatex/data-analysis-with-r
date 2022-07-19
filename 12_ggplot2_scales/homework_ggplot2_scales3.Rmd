@@ -1,0 +1,56 @@
+---
+title: "ggplot2之标度作业3"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+# 作业
+
+问题，怎么让d1中0.03的圆点和d2中0.03的圆点大小一致呀?
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(patchwork)
+
+
+d1 <- tibble(
+  x = 1:3,
+  y = 1:3,
+  z = c(0.01, 0.02, 0.03)
+)
+
+d2 <- tibble(
+  x = 1:3,
+  y = 1:3,
+  z = c(0.03, 0.05, 0.06)
+)
+```
+
+
+
+```{r}
+g1 <- d1 %>% 
+  ggplot(aes(x = x, y = y, size = z)) +
+  geom_point()
+
+g2 <- d2 %>% 
+  ggplot(aes(x = x, y = y, size = z)) +
+  geom_point() 
+
+g1 + g2
+```
+
+

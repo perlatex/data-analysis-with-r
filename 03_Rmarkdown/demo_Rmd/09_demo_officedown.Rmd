@@ -1,0 +1,85 @@
+---
+title: "学生学习情况分析报告"
+output: 
+  officedown::rdocx_document:
+    toc: yes
+    tables:
+      caption:
+        pre: '表 '
+    plots:
+      caption:
+        pre: '图 '
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.cap = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.showtext = TRUE,
+  dpi = 300,
+  fig.align = "center",
+  out.width = "\\textwidth" 
+
+)
+
+options(digits = 4)
+```
+
+
+```{r}
+library(tidyverse)
+library(flextable)
+library(officedown)
+library(officer)
+library(ragg)
+library(palmerpenguins)
+
+penguins <- penguins %>% 
+  drop_na()
+```
+
+
+
+# 主要发现
+
+- 切身体验机会：教师教学过程中通过用眼和用心唤醒学生学习兴趣比动手更多，学生能自己动手操作和探索的机会有待增加。
+- 高阶思维参与：教师更关注让学生反思所讲所学的知识，在甄别不同思路，特别是质疑他人观点方面相对较少；教师在新旧知识的联系上已做得较好，但在跨学科的知识联系和知识关联的可视化方面还需加强；实践与创新思维是高阶思维的培育中难度和挑战最大的方面，也是教师教学过程中最容易忽略的方面。
+- 学会学习指导：教师在鼓励学生向自己要求进一步厘清认识上较为欠缺。
+- 交流合作机会：较为局限于课堂上就相关问题进行讨论，学生一起完成任务、互相评价、当小老师等形式较少。
+- 评价反馈方式：教师更多关注的是偏向于结果的反馈，而在教学过程中给学生提供学习信息，如让学生知道自己现在在哪里、离目标有多远等不够。
+- 教学形式的革新：跨学科的项目式学习、问题解决学习、课题研究学习和学科内教材重组后的教学还有待开展。
+
+
+```{r, out.width= "45%", fig.cap= "这是关于企鹅的故事"}
+file <- knitr::fig_path('percent.png')
+
+agg_png(file, res = 300, height = 3.6, width = 5, units = "in")
+
+p <- penguins %>% 
+  count(species) %>% 
+  ggplot(aes(x = species, y = n)) +
+  geom_col(fill = "red", width = 0.5) +
+  geom_text(aes(label = n), vjust = -0.4) 
+
+
+print(p)
+invisible(dev.off())
+
+knitr::include_graphics(file)
+```
+
+
+# 统计结果
+
+```{r tab.cap='调查的样本数量', tab.id='调查的样本数量'}
+penguins %>% 
+  count(species) %>% 
+  flextable(cwidth = 1.2) %>% 
+  width(j = 1, width = 1.5) %>% 
+  align(j = 2, align = "right", part = "all")
+```
+
+

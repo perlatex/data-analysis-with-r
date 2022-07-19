@@ -1,0 +1,133 @@
+---
+title: "ggplot2之标度作业3"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+# 作业
+
+问题，怎么让d1中0.03的圆点和d2中0.03的圆点大小一致呀?
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(patchwork)
+
+
+d1 <- tibble(
+  x = 1:3,
+  y = 1:3,
+  z = c(0.01, 0.02, 0.03)
+)
+
+d2 <- tibble(
+  x = 1:3,
+  y = 1:3,
+  z = c(0.03, 0.05, 0.06)
+)
+```
+
+
+
+```{r}
+g1 <- d1 %>% 
+  ggplot(aes(x = x, y = y, size = z)) +
+  geom_point()
+
+g2 <- d2 %>% 
+  ggplot(aes(x = x, y = y, size = z)) +
+  geom_point() 
+
+g1 + g2
+```
+
+
+
+
+## 方法1
+
+```{r}
+g1 <- d1 %>% 
+  ggplot(aes(x = x, y = y, size = z)) +
+  geom_point() +
+  scale_size_identity()
+
+g2 <- d2 %>% 
+  ggplot(aes(x = x, y = y, size = z)) +
+  geom_point() +
+  scale_size_identity()
+
+g1 + g2
+```
+
+`scale_size_identity()`用的是z本身的值作为点的大小，这样可以保证，z一样，点的大小也一样。但是，这样带来一个问题，z的值很小，图中的点也很小。所以，我们这里让每个z都乘以100，让值大一点，圆点就看的见了
+
+```{r}
+g1 <- d1 %>% 
+  ggplot(aes(x = x, y = y, size = 100*z)) +
+  geom_point() +
+  scale_size_identity()
+
+g2 <- d2 %>% 
+  ggplot(aes(x = x, y = y, size = 100*z)) +
+  geom_point() +
+  scale_size_identity()
+
+g1 + g2
+```
+
+
+
+
+
+## 方法2
+
+这就好比设置坐标轴limits界限一样，拉平对齐
+
+```{r}
+g11 <- d1 %>% 
+  ggplot(aes(x = x, y = y, size = z)) +
+  geom_point() +
+  scale_size(limits = c(0.01, 0.06), range = c(1, 6))
+
+g22 <- d2 %>% 
+  ggplot(aes(x = x, y = y, size = z)) +
+  geom_point() +
+  scale_size(limits = c(0.01, 0.06), range = c(1, 6))
+
+g11 + g22
+```
+
+
+
+
+## 方法3
+
+整合成一个数据框中
+
+```{r}
+df <- bind_rows(
+  d1 %>% mutate(g = "g1"),
+  d2 %>% mutate(g = "g2")
+)
+
+df %>% 
+  ggplot(aes(x = x, y = y, size = z)) +
+  geom_point() +
+  facet_wrap(vars(g))
+```
+
+
+
