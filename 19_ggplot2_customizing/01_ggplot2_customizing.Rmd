@@ -59,6 +59,9 @@ g1 + g2
 g1 + g2 + plot_layout(guides = "collect")
 ```
 
+```{r, fig.width = 12, fig.asp= 0.418}
+g1 + g2 + plot_layout(guides = "collect") & theme(legend.position = "bottom")
+```
 
 
 patchwork 使用方法很简单，根本不需要记
