@@ -98,6 +98,14 @@ penguins %>% select(contains("length"))
 penguins %>% select(last_col())
 ```
 
+**提问**，如何快速地删除某个数据框 `df` 的最后一列
+```{r, eval=FALSE}
+df %>% 
+  select(!last_col())
+```
+
+
+  
 ## 选择数值型的列
 
 ```{r}

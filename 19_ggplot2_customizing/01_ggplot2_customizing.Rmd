@@ -236,6 +236,20 @@ ggsave("showtext-example.pdf", width = 7, height = 4, dpi = 300)
 ```
 
 
+## 交互式
+
+```{r, message = FALSE, warning = FALSE}
+library(plotly)  # install.packages("plotly")
+
+penguins <- penguins %>% drop_na()
+
+p <- penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point()
+
+ggplotly(p)
+```
+
 
 
 ## 参考

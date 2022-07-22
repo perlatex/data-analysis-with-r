@@ -306,7 +306,7 @@ c(7, TRUE, FALSE)
 c(1L, 2, pi)
 ```
 
-**课堂扩展**，更多的专业词汇
+**课堂扩展**，更多的保留词汇
 
 ```{r}
 TRUE
@@ -318,6 +318,8 @@ LETTERS
 month.name
 month.abb
 ```
+
+`?Reserved` 看看还有哪些保留词汇？
 
 
 ## 思考

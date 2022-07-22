@@ -39,6 +39,12 @@ penguins %>%
   count(interval)
 ```
 
+或者
+```{r}
+penguins %>%
+  mutate(interval = ggplot2::cut_interval(body_mass_g, n = 35)) %>% 
+  count(interval)
+```
 
 
 不同的物种，用不的颜色
