@@ -236,6 +236,22 @@ ggsave("showtext-example.pdf", width = 7, height = 4, dpi = 300)
 ```
 
 
+
+## 添加标注
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() +
+  annotate(
+    geom  = "text", x = c(55), y = c(14),
+    label = c("在这里添加你想说的话，今天好凉快啊~~~"),
+    color = "red",
+    size  = 4
+  )
+```
+
+
 ## 交互式
 
 ```{r, message = FALSE, warning = FALSE}
