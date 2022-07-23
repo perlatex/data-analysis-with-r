@@ -48,6 +48,16 @@ df <- df_raw %>%
   rename(country = entity, working_hours = 4, gdp_per_cap = 5, population = 6) %>%
   select(-continent) %>%
   mutate(continent = countrycode::countrycode(code, origin = "iso3c", destination = "continent")) %>%
+  mutate(
+    continent_new = case_when(
+      country %in% c(
+        "Argentina", "Brazil", "Chile", "Colombia",  "Costa Rica", "Dominican Republic", 
+        "Ecuador",  "Peru", "Uruguay"
+      ) ~ "South America",
+      country %in% c("Canada", "Mexico", "United States") ~ "North America",
+      .default = continent
+    )
+  ) %>% 
   drop_na() %>%
   slice_max(year)
 
@@ -95,13 +105,13 @@ highlight_countries <- c(
 
 
 
-```{r}
+```{r, fig.width = 8}
 df %>%
   ggplot(aes(x = gdp_per_cap, y = working_hours)) +
-  geom_point(aes(size = population, fill = continent), shape = 21, alpha = 0.7) +
+  geom_point(aes(size = population, fill = continent_new), shape = 21, alpha = 0.7) +
   ggrepel::geom_text_repel(
     # data = df %>% filter(country %in% highlight_countries),
-    aes(label = country, color = continent),
+    aes(label = country, color = continent_new),
     size = 2.5,
     min.segment.length = 0,
     segment.size = 0.2
@@ -119,15 +129,20 @@ df %>%
     breaks = seq(1400, 2400, by = 200),
     labels = scales::label_number(suffix = " h", big.mark = ",")
   ) +
-  scale_size_continuous(range = c(1, 18)) +
+  scale_size(
+    name   = "Population",
+    breaks = c(1e+08, 6e+08, 14e+08),
+    labels = c("100 Million", "600 Million", "1.4 Billion"),
+    range  = c(1, 18)
+  ) +
   scale_fill_manual(
     values = c(
       "Africa"        = "#923E8B",
       "Asia"          = "#2D8587",
       "Europe"        = "#4C5C78",
-      "North America" = "#F7D3D2",
-      "Oceania"       = "#A8633C",
-      "South America" = "#932834"
+      "North America" = "#E04E4B",
+      "Oceania"       = "#AC6B46",
+      "South America" = "#99333E"
     ),
     aesthetics = c("colour", "fill")
   ) +
@@ -137,14 +152,15 @@ df %>%
     fill  = guide_legend(order = 1, override.aes = list(size = 4, shape = 22), keywidth = 1.5)
   ) +
   labs(
-    title    = "Annual working hours vs. GDP per capita",
+    title = "Annual working hours vs. GDP per capita",
     subtitle = "Workers in poorer countries tend to work more...",
-    caption  = "Source: Our World in Data, Feenstra et al. (2019). "
+    caption = "Source: Our World in Data, Feenstra et al. (2019). "
   ) +
   theme(
-    panel.background = element_rect(fill = "white"),
-    panel.grid.major = element_line(linetype = "dotted", color = "gray"),
-    plot.caption     = element_text(hjust = 0, size = 7)
+    panel.background  = element_rect(fill = "white"),
+    panel.grid.major  = element_line(linetype = "dotted", color = "gray"),
+    legend.background = element_blank(),
+    plot.caption      = element_text(hjust = 0, size = 7)
   )
 ```
 

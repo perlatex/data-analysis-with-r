@@ -53,7 +53,8 @@ df <- prostate %>%
       rbc_age_group == 1 ~ "Younger", 
       rbc_age_group == 2 ~ "Middle", 
       rbc_age_group == 3 ~ "Older"
-    )
+    ),
+    .after = rbc_age_group
   ) 
 
 df %>% 
@@ -85,6 +86,20 @@ df %>%
   ggplot(aes(x = rbc_age_group_new, y = n_recurrence)) +
   geom_col(width = 0.5)
 ```
+
+
+如果是否复发的编码是1 = yes 和2 = no, 怎么计算频次？
+
+```{r}
+df %>% 
+  group_by(rbc_age_group_new) %>% 
+  summarise(
+    n_recurrence = sum(recurrence == 1)
+  ) %>% 
+  ggplot(aes(x = rbc_age_group_new, y = n_recurrence)) +
+  geom_col(width = 0.5)
+```
+
 
 - 以血液存储时间分组，统计是否复发的占比，最后画出柱状图，并在图中标记比例
 

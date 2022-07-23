@@ -48,6 +48,16 @@ df <- df_raw %>%
   rename(country = entity, working_hours = 4, gdp_per_cap = 5, population = 6) %>%
   select(-continent) %>%
   mutate(continent = countrycode::countrycode(code, origin = "iso3c", destination = "continent")) %>%
+  mutate(
+    continent_new = case_when(
+      country %in% c(
+        "Argentina", "Brazil", "Chile", "Colombia",  "Costa Rica", "Dominican Republic", 
+        "Ecuador",  "Peru", "Uruguay"
+      ) ~ "South America",
+      country %in% c("Canada", "Mexico", "United States") ~ "North America",
+      .default = continent
+    )
+  ) %>% 
   drop_na() %>%
   slice_max(year)
 
