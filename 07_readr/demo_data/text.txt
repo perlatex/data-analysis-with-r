@@ -1,0 +1,5 @@
+name ~  sex ~ score
+Alice ~ girl ~ 89
+Bob ~ boy ~ 78
+Cralo ~ girl ~ 90
+Dave ~ boy ~ 85

@@ -29,6 +29,7 @@ wages
 write_csv(wages, "wages_new.csv")
 ```
 
+请问，此时`wages_new.csv`保存在什么地方？
 
 
 ## 读写excel数据
@@ -47,7 +48,7 @@ write.xlsx(olympics, "olympics_new.xlsx")
 ```
 
 
-**课堂练习**，把 `olympics` 保存到demo_data文件夹，并取名为`olympics_new2.xlsx`
+**课堂练习**，把 `olympics` 保存到 data 文件夹，并取名为`olympics_new2.xlsx`
 
 
 

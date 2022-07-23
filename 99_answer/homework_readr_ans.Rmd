@@ -14,9 +14,10 @@ output:
     df_print: paged
 ---
 
+
 ## 作业
 
-读取demo_data文件夹下`kidiq.RDS`文件
+1. 读取demo_data文件夹下`kidiq.RDS`文件
 
 - 可以使用`readr::read_rds()`或者`readRDS()`
 
@@ -25,7 +26,6 @@ library(readr)
 kidiq <- read_rds("./demo_data/kidiq.RDS")
 kidiq
 ```
-
 
 - 请说出数据框中每一列的变量类型
 
@@ -44,3 +44,44 @@ kidiq %>%
   openxlsx::write.xlsx("kidiq.xlsx")
 ```
 
+- 读取刚刚保存的`xlsx`文件
+
+```{r}
+df <- readxl::read_excel("kidiq.xlsx")
+df
+```
+
+- 保存为`csv`文件到demo_data文件夹下
+
+```{r}
+df %>% write_csv("./demo_data/kidiq_new.csv")
+```
+
+
+
+2. 读取demo_data文件夹下的wages.csv文件，要求 `edu` 和 `age` 这两列，以整数型读进来。
+
+```{r}
+library(readr)
+
+wages <- read_csv(
+  file = "./demo_data/wages.csv", 
+  col_types = list(edu = "i", age = "i")
+  )
+
+wages
+```
+
+
+
+3. 阅读帮助文档，学习`readr::read_delim()`用法，读入`demo_data`文件夹下的`text.txt`文件
+```{r}
+library(readr)
+
+tbl <- read_delim(
+  file = "./demo_data/text.txt",
+  delim = "~"
+  )
+
+tbl
+```
