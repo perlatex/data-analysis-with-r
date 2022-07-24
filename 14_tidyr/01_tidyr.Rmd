@@ -297,7 +297,23 @@ skipping_longer %>%
 
 # 课堂练习
 
-- 以体征指标分面，画出不同性别的箱线图
+- 统计各体征的均值，然后变成长表格
+
+```{r}
+penguins %>%
+  select(bill_length_mm:body_mass_g) %>%
+  summarise(
+    across(everything(), mean)
+  ) %>% 
+  pivot_longer(
+    cols = everything(),
+    names_to = "index",
+    values_to = "value"
+  ) 
+```
+
+
+- 画出不同性别的各体征指标的箱线图，要求以体征指标分面
 
 ```{r, fig.width= 16, fig.height= 4}
 penguins %>%
@@ -317,23 +333,9 @@ penguins %>%
 
 
 
-- 统计penguins各个体征的均值，然后变成长表格
-
-```{r}
-penguins %>%
-  select(bill_length_mm:body_mass_g) %>%
-  summarise(
-    across(everything(), mean)
-  ) %>% 
-  pivot_longer(
-    cols = everything(),
-    names_to = "index",
-    values_to = "value"
-  ) 
-```
 
 
-- 统计penguins各个体征的均值和标准差，然后旋转数据框，让数据框的第一列是函数名
+- 统计各体征的均值和标准差，然后旋转数据框，让数据框的第一列是函数名
 
 第一种方法
 
