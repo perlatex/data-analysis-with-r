@@ -13,6 +13,7 @@ output:
     df_print: paged
 ---
 
+# 作业1
 
 这里是我虚构的六位同学的各科考试成绩，`NA`代表未参加考试
 
@@ -32,15 +33,24 @@ example
 ```
 
 
-# 作业
-
 - 用各科的均值代替缺失值`NA`
 
 
-- 旋转数据框，即希望数据框的第一列是各科目，然后第二列到最后一列是学生姓名，A, B...F
+- 旋转数据框，即希望数据框的第一列是各科目，然后第二列到最后一列是学生姓名，A, B, ... F
 
 
 ```{r, out.width = '100%', fig.align='left', echo = FALSE}
 knitr::include_graphics("images/wrangle.png")
 ```
 
+
+
+# 作业2
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+penguins <- penguins %>% drop_na()
+```
+
+统计各体征的均值和标准差，然后旋转数据框，让数据框的第一列是函数名
