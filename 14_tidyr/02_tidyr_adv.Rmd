@@ -1,5 +1,5 @@
 ---
-title: "数据规整与高级转换"
+title: "数据规整与高级转换2"
 author: "王小二"
 date: "`r Sys.Date()`"
 output: 
@@ -62,6 +62,10 @@ df %>%
 
 ## 尝试2
 
+通常情况下，`names_to` 指定一个字符串向量当作新的一列的列名，用于装 `cols` 指定的旧名。
+
+当然，在 `names_sep` 或者 `names_pattern` 的协助下，也可以指定多个新列名。
+
 ```{r}
 long <- df %>%
   pivot_longer(
@@ -95,6 +99,9 @@ df %>%
     names_sep = "_"
   )
 ```
+
+旋转成长表格，一般要指定`names_to`和 `values_to`. 
+但是，如果 `names_to` 指定的字符串向量中含有".value"，那么旧的列名在经过 `names_sep` 或 `names_pattern` 分割后，".value"所对应或匹配的那部分，被当作新value列的列名，`values_to`就可以省略了。即 .value 代替了 values_to 
 
 
 ```{r}
