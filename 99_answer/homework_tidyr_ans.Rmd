@@ -131,7 +131,7 @@ penguins %>%
 df_stat2 <- penguins %>%
   select(bill_length_mm:body_mass_g) %>%
   summarise(
-    across(everything(),list(mean = mean, sd = sd))
+    across(everything(), list(mean = mean, sd = sd))
   ) 
 df_stat2
 ```
@@ -148,4 +148,15 @@ df_stat2 %>%
 ```
 
 
-
+更简练的版本
+```{r}
+penguins %>%
+  summarise(
+    across(contains("_"), list(mean = mean, sd = sd), .names = "{.col}-{.fn}")
+  ) %>%
+  pivot_longer(
+    cols = everything(),
+    names_sep = "-",
+    names_to = c(".value", "index")
+  )
+```
