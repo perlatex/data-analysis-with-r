@@ -167,10 +167,27 @@ df %>%
 ```
 
 
+**课堂练习**，计算每位同学的平均成绩
+
+```{r, message=FALSE, warning=FALSE}
+scores <- 
+ tibble::tribble(
+   ~name, ~english, ~chinese, ~math, ~sport, ~psy, ~edu,
+     "A",     133,    100,    102,     56,    89,   89,
+     "B",     120,    120,     86,     88,    45,   75,
+     "C",      98,    109,    114,     87,    NA,   84,
+     "D",     120,     78,    106,     68,    86,   69,
+     "E",     110,     99,    134,     98,    75,   70,
+     "F",      NA,    132,    130,     NA,    68,   88
+   )
+scores
+```
 
 
 
-这个很好的解决方案中，`rowwise()`工作原理类似`group_by()`，它是按每一行进行分组，然后按行（行方向）统计
+## `rowwise()`与`group_by()`
+
+`rowwise()`工作原理类似`group_by()`，它是按每一行进行分组，然后按行（行方向）统计
 
 ```{r, out.width = '100%', fig.align='left', echo = FALSE}
 knitr::include_graphics(path = "images/colwise_vs_rowwise.jpg")

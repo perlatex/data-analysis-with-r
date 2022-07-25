@@ -108,6 +108,26 @@ df_stat1 %>%
 
 第二种方法
 ```{r}
+penguins %>%
+  summarise(
+    across(contains("_"), list(mean = mean, sd = sd), .names = "{.fn}-{.col}")
+  ) %>%
+  pivot_longer(
+    cols = everything(),
+    names_sep = "-",
+    names_to = c("fn", "index"),
+    values_to = "value"
+  ) %>%
+  pivot_wider(
+    names_from = index,
+    values_from = value
+  )
+```
+
+
+
+第三种方法
+```{r}
 df_stat2 <- penguins %>%
   select(bill_length_mm:body_mass_g) %>%
   summarise(
@@ -126,3 +146,6 @@ df_stat2 %>%
     names_pattern = "(.*)_(.*)"
   )
 ```
+
+
+

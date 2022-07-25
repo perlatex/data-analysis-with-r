@@ -62,9 +62,7 @@ df %>%
 
 ## 尝试2
 
-通常情况下，`names_to` 指定一个字符串向量当作新的一列的列名，用于装 `cols` 指定的旧名。
-
-当然，在 `names_sep` 或者 `names_pattern` 的协助下，也可以指定多个新列名。
+宽表格旋转成长表格，通常情况下，`names_to`只需要指定一个字符串向量当作新的一列的列名，用于收编`cols` 指定的旧名。当然，在`names_sep`或者`names_pattern`的协助下，原列名被分割成两部分，`names_to` 也据此指定两个新列名，将分割成的两部分对号入座地收编入队。
 
 ```{r}
 long <- df %>%
@@ -78,7 +76,7 @@ long <- df %>%
 long
 ```
 
-
+然后，我们再转回宽表格，就实现了效果
 ```{r}
 long %>%
   pivot_wider(
@@ -87,32 +85,49 @@ long %>%
   )
 ```
 
-## 尝试3
 
-更简洁的方法
+## 尝试3 （口是心非、偷梁换柱的.value）
 
+承上内容，原列名被一分为二，于是 `names_to` 指定两个新列名对接。
 ```{r}
 df %>%
   pivot_longer(
     cols = rt_word:acc_nonword,
-    names_to = c(".value", "condition"), # .value 代替了 values_to 
-    names_sep = "_"
+    names_sep = "_",
+    names_to = c("index", "condition")  
   )
 ```
 
-旋转成长表格，一般要指定`names_to`和 `values_to`. 
-但是，如果 `names_to` 指定的字符串向量中含有".value"，那么旧的列名在经过 `names_sep` 或 `names_pattern` 分割后，".value"所对应或匹配的那部分，被当作新value列的列名，`values_to`就可以省略了。即 .value 代替了 values_to 
 
+但是，如果`names_to`指定的字符串向量中含有".value"，情况有所不同。这个".value"有着特殊使命，它所对应的那部分，不再聚合，而是维持列名的身份，并充当新value列的列名，相当于 .value 随便还干了`values_to`的工作。因此，最后的`values_to`也就不用写了。
 
 ```{r}
 longer <- df %>%
   pivot_longer(
     cols = rt_word:acc_nonword,
-    names_to = c(".value", "condition"),
-    names_pattern = "(.*)_(.*)"
+    names_sep = "_",
+    names_to = c(".value", "condition") # .value 代替了 values_to 
   )
 longer
 ```
+
+
+**好一个偷梁换柱**：初见上面的代码，给人的感觉是，原列名被一分为二，`names_to`指定两个新列名对接。
+这里的conditions很忠诚，它把它匹配到的"word"和"nonword"整编入队。但是，`.value`口是心非，她表面上匹配到"rt"和"acc"后，但实际上不让他们聚合，而是让"rt"和"acc"继续充当列名，并让值对号入座地规整到"rt"和"acc"名下，即，`values_to = c("rt","acc")`。整个过程相当于，`.value`偷来本该去站队的"rt"和"acc"，摇身一变，变成了两个首领。
+
+
+
+与`.value`一样有着特殊使命的符号，还有一个`NA`
+```{r}
+df %>%
+  pivot_longer(
+    cols = rt_word:acc_nonword,
+    names_sep = "_",
+    names_to = c(NA, "condition")
+  )
+```
+
+
 
 
 
@@ -123,11 +138,6 @@ longer
 ```{r, out.width = '100%', fig.align='left', echo = FALSE}
 knitr::include_graphics("images/correct_format2.png")
 ```
-
-```{r}
-longer
-```
-
 
 
 ```{r}
