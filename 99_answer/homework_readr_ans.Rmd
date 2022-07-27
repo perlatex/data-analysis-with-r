@@ -40,8 +40,7 @@ kidiq
 - 保存为`xlsx`文件
 
 ```{r}
-kidiq %>% 
-  openxlsx::write.xlsx("kidiq.xlsx")
+openxlsx::write.xlsx(kidiq, "kidiq.xlsx")
 ```
 
 - 读取刚刚保存的`xlsx`文件
@@ -54,7 +53,7 @@ df
 - 保存为`csv`文件到demo_data文件夹下
 
 ```{r}
-df %>% write_csv("./demo_data/kidiq_new.csv")
+write_csv(df, "./demo_data/kidiq_new.csv")
 ```
 
 

@@ -47,6 +47,17 @@ prostate %>%
 - `rbc_age_group` 代表血液存储时间，原数据中用的1，2，3，希望用"Younger", "Middle", "Older"
 
 ```{r}
+prostate %>%
+  mutate(
+    rbc_age_group_new = factor(rbc_age_group,
+      levels = c(1, 2, 3),
+      labels = c("Younger", "Middle", "Older")
+    )
+  )
+```
+
+或者
+```{r}
 df <- prostate %>% 
   mutate(
     rbc_age_group_new = case_when(
