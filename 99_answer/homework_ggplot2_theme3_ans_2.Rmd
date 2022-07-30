@@ -1,0 +1,114 @@
+---
+title: "penguins bubble"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 作业
+
+第一眼看到这张图，就被吸引住了，挺好看的，我们重复试试。
+
+```{r, echo=FALSE, out.width='85%'}
+knitr::include_graphics("images/penguins-bubble.png")
+```
+
+
+# 开始
+```{r setup, include=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+penguins <- penguins %>% drop_na()
+```
+
+
+```{r}
+library(showtext)
+font_add_google(name = "Roboto Condensed")
+
+showtext_auto()
+font_families()
+```
+
+
+```{r}
+font       <- "Roboto Condensed"
+font_color <- "#1A1A1A"    # gray
+line_color <- "#666666"    # lighter gray
+bcolor     <- "white"       
+
+theme_set(theme_minimal(base_size = 12, base_family = font))
+
+theme_update(
+    panel.grid.minor      = element_blank(),
+    panel.grid.major      = element_line(color = line_color, size = 0.3),
+    panel.background      = element_rect(fill = bcolor, color = NA),
+    plot.background       = element_rect(fill = bcolor, color = NA),
+    legend.background     = element_blank(),
+    legend.key            = element_blank(),
+    legend.text           = element_text(size = 12, color = font_color),
+    legend.title          = element_text(size = 12, color = font_color),
+    axis.title            = element_text(size = 12, color = font_color),
+    axis.text             = element_text(size = 12, color = font_color),
+    axis.ticks            = element_line(size = 0),
+    axis.line             = element_line(color = line_color, size = 0.3),
+    plot.title            = element_text(size = 14, color = font_color, lineheight = 0.3),
+    plot.subtitle         = element_text(size = 12, color = font_color, lineheight = 0.3),
+    plot.caption          = element_text(size = 10, color = font_color, hjust = 1),
+    plot.title.position   = "plot",
+    plot.caption.position = "plot"
+  ) 
+```
+
+
+```{r, fig.width = 6, fig.height = 3.7, fig.retina = 1, dpi= 300, dev = 'ragg_png'}
+penguins %>% 
+  drop_na() %>% 
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point(
+    aes(size = body_mass_g, fill = after_scale(alpha(color, 0.4))), 
+    shape = 21
+  ) +
+  coord_cartesian(clip = "off") +
+  scale_x_continuous(
+    name = "Bill length (mm)",
+    limits = c(30, 60),
+    breaks = scales::breaks_width(width = 5),
+    expand = expansion(0, 0)
+  ) +
+  scale_y_continuous(
+    name = "Bill depth (mm)",
+    limits = c(12.5, 22.5),
+    breaks = scales::breaks_width(width = 2.5),
+    expand = expansion(0, 0)
+  ) +
+  scale_size(
+    name   = "Body mass:",
+    range  = c(1, 6),
+    breaks = c(3000, 4000, 5000, 6000),
+    labels = c("3 kg", "4 kg", "5 kg", "6 kg")
+  ) +
+  scale_color_manual(
+    name   = "Speices:",
+    values = c("#F2B263", "#B980F2", "#1B8B8E")
+  ) +
+  guides(
+    size  = guide_legend(order = 1, override.aes = list(shape = 21, fill = "gray", color = "black")),
+    color = guide_legend(order = 2, override.aes = list(size = 3))
+  ) +
+  labs(
+    title = "Bill dimensions of brush-tailed penguins Pygoscelis spec.",
+    caption = "Horst AM, Hill AP, Gorman KB (2020), palmerpenguins R package version 0.1.0"
+  ) 
+```
+
+

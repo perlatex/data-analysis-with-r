@@ -1,0 +1,42 @@
+---
+title: "penguins bubble"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+# 作业
+
+第一眼看到这张图，就被吸引住了，挺好看的，我们重复试试。
+
+```{r, echo=FALSE, out.width='85%'}
+knitr::include_graphics("images/penguins-bubble.png")
+```
+
+
+
+# 开始
+```{r setup, include=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+penguins <- penguins %>% drop_na()
+```
+
+
+```{r}
+library(showtext)
+font_add_google(name = "Roboto Condensed")
+
+showtext_auto()
+font_families()
+```
+
+

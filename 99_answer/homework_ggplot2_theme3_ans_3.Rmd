@@ -1,0 +1,97 @@
+---
+title: "penguins bubble"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 作业
+
+第一眼看到这张图，就被吸引住了，挺好看的，我们重复试试。
+
+```{r, echo=FALSE, out.width='85%'}
+knitr::include_graphics("images/penguins-bubble.png")
+```
+
+
+
+# 开始
+```{r setup, include=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+penguins <- penguins %>% drop_na()
+```
+
+
+```{r}
+library(showtext)
+font_add_google(name = "Roboto Condensed")
+
+showtext_auto()
+font_families()
+```
+
+
+
+
+```{r, fig.width=6, fig.height = 3.7, fig.retina = 1, dpi= 300, dev='ragg_png'}
+penguins %>% 
+  ggplot(
+    aes(x = bill_length_mm, y = bill_depth_mm, color = species, size = body_mass_g)
+  ) +
+  geom_point(alpha = .2, stroke = .3) +
+  geom_point(shape = 1, stroke = .3) +
+
+  scale_color_manual(
+    name = "Species:",
+    values = c("#FF8C00", "#A034F0", "#159090")
+  ) +
+  scale_size(
+    name = "Body mass:",
+    breaks = 3:6 * 1000,
+    labels = function(x) paste(x / 1000, "kg"),
+    range = c(.5, 5)
+  ) +
+  coord_cartesian(
+    expand = FALSE,
+    clip = "off"
+  ) +
+  scale_x_continuous(
+    limits = c(30, 60),
+    breaks = 6:12*5
+  ) +
+  scale_y_continuous(
+    limits = c(12.5, 22.5),
+    breaks = seq(12.5, 22.5, by = 2.5)
+  ) +
+  labs(
+    x = "Bill length (mm)",
+    y = "Bill depth (mm)",
+    title = "Bill dimensions of brush-tailed penguins Pygoscelis spec.",
+    caption = "Horst AM, Hill AP, Gorman KB (2020). palmerpenguins R package version 0.1.0"
+  ) +
+  theme_minimal(base_size = 10, base_family = "Roboto Condensed") +
+  theme(
+    panel.grid.minor      = element_blank(),
+    plot.margin           = margin(0, 14, 0, 12),
+    plot.background       = element_rect(fill = NA, color = "grey50", size = 1),
+    plot.title.position   = "plot",
+    plot.caption.position = "plot",
+    plot.title            = element_markdown(face = "bold", size = 16, margin = margin(12, 0, 12, 0)),
+    plot.caption          = element_markdown(size = 8, color = "grey50", margin = margin(12, 0, 6, 0)),
+    axis.title.x          = element_markdown(margin = margin(t = 8)),
+    axis.title.y          = element_markdown(margin = margin(r = 8)),
+    legend.text           = element_text(color = "grey50")
+  )
+
+```
+
